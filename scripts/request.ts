@@ -14,7 +14,7 @@ export interface HttpMethods {
 export type HttpMethod = GetPropsWithTrueValue<HttpMethods>;
 
 export interface RequestInitializationData {
-	readonly method: HttpMethods;
+	readonly method: HttpMethod;
 	readonly headers: Partial<Record<string, string>>;
 	readonly url: string;
 	readonly host: string;
@@ -26,7 +26,7 @@ export interface RequestInitializationData {
 }
 
 export class Request implements RequestInitializationData {
-	public method: HttpMethods;
+	public method: HttpMethod;
 
 	public headers: Partial<Record<string, string>>;
 

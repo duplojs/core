@@ -31,7 +31,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_OWNER: ${{ github.repository_owner }}
-          GITHUB_REPO: echo "${{ github.repository }}" | cut -d'/' -f2
+          GITHUB_REPO: core
           GITHUB_BRANCHE: develop
           REGEXP_PATCH: '^fix'
           REGEXP_MINOR: '^feat'

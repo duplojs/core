@@ -10,8 +10,8 @@
     "build:types": "tsc -p tsconfig.types.json",
     "build": "npm run build:types && npm run build:scripts",
 
-    "test:tu": "vitest",
-    "test:tu:watch": "vitest --watch",
+    "test:tu": "vitest --coverage",
+    "test:tu:watch": "vitest --coverage --watch",
     "test:types": "tsc && tsc -p test/overrideTypes/tsconfig.json",
 	"test:lint": "eslint",
 	"test:lint:fix": "eslint --fix",

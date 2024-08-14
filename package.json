@@ -12,7 +12,7 @@
 
     "test:tu": "vitest",
     "test:tu:watch": "vitest --watch",
-    "test:types": "tsc",
+    "test:types": "tsc && tsc -p test/overrideTypes/tsconfig.json",
 	"test:lint": "eslint",
 	"test:lint:fix": "eslint --fix",
 	

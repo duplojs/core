@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 import { CurrentRequestObject, HttpMethod } from "@scripts/request";
 import { ExpectType } from "@utils/expectType";
 
@@ -13,6 +11,10 @@ declare module "@scripts/request" {
 	}
 }
 
-type CheckOverrideRequestObject = ExpectType<string, CurrentRequestObject>;
+type CheckOverrideRequestObject = ExpectType<string, CurrentRequestObject, "strict">;
 
-type CheckNewHttpMethod = ExpectType<HttpMethod, "TRACE">;
+type CheckNewHttpMethod = ExpectType<
+	HttpMethod,
+	"GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "HEAD" | "TRACE",
+	"strict"
+>;

@@ -16,6 +16,16 @@ export default [
 				afterAll: true,
 			},
 		},
+		rules: {
+			...duploLint.rules,
+			"no-magic-numbers": "off",
+			"no-unused-vars": "off",
+		},
+		files: ["**/*.test.ts", "test/**/*.ts"],
+	},
+	{
+		...duploLint,
 		files: ["**/*.{ts,js}"],
+		ignores: ["**/*.test.ts", "test/**/*.ts"],
 	},
 ];

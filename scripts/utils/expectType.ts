@@ -1,4 +1,4 @@
-export type ExpectType<
+export interface ExpectType<
 	T extends any,
 	A extends T,
 	_R extends (
@@ -11,7 +11,7 @@ export type ExpectType<
 			: "strict"
 	),
 
-> = {
+> {
 	A: A;
 	T: T;
-};
+}

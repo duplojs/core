@@ -1,5 +1,5 @@
-import { AnyFunction, ObjectEntry, ObjectKey } from "./types";
-import { UnionToIntersection } from "./unionToIntersection";
+import type { AnyFunction, ObjectEntry, ObjectKey } from "./types";
+import type { UnionToIntersection } from "./unionToIntersection";
 
 export type EntriesToMapper<E extends ObjectEntry> =
 	UnionToIntersection<

@@ -1,4 +1,4 @@
-import { GetLastOfUnion } from "./getLastOfUnion";
+import type { GetLastOfUnion } from "./getLastOfUnion";
 
 export type PushElementToTuple<T extends any[], V> = [...T, V];
 

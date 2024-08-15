@@ -1,28 +1,28 @@
-import { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
-import { OverrideInterface } from "@utils/overrideInterface";
+import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
+import type { OverrideInterface } from "@utils/overrideInterface";
 
 export interface HttpMethods {
+	DELETE: true;
 	GET: true;
+	HEAD: true;
+	OPTIONS: true;
+	PATCH: true;
 	POST: true;
 	PUT: true;
-	PATCH: true;
-	DELETE: true;
-	OPTIONS: true;
-	HEAD: true;
 }
 
 export type HttpMethod = GetPropsWithTrueValue<HttpMethods>;
 
 export interface RequestInitializationData {
-	readonly method: HttpMethod;
 	readonly headers: Partial<Record<string, string>>;
-	readonly url: string;
 	readonly host: string;
-	readonly origin: string;
-	readonly path: string;
-	readonly params: Record<string, string>;
-	readonly query: Record<string, string | string[]>;
 	readonly matchedPath: string | null;
+	readonly method: HttpMethod;
+	readonly origin: string;
+	readonly params: Record<string, string>;
+	readonly path: string;
+	readonly query: Record<string, string | string[]>;
+	readonly url: string;
 }
 
 export class Request implements RequestInitializationData {
@@ -46,7 +46,7 @@ export class Request implements RequestInitializationData {
 
 	public body: unknown = undefined;
 
-	constructor(initializationData: RequestInitializationData) {
+	public constructor(initializationData: RequestInitializationData) {
 		this.method = initializationData.method;
 		this.headers = initializationData.headers;
 		this.url = initializationData.url;
@@ -59,6 +59,8 @@ export class Request implements RequestInitializationData {
 	}
 }
 
-export interface RequestObject {}
+export interface RequestObject {
+	empty: null;
+}
 
 export type CurrentRequestObject = OverrideInterface<{ override: Request }, RequestObject>["override"];

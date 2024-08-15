@@ -1,4 +1,4 @@
-import { UnionToIntersection } from "./unionToIntersection";
+import type { UnionToIntersection } from "./unionToIntersection";
 
 export type GetLastOfUnion<T> =
 	UnionToIntersection<

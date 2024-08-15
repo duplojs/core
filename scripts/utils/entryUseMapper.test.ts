@@ -1,5 +1,5 @@
 import { entryUseMapper } from "./entryUseMapper";
-import { ExpectType } from "./expectType";
+import type { ExpectType } from "./expectType";
 
 it("entryUseMapper", () => {
 	type Entries = ["test", { tt: string }] | ["lo", number];

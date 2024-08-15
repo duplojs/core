@@ -20,12 +20,20 @@ export default [
 			...duploLint.rules,
 			"no-magic-numbers": "off",
 			"no-unused-vars": "off",
+			"@typescript-eslint/no-unused-vars": "off",
+			"@typescript-eslint/no-magic-numbers": "off",
+			"@typescript-eslint/no-unnecessary-type-parameters": "off",
 		},
 		files: ["**/*.test.ts", "test/**/*.ts"],
 	},
 	{
 		...duploLint,
-		files: ["**/*.{ts,js}"],
+		rules: {
+			...duploLint.rules,
+			"@typescript-eslint/no-unnecessary-type-parameters": "off",
+			"@typescript-eslint/strict-boolean-expressions": "off",
+		},
+		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts"],
 	},
 ];

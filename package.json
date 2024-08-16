@@ -4,21 +4,17 @@
   "author": "mathcovax",
   "license": "ISC",
   "type": "module",
-
   "scripts": {
     "build:scripts": "rollup --config",
     "build:types": "tsc -p tsconfig.types.json",
     "build": "npm run build:types && npm run build:scripts",
-
-    "test:tu": "vitest",
-    "test:tu:watch": "vitest --watch",
-    "test:types": "tsc",
-	"test:lint": "eslint",
-	"test:lint:fix": "eslint --fix",
-	
+    "test:tu": "vitest --coverage",
+    "test:tu:watch": "vitest --coverage --watch",
+    "test:types": "tsc && tsc -p test/overrideTypes/tsconfig.json",
+    "test:lint": "eslint",
+    "test:lint:fix": "eslint --fix",
     "prepare": "husky"
   },
-
   "types": "./types/index.d.ts",
   "exports": {
     "default": {
@@ -31,15 +27,15 @@
     "dist",
     "types"
   ],
-
   "dependencies": {
     "mime": ">=4.0.4 <5.0.0",
+    "vite-tsconfig-paths": "^5.0.1",
     "zod": ">=3.23.8 <4.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
-    "@duplojs/eslint": "0.1.2",
+    "@duplojs/eslint": "0.2.0",
     "@types/node": "22.1.0",
     "@vitest/coverage-istanbul": "2.0.5",
     "eslint": "9.9.0",
@@ -49,6 +45,5 @@
     "typescript": "5.5.4",
     "vitest": "2.0.5"
   },
-
   "keywords": []
 }

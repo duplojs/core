@@ -13,25 +13,26 @@ export interface SafeEvalParams {
 }
 
 export const advancedEvalRules = [
-	/global/,
-	/globalThis/,
-	/window/,
-	/eval/,
-	/Function/,
-	/import/,
-	/require/,
-	/shadowEval/,
-	/Window/,
-	/document/,
-	/module/,
-	/process/,
+	"global",
+	"globalThis",
+	"window",
+	"eval",
+	"Function",
+	"import",
+	"require",
+	"shadowEval",
+	"Window",
+	"document",
+	"module",
+	"process",
+	"advancedEvalRules",
 ];
 
 export class AdvancedEvalError extends Error {
 	public constructor(
 		public functionInString: string,
 	) {
-		super("Function contain unsafe word.");
+		super(`Function contain unsafe word.\n Banned word: \n - ${advancedEvalRules.join("\n - ")}`);
 	}
 }
 
@@ -51,7 +52,7 @@ export function advancedEval<T extends unknown>({
 		}
 	)`;
 
-	if (!unsafe && !advancedEvalRules.every((regex) => !regex.test(functionInString))) {
+	if (!unsafe && !advancedEvalRules.every((keyword) => !functionInString.includes(keyword))) {
 		throw new AdvancedEvalError(functionInString);
 	}
 

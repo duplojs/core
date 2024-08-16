@@ -89,14 +89,14 @@ export class Hook<
 }
 
 export function makeHooksRouteLifeCycle<
-	request extends CurrentRequestObject = CurrentRequestObject,
+	Request extends CurrentRequestObject = CurrentRequestObject,
 >() {
 	return {
-		beforeRouteExecution: new Hook<[request: request]>(1),
-		parsingBody: new Hook<[request: request]>(1),
-		onError: new Hook<[request: request, error: unknown]>(2),
-		beforeSend: new Hook<[request: request, response: Response]>(2),
-		serializeBody: new Hook<[request: request, response: Response]>(2),
-		afterSend: new Hook<[request: request, response: Response]>(2),
+		beforeRouteExecution: new Hook<[request: Request]>(1),
+		parsingBody: new Hook<[request: Request]>(1),
+		onError: new Hook<[request: Request, error: unknown]>(2),
+		beforeSend: new Hook<[request: Request, response: Response]>(2),
+		serializeBody: new Hook<[request: Request, response: Response]>(2),
+		afterSend: new Hook<[request: Request, response: Response]>(2),
 	};
 }

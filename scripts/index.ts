@@ -2,7 +2,9 @@ export * from "./request";
 export * from "./response";
 export * from "./response/simplePreset";
 export * from "./response/advancedPreset";
+export * from "./hook";
 
+export * from "@utils/advancedEval";
 export * from "@utils/entryUseMapper";
 export * from "@utils/expectType";
 export * from "@utils/getLastOfUnion";

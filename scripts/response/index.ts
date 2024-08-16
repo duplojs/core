@@ -11,8 +11,6 @@ export class Response<
 
 	public body: Body;
 
-	public file: string | undefined;
-
 	public headers: Record<string, string | string[]> = {};
 
 	public constructor(

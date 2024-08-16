@@ -34,17 +34,6 @@ export class AcceptedHttpResponse<
 	public static readonly code = 202;
 }
 
-export class NoContentHttpResponse<
-	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
-> extends Response<typeof NoContentHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
-		super(NoContentHttpResponse.code, info, body);
-	}
-
-	public static readonly code = 204;
-}
-
 export class ResetContentHttpResponse<
 	Information extends string | undefined = undefined,
 	Body extends unknown = unknown,
@@ -263,6 +252,17 @@ export class ImATeapotHttpResponse<
 	}
 
 	public static readonly code = 418;
+}
+
+export class UnprocessableEntityHttpResponse<
+	Information extends string | undefined = undefined,
+	Body extends unknown = unknown,
+> extends Response<typeof UnprocessableEntityHttpResponse.code, Information, Body> {
+	public constructor(info: Information, body: Body) {
+		super(UnprocessableEntityHttpResponse.code, info, body);
+	}
+
+	public static readonly code = 422;
 }
 
 export class UpgradeRequiredHttpResponse<

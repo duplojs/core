@@ -1,13 +1,17 @@
-export class Floor<
+export interface Floor<
 	Data extends object = object,
 > {
-	private map = new Map();
+	pickup<Key extends keyof Data>(index: Key): Data[Key];
+	drop<Key extends keyof Data>(index: Key, value: Data[Key]): void;
+}
 
-	public pickup<Key extends keyof Data>(key: Key): Data[Key] {
-		return this.map.get(key);
-	}
+export function makeFloor(): Floor {
+	const data = new Map();
 
-	public drop<Key extends keyof Data>(key: Key, value: Data[Key]): void {
-		this.map.set(key, value);
-	}
+	return {
+		pickup: (index) => data.get(index),
+		drop: (index, value) => {
+			data.set(index, value);
+		},
+	};
 }

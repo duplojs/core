@@ -1,12 +1,14 @@
 import type { Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
-import { makeHooksRouteLifeCycle } from "@scripts/hook";
+import { copyHooks, makeHooksRouteLifeCycle, type HooksRouteLifeCycle } from "@scripts/hook";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
 import type { AnyFunction } from "@utils/types";
 import type { ZodError, ZodType } from "zod";
+import { ProcessStep } from "@scripts/step/process";
+import type { Duplo } from "@scripts/duplo";
 
-export type ErrorExtractFunction = (
+export type ExtractErrorFunction = (
 	type: keyof ExtractObject,
 	index: string,
 	error: ZodError
@@ -20,16 +22,22 @@ export interface ExtractObject {
 }
 
 export abstract class Duplose<
-	Request extends CurrentRequestObject = CurrentRequestObject,
-	_Extract extends ExtractObject = ExtractObject,
-	_Steps extends Step[] = [],
-	_Floor extends object = object,
+	BuildedFunction extends AnyFunction = any,
+	Request extends CurrentRequestObject = any,
+	_Preflight extends ProcessStep = any,
+	_Extract extends ExtractObject = any,
+	_Steps extends Step = any,
+	_Floor extends object = any,
 > {
+	public instance?: Duplo;
+
 	public hooks = makeHooksRouteLifeCycle<Request>();
+
+	public preflight: ProcessStep[] = [];
 
 	public extract?: ExtractObject;
 
-	public errorExtract?: ErrorExtractFunction;
+	public extractError?: ExtractErrorFunction;
 
 	public steps: Step[] = [];
 
@@ -45,17 +53,37 @@ export abstract class Duplose<
 
 	public setExtract(
 		extract: ExtractObject,
-		errorExtract: ErrorExtractFunction | undefined,
+		extractError: ExtractErrorFunction | undefined,
 		descriptions: Description[],
 	) {
 		this.extract = extract;
-		this.errorExtract = errorExtract;
+		this.extractError = extractError;
 		this.descriptions.push(...descriptions);
+	}
+
+	public addPreflight(preflight: ProcessStep) {
+		this.preflight.push(preflight);
 	}
 
 	public addStep(step: Step) {
 		this.steps.push(step);
 	}
 
-	public abstract toString(): string;
+	public copyHooks(base: HooksRouteLifeCycle<any>) {
+		copyHooks(base, this.hooks);
+
+		this.steps.forEach((step) => {
+			if (step instanceof ProcessStep) {
+				step.parent.copyHooks(base);
+			}
+		});
+
+		this.preflight.forEach((step) => {
+			if (step instanceof ProcessStep) {
+				step.parent.copyHooks(base);
+			}
+		});
+	}
+
+	public abstract build(): BuildedFunction;
 }

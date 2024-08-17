@@ -2,17 +2,19 @@ import type { AnyFunction } from "./types";
 
 const { eval: shadowEval } = global;
 
-export interface SafeEvalParams {
+export interface AdvancedEvalParams<
+	Context extends unknown = object,
+> {
 	args?: string[];
 	autoLaunch?: boolean;
-	bind?: object;
+	bind?: Context;
 	content: string;
 	forceAsync?: boolean;
 	name?: string;
 	unsafe?: boolean;
 }
 
-export const advancedEvalRules = [
+export const bannedWords = [
 	"global",
 	"globalThis",
 	"window",
@@ -25,14 +27,16 @@ export const advancedEvalRules = [
 	"document",
 	"module",
 	"process",
-	"advancedEvalRules",
+	"bannedWords",
+	"advancedEval",
 ];
 
 export class AdvancedEvalError extends Error {
 	public constructor(
+		public bannedWord: string,
 		public functionInString: string,
 	) {
-		super(`Function contain unsafe word.\n Banned word: \n - ${advancedEvalRules.join("\n - ")}`);
+		super(`Function contain unsafe word "${bannedWord}".`);
 	}
 }
 
@@ -44,7 +48,11 @@ export function advancedEval<T extends unknown>({
 	args = [],
 	name,
 	unsafe,
-}: SafeEvalParams): T {
+}: AdvancedEvalParams<
+	T extends AnyFunction
+		? ThisParameterType<T>
+		: object
+>): T {
 	const functionInString = `(
 		${content.includes("await") || forceAsync ? "async " : ""}function ${name || ""}(${args.join(", ")}){
 			"use strict";
@@ -52,8 +60,12 @@ export function advancedEval<T extends unknown>({
 		}
 	)`;
 
-	if (!unsafe && !advancedEvalRules.every((keyword) => !functionInString.includes(keyword))) {
-		throw new AdvancedEvalError(functionInString);
+	if (!unsafe) {
+		bannedWords.forEach((bannedWord) => {
+			if (functionInString.includes(bannedWord)) {
+				throw new AdvancedEvalError(bannedWord, functionInString);
+			}
+		});
 	}
 
 	let fnc = shadowEval(functionInString) as AnyFunction;

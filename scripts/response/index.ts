@@ -2,7 +2,7 @@ import { getTypedEntries } from "@utils/getTypedEntries";
 
 export class Response<
 	Code extends number = number,
-	Information extends string | undefined = undefined,
+	Information extends string | undefined = string | undefined,
 	Body extends unknown = unknown,
 > {
 	public code: Code;

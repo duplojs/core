@@ -1,18 +1,12 @@
 import { Step } from ".";
 import type { Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
-import { insertBlock } from "@utils/insertBlock";
-import type { Checker, CheckerOutput } from "@scripts/checker";
+import { condition, insertBlock, maybeAwait, skipStep, StringBuilder } from "@utils/stringBuilder";
+import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Floor } from "@scripts/floor";
 
-export interface CheckerGenericObject {
-	options: object;
-	input: unknown;
-	output: CheckerOutput;
-}
-
 export interface CheckerStepParams<
-	CheckerGeneric extends CheckerGenericObject = CheckerGenericObject,
+	CheckerGeneric extends GetCheckerGeneric = GetCheckerGeneric,
 	Info extends string | string[] = string,
 	Key extends string = string,
 	CatchResponse extends Response = Response,
@@ -20,7 +14,7 @@ export interface CheckerStepParams<
 	Skip extends (() => boolean) | undefined = undefined,
 > {
 	input(pickup: Floor<FloorData>["pickup"]): CheckerGeneric["input"];
-	result?:
+	result:
 		| (Info & CheckerGeneric["output"]["info"])
 		| (Info[] & CheckerGeneric["output"]["info"][]);
 	indexing?: Key;
@@ -51,9 +45,7 @@ export class CheckerStep extends Step<Checker> {
 				...checker.options,
 				...originalOptions(pickup),
 			});
-		}
-
-		if (typeof params.options === "object") {
+		} else if (params.options) {
 			params.options = {
 				...checker.options,
 				...params.options,
@@ -63,20 +55,52 @@ export class CheckerStep extends Step<Checker> {
 		this.params = params;
 	}
 
-	public toString(): string {
-		const async = this.parent.constructor.name === "AsyncFunction"
-			? "await "
-			: "";
-		return /* js */`
-		${insertBlock("step-cut-({index})-before-function")}
+	public toString(index: number) {
+		const async = this.parent.constructor.name === "AsyncFunction";
 
-		result = ${async}this.steps[{index}].parent(floor, request);
+		const options = typeof this.params.options === "function"
+			? /* js */`this.steps[${index}].params.options`
+			: /* js */`this.steps[${index}].params.options(${StringBuilder.floor}.pickup)`;
 
-		${insertBlock("step-cut-({index})-before-drop")}
+		const checkResult = this.params.result instanceof Array
+			? /* js */`this.steps[${index}].params.result !== ${StringBuilder.result}.info`
+			: /* js */`!this.steps[${index}].params.result.includes(${StringBuilder.result}.info)`;
 
-		${this.drop.map((key) => `floor.drop("${key}", result["${key}"]);`).join("\n")}
+		const indexing = condition(
+			Boolean(this.params.indexing),
+			() => /* js */`${StringBuilder.floor}.drop(this.steps[${index}].params.indexing, ${StringBuilder.result}.data)`,
+		);
 
-		${insertBlock("step-cut-({index})-after")}
-		`;
+		return skipStep(
+			Boolean(this.params.skip),
+			index,
+			/* js */`
+			${insertBlock(`step-checker-(${index})-before`)}
+
+			${StringBuilder.result} = ${maybeAwait(async)}this.steps[${index}].parent.handler(
+				this.steps[${index}].params.input(${StringBuilder.floor}.pickup),
+				(info, data) => ({info, data}),
+				${options},
+			);
+
+			${insertBlock(`step-checker-(${index})-before-treat-result`)}
+
+			if(${checkResult}){
+				${StringBuilder.result} = this.steps[${index}].params.catch(
+					${StringBuilder.result}.info, 
+					${StringBuilder.result}.data, 
+					${StringBuilder.floor}.pickup
+				);
+
+				break ${StringBuilder.label};
+			}
+
+			${insertBlock(`step-checker-(${index})-before-indexing`)}
+
+			${indexing}
+
+			${insertBlock(`step-checker-(${index})-after`)}
+			`,
+		);
 	}
 }

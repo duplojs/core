@@ -6,5 +6,5 @@ export abstract class Step<Parent extends any = any> {
 		public descriptions: Description[] = [],
 	) {}
 
-	public abstract toString(): string;
+	public abstract toString(index: number): string;
 }

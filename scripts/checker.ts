@@ -1,6 +1,20 @@
 import type { PromiseOrNot } from "@utils/types";
 import type { Description } from "./description";
 
+export type GetCheckerGeneric<
+	T extends Checker = Checker,
+> = T extends Checker<
+	infer Options,
+	infer Input,
+	infer Output
+>
+	? {
+		options: Options;
+		input: Input;
+		output: Output;
+	}
+	: never;
+
 export interface CheckerOutput<
 	Info extends string = string,
 	Data extends unknown = unknown,

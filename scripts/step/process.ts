@@ -11,7 +11,7 @@ export interface ProcessStepParams<
 	Skip extends (() => boolean) | undefined = undefined,
 > {
 	options?: Partial<ProcessGeneric["options"]> | ((pickup: Floor<FloorData>["pickup"]) => Partial<ProcessGeneric["options"]>);
-	pickup?: ProcessGeneric["drop"] & Pickup[];
+	pickup?: ProcessGeneric["drop"][] & Pickup[];
 	input?(pickup: Floor<FloorData>["pickup"]): ProcessGeneric["input"];
 	skip?: Skip;
 }

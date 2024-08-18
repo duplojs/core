@@ -68,7 +68,7 @@ export class Process<
 
 	public constructor(
 		name: string,
-		descriptions: Description[],
+		descriptions: Description[] = [],
 	) {
 		super(descriptions);
 

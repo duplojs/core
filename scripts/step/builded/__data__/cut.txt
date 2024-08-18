@@ -1,0 +1,29 @@
+
+		
+/* step-cut-(2)-before */
+/* end_block */
+
+
+		result = this.steps[2].cutFunction(floor, request);
+
+		
+/* step-cut-(2)-before-check-result */
+/* end_block */
+
+
+		if(result instanceof this.Response){
+break Execution;
+}
+
+		
+/* step-cut-(2)-before-drop */
+/* end_block */
+
+
+		floor.drop("test", result["test"]);
+
+		
+/* step-cut-(2)-after */
+/* end_block */
+
+		

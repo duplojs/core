@@ -1,4 +1,4 @@
-import type { ExpectType } from "./expectType";
+import type { ExpectType } from "../../test/utils/expectType";
 import { getTypedEntries } from "./getTypedEntries";
 
 it("getTypedEntries", () => {

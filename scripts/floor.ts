@@ -5,7 +5,9 @@ export interface Floor<
 	drop<Key extends keyof Data>(index: Key, value: Data[Key]): void;
 }
 
-export function makeFloor(): Floor {
+export function makeFloor<
+	Data extends object = object,
+>(): Floor<Data> {
 	const data = new Map();
 
 	return {

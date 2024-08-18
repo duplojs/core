@@ -1,4 +1,5 @@
-import { Hook, makeHooksRouteLifeCycle } from "./hook";
+import { getTypedEntries } from ".";
+import { Hook, copyHooks, makeHooksRouteLifeCycle } from "./hook";
 
 describe("hook", () => {
 	const hook = new Hook<(test?: boolean) => any>(1);
@@ -79,7 +80,7 @@ describe("hook", () => {
 		expect(testlaunch).toBe(false);
 	});
 
-	it("copy hook", async() => {
+	it("import hook", async() => {
 		let testlaunch = false;
 		const fnc1 = () => true;
 		const fnc = () => {
@@ -150,6 +151,17 @@ describe("hook", () => {
 		const hooks = makeHooksRouteLifeCycle();
 		Object.values(hooks).forEach((hook) => {
 			expect(hook).instanceOf(Hook);
+		});
+	});
+
+	it("copy HooksRouteLifeCycle", () => {
+		const hooks = makeHooksRouteLifeCycle();
+		const copyedHooks = makeHooksRouteLifeCycle();
+
+		copyHooks(hooks, copyedHooks);
+
+		getTypedEntries(hooks).forEach(([key, hook]) => {
+			expect(hook.hasSubscriber(copyedHooks[key])).toBe(true);
 		});
 	});
 });

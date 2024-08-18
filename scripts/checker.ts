@@ -47,13 +47,13 @@ export class Checker<
 		public descriptions: Description[] = [],
 	) {}
 
-	public setOptions(options: object, descriptions: Description[]) {
+	public setOptions(options: object, descriptions: Description[] = []) {
 		this.options = options;
 
 		this.descriptions.push(...descriptions);
 	}
 
-	public setHandler(handlerFunction: CheckerHandler, descriptions: Description[]) {
+	public setHandler(handlerFunction: CheckerHandler, descriptions: Description[] = []) {
 		this.handler = handlerFunction;
 
 		this.descriptions.push(...descriptions);

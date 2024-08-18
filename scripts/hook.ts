@@ -56,7 +56,7 @@ export class Hook<
 		}
 	}
 
-	public hasSubscriber(subscriber: subscriber | Hook<subscriber>) {
+	public hasSubscriber(subscriber: subscriber | Hook) {
 		return !!this.subscribers.find((fnc) => fnc === subscriber);
 	}
 

@@ -29,7 +29,6 @@ export * from "@scripts/error/lastStepMustBeHandlerError";
 export * from "@utils/addThis";
 export * from "@utils/advancedEval";
 export * from "@utils/entryUseMapper";
-export * from "@utils/expectType";
 export * from "@utils/getLastOfUnion";
 export * from "@utils/getPropsWithTrueValue";
 export * from "@utils/getTypedEntries";

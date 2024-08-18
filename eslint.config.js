@@ -27,6 +27,7 @@ export default [
 			"@typescript-eslint/no-shadow": "off",
 			"id-denylist": ["error", "tmp", "temp", "err", "e"],
 			"@typescript-eslint/member-ordering": "off",
+			"@typescript-eslint/unbound-method": "off",
 			"no-implicit-coercion": [
 				"error",
 				{
@@ -53,6 +54,7 @@ export default [
 					allow: ["!!"],
 				},
 			],
+			"@typescript-eslint/unbound-method": "off",
 		},
 		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],

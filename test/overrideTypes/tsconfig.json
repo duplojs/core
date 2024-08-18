@@ -4,7 +4,8 @@
     "baseUrl": "../../",
     "paths": {
 		"@utils/*": ["scripts/utils/*"],
-		"@scripts/*": ["scripts/*"]
+		"@scripts/*": ["scripts/*"],
+		"@test/*": ["test/*"]
 	}, 
   },
   "include": ["**/*.ts"],

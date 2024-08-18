@@ -7,6 +7,19 @@ import type { AnyFunction } from "@utils/types";
 import type { ZodError, ZodType } from "zod";
 import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
+import type { makeFloor } from "@scripts/floor";
+import type { BuildedStep } from "@scripts/step/builded";
+import type { BuildedProcessStep } from "@scripts/step/builded/process";
+
+export interface DuploseBuildedFunctionContext {
+	makeFloor: typeof makeFloor;
+	Response: typeof Response;
+	extract?: ExtractObject;
+	extractError: ExtractErrorFunction;
+	preflight: BuildedProcessStep[];
+	steps: BuildedStep[];
+	extensions: object;
+}
 
 export type ExtractErrorFunction = (
 	type: keyof ExtractObject,

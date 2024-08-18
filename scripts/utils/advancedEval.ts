@@ -2,12 +2,10 @@ import type { AnyFunction } from "./types";
 
 const { eval: shadowEval } = global;
 
-export interface AdvancedEvalParams<
-	Context extends unknown = object,
-> {
+export interface AdvancedEvalParams {
 	args?: string[];
 	autoLaunch?: boolean;
-	bind?: Context;
+	bind?: unknown;
 	content: string;
 	forceAsync?: boolean;
 	name?: string;
@@ -48,11 +46,7 @@ export function advancedEval<T extends unknown>({
 	args = [],
 	name,
 	unsafe,
-}: AdvancedEvalParams<
-	T extends AnyFunction
-		? ThisParameterType<T>
-		: object
->): T {
+}: AdvancedEvalParams): T {
 	const functionInString = `(
 		${content.includes("await") || forceAsync ? "async " : ""}function ${name || ""}(${args.join(", ")}){
 			"use strict";

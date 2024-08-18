@@ -1,7 +1,7 @@
 import { Hook, makeHooksRouteLifeCycle } from "./hook";
 
 describe("hook", () => {
-	const hook = new Hook<[test?: boolean]>(1);
+	const hook = new Hook<(test?: boolean) => any>(1);
 
 	beforeEach(() => {
 		hook.removeAllSubscriber();

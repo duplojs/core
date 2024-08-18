@@ -27,8 +27,15 @@ export default [
 			"@typescript-eslint/no-shadow": "off",
 			"id-denylist": ["error", "tmp", "temp", "err", "e"],
 			"@typescript-eslint/member-ordering": "off",
+			"no-implicit-coercion": [
+				"error",
+				{
+					allow: ["!!"],
+				},
+			],
 		},
 		files: ["**/*.test.ts", "test/**/*.ts"],
+		ignores: ["**/*.d.ts"]
 	},
 	{
 		...duploLint,
@@ -40,8 +47,14 @@ export default [
 			"@typescript-eslint/no-magic-numbers": "off",
 			"id-denylist": ["error", "tmp", "temp", "err", "e"],
 			"@typescript-eslint/member-ordering": "off",
+			"no-implicit-coercion": [
+				"error",
+				{
+					allow: ["!!"],
+				},
+			],
 		},
 		files: ["**/*.ts"],
-		ignores: ["**/*.test.ts", "test/**/*.ts"],
+		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],
 	},
 ];

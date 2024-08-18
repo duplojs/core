@@ -1,4 +1,5 @@
 import type { Description } from "@scripts/description";
+import type { BuildedStep } from "./builded";
 
 export abstract class Step<Parent extends any = any> {
 	public constructor(
@@ -6,5 +7,5 @@ export abstract class Step<Parent extends any = any> {
 		public descriptions: Description[] = [],
 	) {}
 
-	public abstract toString(index: number): string;
+	public abstract build(): BuildedStep;
 }

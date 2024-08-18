@@ -1,26 +1,41 @@
 import type { CurrentRequestObject, HttpMethod } from "@scripts/request";
 import { Response } from "@scripts/response";
-import { Duplose, type ExtractObject, type ExtractErrorFunction } from ".";
+import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext } from ".";
 import type { Step } from "@scripts/step";
 import type { Description } from "@scripts/description";
 import type { ProcessStep } from "@scripts/step/process";
 import { advancedEval } from "@utils/advancedEval";
-import { checkResult, condition, extractPart, insertBlock, StringBuilder } from "@utils/stringBuilder";
+import { checkResult, condition, extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { copyHooks, makeHooksRouteLifeCycle, type BuildedHooksRouteLifeCycle } from "@scripts/hook";
 import { makeFloor } from "@scripts/floor";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
+import { simpleClone } from "@utils/simpleClone";
+import { HandlerStep } from "@scripts/step/handler";
+import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
 
-interface RouteBuildedFunctionContext {
+interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext {
 	hooks: BuildedHooksRouteLifeCycle;
-	makeFloor: typeof makeFloor;
-	Response: typeof Response;
-	extract?: ExtractObject;
-	extractError: ExtractErrorFunction;
-	preflight: ProcessStep[];
-	steps: Step[];
 }
 
 type RouteBuildedFunction = (this: RouteBuildedFunctionContext, request: CurrentRequestObject) => Promise<void>;
+
+export type GetRouteGeneric<
+	T extends Route = Route,
+> = T extends Route<
+	infer Request,
+	infer Preflight,
+	infer Extract,
+	infer Steps,
+	infer Floor
+>
+	? {
+		request: Request;
+		preflight: Preflight;
+		extract: Extract;
+		steps: Steps;
+		floor: Floor;
+	}
+	: never;
 
 export class Route<
 	Request extends CurrentRequestObject = CurrentRequestObject,
@@ -55,13 +70,21 @@ export class Route<
 			throw new BuildNoRegisteredDuploseError(this);
 		}
 
+		if (!(this.steps.at(-1) instanceof HandlerStep)) {
+			throw new LastStepMustBeHandlerError(this);
+		}
+
 		const hooks = makeHooksRouteLifeCycle<Request>();
 
 		this.copyHooks(hooks);
 		copyHooks(hooks, this.instance.hooksRouteLifeCycle);
 
+		const buildedPreflight = this.preflight.map(
+			(step) => step.build(),
+		);
+
 		const bodyTreat = condition(
-			Boolean(this.extract?.body),
+			!!this.extract?.body,
 			() => /* js */`
 			if(request.body === undefined){
 				${insertBlock("hook-parsingBody-before")}
@@ -77,9 +100,9 @@ export class Route<
 			`,
 		);
 
-		const steps = this.steps.map(
-			(step, index) => step.toString(index),
-		).join("\n");
+		const buildedStep = this.steps.map(
+			(step) => step.build(),
+		);
 
 		const content = /* js */`
 		let ${StringBuilder.floor} = this.makeFloor();
@@ -89,7 +112,7 @@ export class Route<
 			${StringBuilder.label}: {
 				${insertBlock("hook-beforeRouteExecution-before")}
 
-				${StringBuilder.result} = ${condition(Boolean(hooks.onError.subscribers.length), () => `await this.hooks.beforeRouteExecution(${StringBuilder.request})`)}}
+				${StringBuilder.result} = ${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.beforeRouteExecution(${StringBuilder.request})`)}}
 				
 				${insertBlock("hook-beforeRouteExecution-before-check-result")}
 
@@ -97,13 +120,19 @@ export class Route<
 
 				${insertBlock("hook-beforeRouteExecution-after")}
 
+				${insertBlock("preflight-before")}
+
+				${mapped(buildedPreflight, (value, index) => value.toString(index))}
+
+				${insertBlock("preflight-after")}
+
 				${bodyTreat}
 
 				${extractPart(this.extract)}
 
 				${insertBlock("steps-before")}
 
-				${steps}
+				${mapped(buildedStep, (value, index) => value.toString(index))}
 
 				${insertBlock("steps-after")}
 
@@ -113,23 +142,23 @@ export class Route<
 
 			${insertBlock("hook-beforeSend-before")}
 
-			${condition(Boolean(hooks.onError.subscribers.length), () => `await this.hooks.beforeSend(${StringBuilder.request}, ${StringBuilder.result})`)}
+			${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.beforeSend(${StringBuilder.request}, ${StringBuilder.result})`)}
 
 			${insertBlock("hook-beforeSend-after")}
 			${insertBlock("hook-serializeBody-before")}
 
-			${condition(Boolean(hooks.onError.subscribers.length), () => `await this.hooks.serializeBody(${StringBuilder.request}, ${StringBuilder.result})`)}
+			${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.serializeBody(${StringBuilder.request}, ${StringBuilder.result})`)}
 
 			${insertBlock("hook-serializeBody-after")}
 			${insertBlock("hook-afterSend-before")}
 
-			${condition(Boolean(hooks.onError.subscribers.length), () => `await this.hooks.afterSend(${StringBuilder.request}, ${StringBuilder.result})`)}
+			${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.afterSend(${StringBuilder.request}, ${StringBuilder.result})`)}
 
 			${insertBlock("hook-afterSend-after")}
 		} catch (error) {
 			${insertBlock("hook-onError-before")}
 
-			${condition(Boolean(hooks.onError.subscribers.length), () => `await this.hooks.onError(${StringBuilder.request}, error)`)}
+			${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.onError(${StringBuilder.request}, error)`)}
 
 			${insertBlock("hook-onError-after")}
 		}
@@ -137,6 +166,7 @@ export class Route<
 
 		return advancedEval<RouteBuildedFunction>({
 			forceAsync: true,
+			args: [StringBuilder.request],
 			content,
 			bind: {
 				hooks: {
@@ -149,11 +179,12 @@ export class Route<
 				},
 				makeFloor,
 				Response,
-				extract: this.extract,
+				extract: simpleClone(this.extract),
 				extractError: this.extractError ?? this.instance.extractError,
-				preflight: this.preflight,
-				steps: this.steps,
-			},
+				preflight: buildedPreflight,
+				steps: buildedStep,
+				extensions: simpleClone(this.extensions),
+			} satisfies RouteBuildedFunctionContext,
 		});
 	}
 }

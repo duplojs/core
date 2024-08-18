@@ -2,7 +2,6 @@ import { advancedEval } from "@utils/advancedEval";
 import type { AnyFunction, PromiseOrNot } from "@utils/types";
 import type { CurrentRequestObject } from "./request";
 import type { Response } from "./response";
-import type { AddThis } from "@utils/addThis";
 
 export class Hook<
 	subscriber extends AnyFunction = AnyFunction,
@@ -58,7 +57,7 @@ export class Hook<
 	}
 
 	public hasSubscriber(subscriber: subscriber | Hook<subscriber>) {
-		return Boolean(this.subscribers.find((fnc) => fnc === subscriber));
+		return !!this.subscribers.find((fnc) => fnc === subscriber);
 	}
 
 	public build() {
@@ -72,7 +71,7 @@ export class Hook<
 			if(${(fnc.constructor.name === "AsyncFunction" ? "await " : "")}this.subscribers[${index}](${mapArgs}) === true) return;
 		`).join("");
 
-		return advancedEval<AddThis<subscriber, { subscribers: subscriber[] }>>({
+		return advancedEval<subscriber>({
 			content: functionContent,
 			args: [mapArgs],
 			bind: { subscribers },

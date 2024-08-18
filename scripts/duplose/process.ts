@@ -1,9 +1,21 @@
 import type { CurrentRequestObject } from "@scripts/request";
-import { Duplose, type ExtractObject } from ".";
+import { Response } from "@scripts/response";
+import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext } from ".";
 import type { Step } from "@scripts/step";
-import type { AnyFunction } from "@utils/types";
 import type { ProcessStep } from "@scripts/step/process";
 import type { Description } from "@scripts/description";
+import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
+import { advancedEval } from "@utils/advancedEval";
+import { extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
+import { simpleClone } from "@utils/simpleClone";
+import { makeFloor } from "@scripts/floor";
+
+export type ProcessBuildedFunction = (
+	this: DuploseBuildedFunctionContext,
+	request: CurrentRequestObject,
+	options?: object,
+	input?: unknown
+) => Promise<void>;
 
 export type GetProcessGeneric<
 	T extends Process = Process,
@@ -39,7 +51,7 @@ export class Process<
 	_Steps extends Step = Step,
 	_Floor extends object = object,
 > extends Duplose<
-		AnyFunction,
+		ProcessBuildedFunction,
 		Request,
 		_Preflight,
 		_Extract,
@@ -76,6 +88,65 @@ export class Process<
 	}
 
 	public build() {
+		if (!this.instance) {
+			throw new BuildNoRegisteredDuploseError(this);
+		}
 
+		const buildedPreflight = this.preflight.map(
+			(step) => step.build(),
+		);
+
+		const buildedStep = this.steps.map(
+			(step) => step.build(),
+		);
+
+		const drop = mapped(
+			this.drop ?? [],
+			(key) => /* js */`"${key}": floor.pickup("${key}"),`,
+		);
+
+		const content = /* js */`
+		let ${StringBuilder.floor} = this.makeFloor();
+		let ${StringBuilder.result} = undefined;
+		floor.drop("options", ${StringBuilder.options});
+		floor.drop("input", ${StringBuilder.input});
+		${StringBuilder.label}: {
+			${insertBlock("preflight-before")}
+
+			${mapped(buildedPreflight, (value, index) => value.toString(index))}
+
+			${insertBlock("preflight-after")}
+			
+			${extractPart(this.extract)}
+
+			${insertBlock("steps-before")}
+
+			${mapped(buildedStep, (value, index) => value.toString(index))}
+
+			${insertBlock("steps-after")}
+		}
+		if(${StringBuilder.result} instanceof this.Response){
+			return result;
+		}
+		else {
+			return {
+				${drop}
+			};
+		}
+		`;
+
+		return advancedEval<ProcessBuildedFunction>({
+			args: [StringBuilder.request, StringBuilder.options, StringBuilder.input],
+			content,
+			bind: {
+				makeFloor,
+				Response,
+				extract: simpleClone(this.extract),
+				extractError: this.extractError ?? this.instance.extractError,
+				preflight: buildedPreflight,
+				steps: buildedStep,
+				extensions: simpleClone(this.extensions),
+			} satisfies DuploseBuildedFunctionContext,
+		});
 	}
 }

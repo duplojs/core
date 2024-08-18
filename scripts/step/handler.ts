@@ -1,31 +1,26 @@
 import type { PromiseOrNot } from "@utils/types";
 import { Step } from ".";
 import type { Description } from "@scripts/description";
-import { BuildedCutStep } from "./builded/cut";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Response } from "@scripts/response";
 import type { Floor } from "@scripts/floor";
+import { BuildedHandlerStep } from "./builded/handler";
 
-export type Cut<
+export type Handler<
 	FloorData extends object = object,
 	Request extends CurrentRequestObject = CurrentRequestObject,
 	CurrentResponse extends Response = Response,
-	ReturnValue extends object = object,
-> = (floor: Floor<FloorData>, request: Request) => PromiseOrNot<NoInfer<CurrentResponse> | ReturnValue>;
+> = (floor: Floor<FloorData>, request: Request) => PromiseOrNot<NoInfer<CurrentResponse>>;
 
-export class CutStep extends Step<Cut> {
-	public drop: string[];
-
+export class HandlerStep extends Step<Handler> {
 	public constructor(
-		cutFunction: Cut,
-		drop: string[] = [],
+		handlerFunction: Handler,
 		descriptions: Description[] = [],
 	) {
-		super(cutFunction, descriptions);
-		this.drop = drop;
+		super(handlerFunction, descriptions);
 	}
 
 	public build() {
-		return new BuildedCutStep(this);
+		return new BuildedHandlerStep(this);
 	}
 }

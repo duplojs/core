@@ -10,6 +10,10 @@ export class StringBuilder {
 	public static label = "Execution";
 
 	public static request = "request";
+
+	public static options = "options";
+
+	public static input = "input";
 }
 
 export function mapped<T extends any[]>(
@@ -20,7 +24,7 @@ export function mapped<T extends any[]>(
 }
 
 export function spread(...args: string[]) {
-	return args.filter((value) => Boolean(value)).join("\n");
+	return args.filter((value) => !!value).join("\n");
 }
 
 export function condition(bool: boolean, block: () => string) {
@@ -56,7 +60,7 @@ export function extractLevelOne(one: string) {
 	${insertBlock(`extract-(${one})-before`)}
 
 	{
-		let temp = this.extracted["${one}"].safeParse(request["${one}"])
+		let temp = this.extracted["${one}"].safeParse(${StringBuilder.request}["${one}"])
 
 		if(!temp.success){
 			${StringBuilder.result} = this.extractError(
@@ -82,7 +86,7 @@ export function extractLevelTwo(one: string, two: string) {
 	${insertBlock(`extract-(${one})-(${two})-before`)}
 
 	{
-		let temp = this.extracted["${one}"]["${two}"].safeParse(request["${one}"]["${two}"])
+		let temp = this.extracted["${one}"]["${two}"].safeParse(${StringBuilder.request}["${one}"]["${two}"])
 
 		if(!temp.success){
 			${StringBuilder.result} = this.extractError(

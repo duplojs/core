@@ -1,9 +1,9 @@
 import { Step } from ".";
 import type { Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
-import { condition, insertBlock, maybeAwait, skipStep, StringBuilder } from "@utils/stringBuilder";
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Floor } from "@scripts/floor";
+import { BuildedCheckerStep } from "./builded/checker";
 
 export interface CheckerStepParams<
 	CheckerGeneric extends GetCheckerGeneric = GetCheckerGeneric,
@@ -38,69 +38,10 @@ export class CheckerStep extends Step<Checker> {
 		descriptions: Description[] = [],
 	) {
 		super(checker, descriptions);
-
-		if (typeof params.options === "function") {
-			const originalOptions = params.options;
-			params.options = (pickup) => ({
-				...checker.options,
-				...originalOptions(pickup),
-			});
-		} else if (params.options) {
-			params.options = {
-				...checker.options,
-				...params.options,
-			};
-		}
-
 		this.params = params;
 	}
 
-	public toString(index: number) {
-		const async = this.parent.constructor.name === "AsyncFunction";
-
-		const options = typeof this.params.options === "function"
-			? /* js */`this.steps[${index}].params.options`
-			: /* js */`this.steps[${index}].params.options(${StringBuilder.floor}.pickup)`;
-
-		const checkResult = this.params.result instanceof Array
-			? /* js */`this.steps[${index}].params.result !== ${StringBuilder.result}.info`
-			: /* js */`!this.steps[${index}].params.result.includes(${StringBuilder.result}.info)`;
-
-		const indexing = condition(
-			Boolean(this.params.indexing),
-			() => /* js */`${StringBuilder.floor}.drop(this.steps[${index}].params.indexing, ${StringBuilder.result}.data)`,
-		);
-
-		return skipStep(
-			Boolean(this.params.skip),
-			index,
-			/* js */`
-			${insertBlock(`step-checker-(${index})-before`)}
-
-			${StringBuilder.result} = ${maybeAwait(async)}this.steps[${index}].parent.handler(
-				this.steps[${index}].params.input(${StringBuilder.floor}.pickup),
-				(info, data) => ({info, data}),
-				${options},
-			);
-
-			${insertBlock(`step-checker-(${index})-before-treat-result`)}
-
-			if(${checkResult}){
-				${StringBuilder.result} = this.steps[${index}].params.catch(
-					${StringBuilder.result}.info, 
-					${StringBuilder.result}.data, 
-					${StringBuilder.floor}.pickup
-				);
-
-				break ${StringBuilder.label};
-			}
-
-			${insertBlock(`step-checker-(${index})-before-indexing`)}
-
-			${indexing}
-
-			${insertBlock(`step-checker-(${index})-after`)}
-			`,
-		);
+	public build() {
+		return new BuildedCheckerStep(this);
 	}
 }

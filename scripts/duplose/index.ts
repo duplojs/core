@@ -23,7 +23,7 @@ export interface DuploseBuildedFunctionContext {
 
 export type ExtractErrorFunction = (
 	type: keyof ExtractObject,
-	index: string,
+	key: string,
 	error: ZodError
 ) => Response;
 

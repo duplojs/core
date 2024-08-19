@@ -7,7 +7,7 @@ export class Duplo {
 
 	public hooksRouteLifeCycle = makeHooksRouteLifeCycle();
 
-	public extractError: ExtractErrorFunction = (type, index, error) => new UnprocessableEntityHttpResponse(`TYPE_ERROR.${type}${index ? "" : ""}`, error);
+	public extractError: ExtractErrorFunction = (type, key, error) => new UnprocessableEntityHttpResponse(`TYPE_ERROR.${type}${key ? `.${key}` : ""}`, error);
 
 	public register(duplose: Duplose) {
 		duplose.instance = this;

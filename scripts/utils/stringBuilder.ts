@@ -23,7 +23,7 @@ export function mapped<T extends any[]>(
 	return arr.map(callback).join("\n");
 }
 
-export function spread(...args: string[]) {
+export function spread(...args: (string | false | undefined | null)[]) {
 	return args.filter((value) => !!value).join("\n");
 }
 

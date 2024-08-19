@@ -1,0 +1,29 @@
+
+	
+/* extract-(params)-(userId)-before */
+/* end_block */
+
+
+	{
+		let temp = this.extracted["params"]["userId"].safeParse(request["params"]["userId"])
+
+		if(!temp.success){
+			result = this.extractError(
+				"params",
+				"userId",
+				temp.error,
+			);
+			break Execution;
+		}
+
+		floor.drop(
+			"userId",
+			temp.data,
+		);
+	}
+
+	
+/* extract-(params)-(userId)-after */
+/* end_block */
+
+	

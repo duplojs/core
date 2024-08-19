@@ -14,6 +14,7 @@ describe("BuildedProcessStep", () => {
 		toto: 1,
 		test: "",
 	});
+	process.setInput(22);
 
 	it("merge object options", () => {
 		const params: ProcessStepParams = {
@@ -25,13 +26,15 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const bildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedProcessStep(step);
 
-		expect(bildedProcessStep.params.options).toStrictEqual({
+		expect(buildedProcessStep.params.options).toStrictEqual({
 			toto: 2,
 			test: "",
 			test1: "&",
 		});
+
+		expect(buildedProcessStep.params.input?.(makeFloor().pickup)).toBe(22);
 	});
 
 	it("merge function options", () => {
@@ -44,11 +47,11 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const bildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedProcessStep(step);
 
 		expect(
-			typeof bildedProcessStep.params.options === "function"
-				? bildedProcessStep.params.options(makeFloor().pickup)
+			typeof buildedProcessStep.params.options === "function"
+				? buildedProcessStep.params.options(makeFloor().pickup)
 				: undefined,
 		).toStrictEqual({
 			toto: 2,
@@ -68,9 +71,9 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const bildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedProcessStep(step);
 
-		expect(bildedProcessStep.toString(1)).toBe(
+		expect(buildedProcessStep.toString(1)).toBe(
 			await readFile(resolve(import.meta.dirname, "__data__/process1.txt"), "utf-8"),
 		);
 	});
@@ -86,9 +89,9 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const bildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedProcessStep(step);
 
-		expect(bildedProcessStep.toString(1)).toBe(
+		expect(buildedProcessStep.toString(1)).toBe(
 			await readFile(resolve(import.meta.dirname, "__data__/process2.txt"), "utf-8"),
 		);
 	});

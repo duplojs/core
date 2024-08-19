@@ -10,7 +10,7 @@ export default defineConfig({
 			provider: "istanbul",
 			reporter: ["text", "json", "html", "json-summary"],
 			reportsDirectory: "coverage",
-			exclude: ["__data__", "**/*.test.ts"],
+			exclude: ["__data__", "**/*.test.ts", "dist"],
 		},
 	},
 	plugins: [tsconfigPaths()],

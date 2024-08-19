@@ -39,3 +39,5 @@ export * from "@utils/types";
 export * from "@utils/unionToIntersection";
 export * from "@utils/unionToTuple";
 export * from "@utils/unPartial";
+
+export { z as zod } from "zod";

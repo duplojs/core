@@ -1,4 +1,4 @@
-import type { ExpectType } from "@utils/expectType";
+import type { ExpectType } from "@test/utils/expectType";
 import { Response } from ".";
 
 describe("response", () => {

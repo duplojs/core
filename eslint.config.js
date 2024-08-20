@@ -23,8 +23,22 @@ export default [
 			"@typescript-eslint/no-unused-vars": "off",
 			"@typescript-eslint/no-magic-numbers": "off",
 			"@typescript-eslint/no-unnecessary-type-parameters": "off",
+			"func-style": "off",
+			"@typescript-eslint/no-shadow": "off",
+			"id-denylist": ["error", "tmp", "temp", "err", "e"],
+			"@typescript-eslint/member-ordering": "off",
+			"@typescript-eslint/unbound-method": "off",
+			"@typescript-eslint/no-unsafe-member-access": "off",
+			"@typescript-eslint/no-unsafe-argument": "off",
+			"no-implicit-coercion": [
+				"error",
+				{
+					allow: ["!!"],
+				},
+			],
 		},
 		files: ["**/*.test.ts", "test/**/*.ts"],
+		ignores: ["**/*.d.ts"]
 	},
 	{
 		...duploLint,
@@ -32,8 +46,19 @@ export default [
 			...duploLint.rules,
 			"@typescript-eslint/no-unnecessary-type-parameters": "off",
 			"@typescript-eslint/strict-boolean-expressions": "off",
+			"@typescript-eslint/no-invalid-void-type": "off",
+			"@typescript-eslint/no-magic-numbers": "off",
+			"id-denylist": ["error", "tmp", "temp", "err", "e"],
+			"@typescript-eslint/member-ordering": "off",
+			"no-implicit-coercion": [
+				"error",
+				{
+					allow: ["!!"],
+				},
+			],
+			"@typescript-eslint/unbound-method": "off",
 		},
 		files: ["**/*.ts"],
-		ignores: ["**/*.test.ts", "test/**/*.ts"],
+		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],
 	},
 ];

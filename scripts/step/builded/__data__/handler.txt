@@ -1,0 +1,22 @@
+
+		
+/* step-handler-(4)-before */
+/* end_block */
+
+
+		result = this.steps[4].handlerFunction(floor, request);
+
+		
+/* step-handler-(4)-before-check-result */
+/* end_block */
+
+
+		if(result instanceof this.Response){
+break Execution;
+}
+
+		
+/* step-handler-(4)-after */
+/* end_block */
+
+		

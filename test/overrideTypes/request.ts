@@ -1,5 +1,5 @@
 import type { CurrentRequestObject, HttpMethod } from "@scripts/request";
-import type { ExpectType } from "@utils/expectType";
+import type { ExpectType } from "@test/utils/expectType";
 
 declare module "@scripts/request" {
 	interface RequestObject {

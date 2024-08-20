@@ -1,0 +1,29 @@
+
+	
+/* extract-(body)-before */
+/* end_block */
+
+
+	{
+		let temp = this.extract["body"].safeParse(request["body"])
+
+		if(!temp.success){
+			result = this.extractError(
+				"body",
+				undefined,
+				temp.error,
+			);
+			break Execution;
+		}
+
+		floor.drop(
+			"body",
+			temp.data,
+		);
+	}
+
+	
+/* extract-(body)-after */
+/* end_block */
+
+	

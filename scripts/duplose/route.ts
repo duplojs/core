@@ -17,7 +17,7 @@ interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext {
 	hooks: BuildedHooksRouteLifeCycle;
 }
 
-type RouteBuildedFunction = (this: RouteBuildedFunctionContext, request: CurrentRequestObject) => Promise<void>;
+type RouteBuildedFunction = (request: CurrentRequestObject) => Promise<void>;
 
 export type GetRouteGeneric<
 	T extends Route = Route,
@@ -26,7 +26,8 @@ export type GetRouteGeneric<
 	infer Preflight,
 	infer Extract,
 	infer Steps,
-	infer Floor
+	infer Floor,
+	infer ContractResponse
 >
 	? {
 		request: Request;
@@ -34,6 +35,7 @@ export type GetRouteGeneric<
 		extract: Extract;
 		steps: Steps;
 		floor: Floor;
+		contractResponse: ContractResponse;
 	}
 	: never;
 
@@ -43,13 +45,15 @@ export class Route<
 	_Extract extends ExtractObject = ExtractObject,
 	_Steps extends Step = Step,
 	_Floor extends object = object,
+	_ContractResponse extends Response = Response,
 > extends Duplose<
 		RouteBuildedFunction,
 		Request,
 		_Preflight,
 		_Extract,
 		_Steps,
-		_Floor
+		_Floor,
+		_ContractResponse
 	> {
 	public method: HttpMethod;
 
@@ -58,7 +62,7 @@ export class Route<
 	public constructor(
 		method: HttpMethod,
 		paths: string[],
-		descriptions: Description[],
+		descriptions: Description[] = [],
 	) {
 		super(descriptions);
 		this.method = method;
@@ -79,7 +83,7 @@ export class Route<
 		this.copyHooks(hooks);
 		copyHooks(hooks, this.instance.hooksRouteLifeCycle);
 
-		const buildedPreflight = this.preflight.map(
+		const buildedPreflight = this.preflights.map(
 			(step) => step.build(),
 		);
 
@@ -112,7 +116,7 @@ export class Route<
 			${StringBuilder.label}: {
 				${insertBlock("hook-beforeRouteExecution-before")}
 
-				${StringBuilder.result} = ${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.beforeRouteExecution(${StringBuilder.request})`)}}
+				${StringBuilder.result} = await this.hooks.beforeRouteExecution(${StringBuilder.request})
 				
 				${insertBlock("hook-beforeRouteExecution-before-check-result")}
 
@@ -142,23 +146,23 @@ export class Route<
 
 			${insertBlock("hook-beforeSend-before")}
 
-			${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.beforeSend(${StringBuilder.request}, ${StringBuilder.result})`)}
+			await this.hooks.beforeSend(${StringBuilder.request}, ${StringBuilder.result})
 
 			${insertBlock("hook-beforeSend-after")}
 			${insertBlock("hook-serializeBody-before")}
 
-			${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.serializeBody(${StringBuilder.request}, ${StringBuilder.result})`)}
+			await this.hooks.serializeBody(${StringBuilder.request}, ${StringBuilder.result})
 
 			${insertBlock("hook-serializeBody-after")}
 			${insertBlock("hook-afterSend-before")}
 
-			${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.afterSend(${StringBuilder.request}, ${StringBuilder.result})`)}
+			await this.hooks.afterSend(${StringBuilder.request}, ${StringBuilder.result})
 
 			${insertBlock("hook-afterSend-after")}
 		} catch (error) {
 			${insertBlock("hook-onError-before")}
 
-			${condition(!!hooks.onError.subscribers.length, () => `await this.hooks.onError(${StringBuilder.request}, error)`)}
+			await this.hooks.onError(${StringBuilder.request}, error)
 
 			${insertBlock("hook-onError-after")}
 		}
@@ -181,7 +185,7 @@ export class Route<
 				Response,
 				extract: simpleClone(this.extract),
 				extractError: this.extractError ?? this.instance.extractError,
-				preflight: buildedPreflight,
+				preflights: buildedPreflight,
 				steps: buildedStep,
 				extensions: simpleClone(this.extensions),
 			} satisfies RouteBuildedFunctionContext,

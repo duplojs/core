@@ -1,12 +1,13 @@
 import { Process } from "@scripts/duplose/process";
-import { ProcessStep, type ProcessStepParams } from "../process";
-import { BuildedProcessStep } from "./process";
+import { type ProcessStepParams } from "../process";
 import { Duplo } from "@scripts/duplo";
 import { makeFloor } from "@scripts/floor";
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import { resolve } from "path";
+import { BuildedPreflightStep } from "./preflight";
+import { PreflightStep } from "../preflight";
 
-describe("BuildedProcessStep", () => {
+describe("BuildedPreflightStep", () => {
 	const instance = new Duplo();
 	const process = new Process("test");
 	process.instance = instance;
@@ -24,9 +25,9 @@ describe("BuildedProcessStep", () => {
 			},
 		};
 
-		const step = new ProcessStep(process, params);
+		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedPreflightStep(step);
 
 		expect(buildedProcessStep.params.options).toStrictEqual({
 			toto: 2,
@@ -45,9 +46,9 @@ describe("BuildedProcessStep", () => {
 			}),
 		};
 
-		const step = new ProcessStep(process, params);
+		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedPreflightStep(step);
 
 		expect(
 			typeof buildedProcessStep.params.options === "function"
@@ -69,12 +70,12 @@ describe("BuildedProcessStep", () => {
 			}),
 		};
 
-		const step = new ProcessStep(process, params);
+		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedPreflightStep(step);
 
 		expect(buildedProcessStep.toString(1)).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/process1.txt"), "utf-8"),
+			await readFile(resolve(import.meta.dirname, "__data__/preflight1.txt"), "utf-8"),
 		);
 	});
 
@@ -85,15 +86,14 @@ describe("BuildedProcessStep", () => {
 				toto: 2,
 				test1: "&",
 			},
-			skip: () => true,
 		};
 
-		const step = new ProcessStep(process, params);
+		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedPreflightStep(step);
 
 		expect(buildedProcessStep.toString(1)).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/process2.txt"), "utf-8"),
+			await readFile(resolve(import.meta.dirname, "__data__/preflight2.txt"), "utf-8"),
 		);
 	});
 });

@@ -1,7 +1,7 @@
 import { Checker, CheckerStep, makeFloor, type CheckerStepParams } from "../..";
 import { Response } from "@scripts/response";
 import { BuildedCheckerStep } from "./checker";
-import { readFile, writeFile } from "fs/promises";
+import { readFile } from "fs/promises";
 import { resolve } from "path";
 
 describe("BuildedCheckerStep", () => {
@@ -103,6 +103,7 @@ describe("BuildedCheckerStep", () => {
 				toto: 2,
 				test1: "&",
 			},
+			skip: () => true,
 		};
 
 		const step = new CheckerStep(checker, params);

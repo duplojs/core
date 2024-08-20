@@ -60,7 +60,7 @@ export function extractLevelOne(one: string) {
 	${insertBlock(`extract-(${one})-before`)}
 
 	{
-		let temp = this.extracted["${one}"].safeParse(${StringBuilder.request}["${one}"])
+		let temp = this.extract["${one}"].safeParse(${StringBuilder.request}["${one}"])
 
 		if(!temp.success){
 			${StringBuilder.result} = this.extractError(
@@ -86,7 +86,7 @@ export function extractLevelTwo(one: string, two: string) {
 	${insertBlock(`extract-(${one})-(${two})-before`)}
 
 	{
-		let temp = this.extracted["${one}"]["${two}"].safeParse(${StringBuilder.request}["${one}"]["${two}"])
+		let temp = this.extract["${one}"]["${two}"].safeParse(${StringBuilder.request}["${one}"]?.["${two}"])
 
 		if(!temp.success){
 			${StringBuilder.result} = this.extractError(

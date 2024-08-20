@@ -5,7 +5,7 @@
 
 
 	{
-		let temp = this.extracted["body"].safeParse(request["body"])
+		let temp = this.extract["body"].safeParse(request["body"])
 
 		if(!temp.success){
 			result = this.extractError(

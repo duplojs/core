@@ -5,7 +5,7 @@
 
 
 	{
-		let temp = this.extracted["params"]["userId"].safeParse(request["params"]["userId"])
+		let temp = this.extract["params"]["userId"].safeParse(request["params"]?.["userId"])
 
 		if(!temp.success){
 			result = this.extractError(

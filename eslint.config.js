@@ -28,6 +28,8 @@ export default [
 			"id-denylist": ["error", "tmp", "temp", "err", "e"],
 			"@typescript-eslint/member-ordering": "off",
 			"@typescript-eslint/unbound-method": "off",
+			"@typescript-eslint/no-unsafe-member-access": "off",
+			"@typescript-eslint/no-unsafe-argument": "off",
 			"no-implicit-coercion": [
 				"error",
 				{

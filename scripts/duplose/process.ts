@@ -11,7 +11,6 @@ import { simpleClone } from "@utils/simpleClone";
 import { makeFloor } from "@scripts/floor";
 
 export type ProcessBuildedFunction = (
-	this: DuploseBuildedFunctionContext,
 	request: CurrentRequestObject,
 	options?: object,
 	input?: unknown
@@ -27,7 +26,8 @@ export type GetProcessGeneric<
 	infer Preflight,
 	infer Extract,
 	infer Steps,
-	infer Floor
+	infer Floor,
+	infer ContractResponse
 >
 	? {
 		request: Request;
@@ -38,6 +38,7 @@ export type GetProcessGeneric<
 		extract: Extract;
 		steps: Steps;
 		floor: Floor;
+		contractResponse: ContractResponse;
 	}
 	: never;
 
@@ -50,13 +51,15 @@ export class Process<
 	_Extract extends ExtractObject = ExtractObject,
 	_Steps extends Step = Step,
 	_Floor extends object = object,
+	_ContractResponse extends Response = Response,
 > extends Duplose<
 		ProcessBuildedFunction,
 		Request,
 		_Preflight,
 		_Extract,
 		_Steps,
-		_Floor
+		_Floor,
+		_ContractResponse
 	> {
 	public name: string;
 
@@ -92,7 +95,7 @@ export class Process<
 			throw new BuildNoRegisteredDuploseError(this);
 		}
 
-		const buildedPreflight = this.preflight.map(
+		const buildedPreflight = this.preflights.map(
 			(step) => step.build(),
 		);
 
@@ -143,7 +146,7 @@ export class Process<
 				Response,
 				extract: simpleClone(this.extract),
 				extractError: this.extractError ?? this.instance.extractError,
-				preflight: buildedPreflight,
+				preflights: buildedPreflight,
 				steps: buildedStep,
 				extensions: simpleClone(this.extensions),
 			} satisfies DuploseBuildedFunctionContext,

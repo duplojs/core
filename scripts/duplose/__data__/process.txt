@@ -1,0 +1,138 @@
+
+		let floor = this.makeFloor();
+		let result = undefined;
+		floor.drop("options", options);
+		floor.drop("input", input);
+		Execution: {
+			
+/* preflight-before */
+/* end_block */
+
+
+			
+			
+/* preflight-process-(0)-before */
+/* end_block */
+
+
+			result = this.preflights[0].processFunction(
+				request,
+				this.preflights[0].params.options,
+				
+			);
+
+			
+/* preflight-process-(0)-before-check-result */
+/* end_block */
+
+
+			if(result instanceof this.Response){
+break Execution;
+}
+
+			
+/* preflight-process-(0)-before-drop */
+/* end_block */
+
+
+			floor.drop("flute", result["flute"]);
+
+			
+/* preflight-process-(0)-after */
+/* end_block */
+
+		
+
+			
+/* preflight-after */
+/* end_block */
+
+			
+			
+/* extract-before */
+/* end_block */
+
+
+	
+/* extract-(params)-(userId)-before */
+/* end_block */
+
+
+	{
+		let temp = this.extract["params"]["userId"].safeParse(request["params"]?.["userId"])
+
+		if(!temp.success){
+			result = this.extractError(
+				"params",
+				"userId",
+				temp.error,
+			);
+			break Execution;
+		}
+
+		floor.drop(
+			"userId",
+			temp.data,
+		);
+	}
+
+	
+/* extract-(params)-(userId)-after */
+/* end_block */
+
+	
+
+/* extract-after */
+/* end_block */
+
+
+			
+/* steps-before */
+/* end_block */
+
+
+			
+		
+/* step-cut-(0)-before */
+/* end_block */
+
+
+		result = this.steps[0].cutFunction(floor, request);
+
+		
+/* step-cut-(0)-before-check-result */
+/* end_block */
+
+
+		if(result instanceof this.Response){
+break Execution;
+}
+
+		
+/* step-cut-(0)-before-drop */
+/* end_block */
+
+
+		floor.drop("toto", result["toto"]);
+
+		
+/* step-cut-(0)-after */
+/* end_block */
+
+		
+
+			
+/* steps-after */
+/* end_block */
+
+		}
+		if(result instanceof this.Response){
+			return result;
+		}
+		else {
+			return {
+				"toto": floor.pickup("toto"),
+"userId": floor.pickup("userId"),
+			};
+		}
+		

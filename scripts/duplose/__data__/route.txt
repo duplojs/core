@@ -1,0 +1,279 @@
+
+		let floor = this.makeFloor();
+		let result = undefined;
+
+		try {
+			Execution: {
+				
+/* hook-beforeRouteExecution-before */
+/* end_block */
+
+
+				result = await this.hooks.beforeRouteExecution(request)
+				
+				
+/* hook-beforeRouteExecution-before-check-result */
+/* end_block */
+
+
+				if(result instanceof this.Response){
+break Execution;
+}
+
+				
+/* hook-beforeRouteExecution-after */
+/* end_block */
+
+
+				
+/* preflight-before */
+/* end_block */
+
+
+				
+			
+/* preflight-process-(0)-before */
+/* end_block */
+
+
+			result = this.preflights[0].processFunction(
+				request,
+				this.preflights[0].params.options,
+				
+			);
+
+			
+/* preflight-process-(0)-before-check-result */
+/* end_block */
+
+
+			if(result instanceof this.Response){
+break Execution;
+}
+
+			
+/* preflight-process-(0)-before-drop */
+/* end_block */
+
+
+			floor.drop("flute", result["flute"]);
+
+			
+/* preflight-process-(0)-after */
+/* end_block */
+
+		
+
+				
+/* preflight-after */
+/* end_block */
+
+
+				
+			if(request.body === undefined){
+				
+/* hook-parsingBody-before */
+/* end_block */
+
+
+				result = await this.hooks.parsingBody(request);
+
+				
+/* hook-parsingBody-before-check-result */
+/* end_block */
+
+
+				if(result instanceof this.Response){
+break Execution;
+}
+
+				
+/* hook-parsingBody-after */
+/* end_block */
+
+			}
+			
+
+				
+/* extract-before */
+/* end_block */
+
+
+	
+/* extract-(params)-(userId)-before */
+/* end_block */
+
+
+	{
+		let temp = this.extract["params"]["userId"].safeParse(request["params"]?.["userId"])
+
+		if(!temp.success){
+			result = this.extractError(
+				"params",
+				"userId",
+				temp.error,
+			);
+			break Execution;
+		}
+
+		floor.drop(
+			"userId",
+			temp.data,
+		);
+	}
+
+	
+/* extract-(params)-(userId)-after */
+/* end_block */
+
+	
+
+	
+/* extract-(body)-before */
+/* end_block */
+
+
+	{
+		let temp = this.extract["body"].safeParse(request["body"])
+
+		if(!temp.success){
+			result = this.extractError(
+				"body",
+				undefined,
+				temp.error,
+			);
+			break Execution;
+		}
+
+		floor.drop(
+			"body",
+			temp.data,
+		);
+	}
+
+	
+/* extract-(body)-after */
+/* end_block */
+
+	
+
+/* extract-after */
+/* end_block */
+
+
+				
+/* steps-before */
+/* end_block */
+
+
+				
+		
+/* step-cut-(0)-before */
+/* end_block */
+
+
+		result = this.steps[0].cutFunction(floor, request);
+
+		
+/* step-cut-(0)-before-check-result */
+/* end_block */
+
+
+		if(result instanceof this.Response){
+break Execution;
+}
+
+		
+/* step-cut-(0)-before-drop */
+/* end_block */
+
+
+		floor.drop("toto", result["toto"]);
+
+		
+/* step-cut-(0)-after */
+/* end_block */
+
+		
+
+		
+/* step-handler-(1)-before */
+/* end_block */
+
+
+		result = this.steps[1].handlerFunction(floor, request);
+
+		
+/* step-handler-(1)-before-check-result */
+/* end_block */
+
+
+		if(result instanceof this.Response){
+break Execution;
+}
+
+		
+/* step-handler-(1)-after */
+/* end_block */
+
+		
+
+				
+/* steps-after */
+/* end_block */
+
+
+				
+/* defaultResponse-before */
+/* end_block */
+
+				result = new this.Response(503, "NO_RESPONSE_SENT", undefined)
+			}
+
+			
+/* hook-beforeSend-before */
+/* end_block */
+
+
+			await this.hooks.beforeSend(request, result)
+
+			
+/* hook-beforeSend-after */
+/* end_block */
+
+			
+/* hook-serializeBody-before */
+/* end_block */
+
+
+			await this.hooks.serializeBody(request, result)
+
+			
+/* hook-serializeBody-after */
+/* end_block */
+
+			
+/* hook-afterSend-before */
+/* end_block */
+
+
+			await this.hooks.afterSend(request, result)
+
+			
+/* hook-afterSend-after */
+/* end_block */
+
+		} catch (error) {
+			
+/* hook-onError-before */
+/* end_block */
+
+
+			await this.hooks.onError(request, error)
+
+			
+/* hook-onError-after */
+/* end_block */
+
+		}
+		

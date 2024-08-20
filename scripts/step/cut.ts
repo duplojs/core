@@ -13,7 +13,7 @@ export type Cut<
 	ReturnValue extends object = object,
 > = (floor: Floor<FloorData>, request: Request) => PromiseOrNot<NoInfer<CurrentResponse> | ReturnValue>;
 
-export class CutStep extends Step<Cut> {
+export class CutStep extends Step<Cut, -1> {
 	public drop: string[];
 
 	public constructor(

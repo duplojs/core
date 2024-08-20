@@ -8,7 +8,7 @@ export interface ProcessStepParams<
 	ProcessGeneric extends GetProcessGeneric = GetProcessGeneric,
 	Pickup extends string = string,
 	FloorData extends object = object,
-	Skip extends (() => boolean) | undefined = undefined,
+	Skip extends ((floor: any) => boolean) | undefined = ((floor: any) => boolean) | undefined,
 > {
 	options?: Partial<ProcessGeneric["options"]> | ((pickup: Floor<FloorData>["pickup"]) => Partial<ProcessGeneric["options"]>);
 	pickup?: ProcessGeneric["drop"][] & Pickup[];
@@ -16,7 +16,9 @@ export interface ProcessStepParams<
 	skip?: Skip;
 }
 
-export class ProcessStep extends Step<Process> {
+export class ProcessStep<
+	_StepNumber extends number = number,
+> extends Step<Process, _StepNumber> {
 	public params: ProcessStepParams;
 
 	public constructor(

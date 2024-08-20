@@ -1,0 +1,34 @@
+
+			
+/* preflight-process-(1)-before */
+/* end_block */
+
+
+			result = this.preflights[1].processFunction(
+				request,
+				this.preflights[1].params.options(floor.pickup),
+				this.preflights[1].input(floor.pickup)
+			);
+
+			
+/* preflight-process-(1)-before-check-result */
+/* end_block */
+
+
+			if(result instanceof this.Response){
+break Execution;
+}
+
+			
+/* preflight-process-(1)-before-drop */
+/* end_block */
+
+
+			floor.drop("rr", result["rr"]);
+floor.drop("tt", result["tt"]);
+
+			
+/* preflight-process-(1)-after */
+/* end_block */
+
+		

@@ -12,7 +12,7 @@ export type Handler<
 	CurrentResponse extends Response = Response,
 > = (floor: Floor<FloorData>, request: Request) => PromiseOrNot<NoInfer<CurrentResponse>>;
 
-export class HandlerStep extends Step<Handler> {
+export class HandlerStep extends Step<Handler, -1> {
 	public constructor(
 		handlerFunction: Handler,
 		descriptions: Description[] = [],

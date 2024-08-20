@@ -11,7 +11,7 @@ export interface CheckerStepParams<
 	Key extends string = string,
 	CatchResponse extends Response = Response,
 	FloorData extends object = object,
-	Skip extends (() => boolean) | undefined = undefined,
+	Skip extends ((floor: any) => boolean) | undefined = ((floor: any) => boolean) | undefined,
 > {
 	input(pickup: Floor<FloorData>["pickup"]): CheckerGeneric["input"];
 	result:
@@ -29,7 +29,9 @@ export interface CheckerStepParams<
 	skip?: Skip;
 }
 
-export class CheckerStep extends Step<Checker> {
+export class CheckerStep<
+	_StepNumber extends number = number,
+> extends Step<Checker, _StepNumber> {
 	public params: CheckerStepParams;
 
 	public constructor(

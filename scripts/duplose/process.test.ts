@@ -23,7 +23,7 @@ describe("Process", async() => {
 	process.addStep(step);
 	const preflightProcess = new Process("preflightProcess");
 	preflightProcess.instance = duplo;
-	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] });
+	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
 	process.addPreflight(preflight);
 
 	const spy = advancedEval as Mock;

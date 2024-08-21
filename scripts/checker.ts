@@ -39,7 +39,7 @@ export type CheckerHandler<
 export class Checker<
 	_Options extends object | undefined = any,
 	_Input extends unknown = any,
-	_Output extends CheckerOutput = CheckerOutput,
+	_Output extends CheckerOutput = any,
 > {
 	public options?: object;
 

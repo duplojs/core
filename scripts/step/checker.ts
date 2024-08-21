@@ -30,12 +30,13 @@ export interface CheckerStepParams<
 }
 
 export class CheckerStep<
+	CurrentChecker extends Checker = Checker,
 	_StepNumber extends number = number,
-> extends Step<Checker, _StepNumber> {
+> extends Step<CurrentChecker, _StepNumber> {
 	public params: CheckerStepParams;
 
 	public constructor(
-		checker: Checker,
+		checker: CurrentChecker,
 		params: CheckerStepParams,
 		descriptions: Description[] = [],
 	) {

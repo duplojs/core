@@ -2,13 +2,13 @@ import type { CurrentRequestObject } from "@scripts/request";
 import { Response } from "@scripts/response";
 import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext } from ".";
 import type { Step } from "@scripts/step";
-import type { ProcessStep } from "@scripts/step/process";
 import type { Description } from "@scripts/description";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
 import { advancedEval } from "@utils/advancedEval";
 import { extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { simpleClone } from "@utils/simpleClone";
 import { makeFloor } from "@scripts/floor";
+import type { PreflightStep } from "@scripts/step/preflight";
 
 export type ProcessBuildedFunction = (
 	request: CurrentRequestObject,
@@ -43,21 +43,21 @@ export type GetProcessGeneric<
 	: never;
 
 export class Process<
-	Request extends CurrentRequestObject = CurrentRequestObject,
-	_Options extends object = object,
-	_Input extends unknown = unknown,
-	_Drop extends string = string,
-	_Preflight extends ProcessStep = ProcessStep,
-	_Extract extends ExtractObject = ExtractObject,
-	_Steps extends Step = Step,
-	_Floor extends object = object,
-	_ContractResponse extends Response = Response,
+	Request extends CurrentRequestObject = any,
+	_Options extends object = any,
+	_Input extends unknown = any,
+	_Drop extends string = any,
+	_Preflight extends PreflightStep = any,
+	_Extract extends ExtractObject = any,
+	_Step extends Step = any,
+	_Floor extends object = any,
+	_ContractResponse extends Response = any,
 > extends Duplose<
 		ProcessBuildedFunction,
 		Request,
 		_Preflight,
 		_Extract,
-		_Steps,
+		_Step,
 		_Floor,
 		_ContractResponse
 	> {

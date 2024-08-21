@@ -27,7 +27,7 @@ describe("Route", async() => {
 	route.addStep(step);
 	const preflightProcess = new Process("preflightProcess");
 	preflightProcess.instance = duplo;
-	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] });
+	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
 	route.addPreflight(preflight);
 
 	const spy = advancedEval as Mock;

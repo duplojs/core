@@ -3,7 +3,6 @@ import { Response } from "@scripts/response";
 import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext } from ".";
 import type { Step } from "@scripts/step";
 import type { Description } from "@scripts/description";
-import type { ProcessStep } from "@scripts/step/process";
 import { advancedEval } from "@utils/advancedEval";
 import { checkResult, condition, extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { copyHooks, makeHooksRouteLifeCycle, type BuildedHooksRouteLifeCycle } from "@scripts/hook";
@@ -12,6 +11,7 @@ import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredD
 import { simpleClone } from "@utils/simpleClone";
 import { HandlerStep } from "@scripts/step/handler";
 import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
+import type { PreflightStep } from "@scripts/step/preflight";
 
 interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext {
 	hooks: BuildedHooksRouteLifeCycle;
@@ -25,33 +25,33 @@ export type GetRouteGeneric<
 	infer Request,
 	infer Preflight,
 	infer Extract,
-	infer Steps,
+	infer Step,
 	infer Floor,
 	infer ContractResponse
 >
 	? {
 		request: Request;
-		preflight: Preflight;
+		preflights: Preflight;
 		extract: Extract;
-		steps: Steps;
+		step: Step;
 		floor: Floor;
 		contractResponse: ContractResponse;
 	}
 	: never;
 
 export class Route<
-	Request extends CurrentRequestObject = CurrentRequestObject,
-	_Preflight extends ProcessStep = ProcessStep,
-	_Extract extends ExtractObject = ExtractObject,
-	_Steps extends Step = Step,
-	_Floor extends object = object,
-	_ContractResponse extends Response = Response,
+	Request extends CurrentRequestObject = any,
+	_Preflight extends PreflightStep = any,
+	_Extract extends ExtractObject = any,
+	_Step extends Step = any,
+	_Floor extends object = any,
+	_ContractResponse extends Response = any,
 > extends Duplose<
 		RouteBuildedFunction,
 		Request,
 		_Preflight,
 		_Extract,
-		_Steps,
+		_Step,
 		_Floor,
 		_ContractResponse
 	> {

@@ -40,7 +40,7 @@ export abstract class Duplose<
 	Request extends CurrentRequestObject = any,
 	_Preflight extends PreflightStep = any,
 	_Extract extends ExtractObject = any,
-	_Steps extends Step = any,
+	_Step extends Step = any,
 	_Floor extends object = any,
 	_ContractResponse extends Response = any,
 > {
@@ -85,11 +85,9 @@ export abstract class Duplose<
 	public copyHooks(base: HooksRouteLifeCycle<any>) {
 		copyHooks(base, this.hooks);
 
-		this.steps.forEach((step) => {
-			if (step instanceof ProcessStep) {
-				step.parent.copyHooks(base);
-			}
-		});
+		this.steps
+			.filter((step): step is ProcessStep => step instanceof ProcessStep)
+			.forEach((step) => void step.parent.copyHooks(base));
 
 		this.preflights.forEach((step) => {
 			if (step instanceof PreflightStep) {

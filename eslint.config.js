@@ -59,6 +59,7 @@ export default [
 			],
 			"@typescript-eslint/unbound-method": "off",
 			"@typescript-eslint/no-shadow": "off",
+			"func-style": "off",
 		},
 		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],

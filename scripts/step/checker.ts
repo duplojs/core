@@ -7,7 +7,7 @@ import { BuildedCheckerStep } from "./builded/checker";
 
 export interface CheckerStepParams<
 	CheckerGeneric extends GetCheckerGeneric = GetCheckerGeneric,
-	Info extends string | string[] = string,
+	Info extends string = string,
 	Key extends string = string,
 	CatchResponse extends Response = Response,
 	FloorData extends object = object,

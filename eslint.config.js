@@ -30,6 +30,7 @@ export default [
 			"@typescript-eslint/unbound-method": "off",
 			"@typescript-eslint/no-unsafe-member-access": "off",
 			"@typescript-eslint/no-unsafe-argument": "off",
+			"@typescript-eslint/no-shadow": "off",
 			"no-implicit-coercion": [
 				"error",
 				{
@@ -57,6 +58,7 @@ export default [
 				},
 			],
 			"@typescript-eslint/unbound-method": "off",
+			"@typescript-eslint/no-shadow": "off",
 		},
 		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],

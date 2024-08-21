@@ -1,4 +1,5 @@
 import { getTypedEntries } from "@utils/getTypedEntries";
+import type { ZodType } from "zod";
 
 export class Response<
 	Code extends number = number,
@@ -55,3 +56,16 @@ export class Response<
 		return this;
 	}
 }
+
+export type ContractResponse = Response<number, string, ZodType>;
+
+export type ContractToResponse<
+	T extends ContractResponse,
+> =
+	T extends Response<
+		infer code,
+		infer information,
+		infer zodSchema extends ZodType
+	>
+		? Response<code, information, zodSchema["_output"]>
+		: never;

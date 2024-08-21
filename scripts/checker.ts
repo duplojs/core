@@ -29,12 +29,15 @@ export type CheckerOutputFunction = <
 >(info: Info, data: Data) => CheckerOutput<Info, Data>;
 
 export type CheckerHandler<
-	Input extends unknown = unknown,
-	Output extends CheckerOutput = CheckerOutput,
-> = (input: Input, output: CheckerOutputFunction, options: any) => PromiseOrNot<Output>;
+	Options extends object | undefined = any,
+> = (
+	input: any,
+	output: CheckerOutputFunction,
+	options: Options
+) => PromiseOrNot<CheckerOutput>;
 
 export class Checker<
-	_Options extends object = any,
+	_Options extends object | undefined = any,
 	_Input extends unknown = any,
 	_Output extends CheckerOutput = CheckerOutput,
 > {
@@ -47,7 +50,7 @@ export class Checker<
 		public descriptions: Description[] = [],
 	) {}
 
-	public setOptions(options: object, descriptions: Description[] = []) {
+	public setOptions(options?: object, descriptions: Description[] = []) {
 		this.options = options;
 
 		this.descriptions.push(...descriptions);

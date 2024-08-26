@@ -5,6 +5,7 @@ export * from "@scripts/checker";
 export * from "@scripts/floor";
 
 export * from "@scripts/builder/duplose";
+export * from "@scripts/builder/route";
 export * from "@scripts/builder/checker";
 
 export * from "@scripts/response";
@@ -32,6 +33,8 @@ export * from "@scripts/error/lastStepMustBeHandlerError";
 export * from "@utils/addThis";
 export * from "@utils/advancedEval";
 export * from "@utils/entryUseMapper";
+export * from "@utils/fixPath";
+export * from "@utils/flatExtract";
 export * from "@utils/getLastOfUnion";
 export * from "@utils/getPropsWithTrueValue";
 export * from "@utils/getTypedEntries";

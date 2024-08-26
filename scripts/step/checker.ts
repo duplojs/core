@@ -31,17 +31,22 @@ export interface CheckerStepParams<
 
 export class CheckerStep<
 	CurrentChecker extends Checker = Checker,
+	CatchResponse extends Response = Response,
 	_StepNumber extends number = number,
 > extends Step<CurrentChecker, _StepNumber> {
 	public params: CheckerStepParams;
 
+	public responses: CatchResponse[];
+
 	public constructor(
 		checker: CurrentChecker,
 		params: CheckerStepParams,
+		responses: CatchResponse[] = [],
 		descriptions: Description[] = [],
 	) {
 		super(checker, descriptions);
 		this.params = params;
+		this.responses = responses;
 	}
 
 	public build() {

@@ -26,8 +26,7 @@ export type GetProcessGeneric<
 	infer Preflight,
 	infer Extract,
 	infer Steps,
-	infer Floor,
-	infer ContractResponse
+	infer Floor
 >
 	? {
 		request: Request;
@@ -38,7 +37,6 @@ export type GetProcessGeneric<
 		extract: Extract;
 		steps: Steps;
 		floor: Floor;
-		contractResponse: ContractResponse;
 	}
 	: never;
 
@@ -50,16 +48,14 @@ export class Process<
 	_Preflight extends PreflightStep = any,
 	_Extract extends ExtractObject = any,
 	_Step extends Step = any,
-	_Floor extends object = any,
-	_ContractResponse extends Response = any,
+	_FloorData extends object = any,
 > extends Duplose<
 		ProcessBuildedFunction,
 		Request,
 		_Preflight,
 		_Extract,
 		_Step,
-		_Floor,
-		_ContractResponse
+		_FloorData
 	> {
 	public name: string;
 

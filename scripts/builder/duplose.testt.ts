@@ -1,10 +1,13 @@
 import { Process } from "@scripts/duplose/process";
 import type { CurrentRequestObject } from "@scripts/request";
-import type { BadRequestHttpResponse } from "@scripts/response/simplePreset";
 import type { Step } from "@scripts/step";
 import type { PreflightStep } from "@scripts/step/preflight";
 import type { ZodString } from "zod";
 import { useBuilder } from "./duplose";
+
+describe("useBuilder", () => {
+
+});
 
 const testProcess = new Process<
 	CurrentRequestObject,
@@ -14,8 +17,7 @@ const testProcess = new Process<
 	PreflightStep,
 	{ body: { dropedValue: ZodString } },
 	Step,
-	{ dropedValue: string },
-	BadRequestHttpResponse<"toto", string>
+	{ dropedValue: string }
 >("test");
 
 const tt = useBuilder()

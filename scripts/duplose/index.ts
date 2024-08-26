@@ -9,8 +9,9 @@ import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
 import type { makeFloor } from "@scripts/floor";
 import type { BuildedStep } from "@scripts/step/builded";
-import { PreflightStep } from "@scripts/step/preflight";
+import type { PreflightStep } from "@scripts/step/preflight";
 import type { BuildedPreflightStep } from "@scripts/step/builded/preflight";
+import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 
 export interface DuploseBuildedFunctionContext {
 	makeFloor: typeof makeFloor;
@@ -28,12 +29,18 @@ export type ExtractErrorFunction = (
 	error: ZodError
 ) => Response;
 
-export interface ExtractObject {
-	body?: Record<string, ZodType> | ZodType;
-	headers?: Record<string, ZodType> | ZodType;
-	params?: Record<string, ZodType> | ZodType;
-	query?: Record<string, ZodType> | ZodType;
+export interface DisabledExtractKey {
+	method: true;
 }
+
+export type ExtractObject = {
+	[
+	P in Exclude<
+		keyof CurrentRequestObject,
+		GetPropsWithTrueValue<DisabledExtractKey>
+	>
+	]?: Record<string, ZodType> | ZodType;
+};
 
 export abstract class Duplose<
 	BuildedFunction extends AnyFunction = any,
@@ -41,8 +48,7 @@ export abstract class Duplose<
 	_Preflight extends PreflightStep = any,
 	_Extract extends ExtractObject = any,
 	_Step extends Step = any,
-	_Floor extends object = any,
-	_ContractResponse extends Response = any,
+	_FloorData extends object = any,
 > {
 	public instance?: Duplo;
 
@@ -69,17 +75,20 @@ export abstract class Duplose<
 	public setExtract(
 		extract: ExtractObject,
 		extractError?: ExtractErrorFunction,
+		descriptions: Description[] = [],
 	) {
 		this.extract = extract;
 		this.extractError = extractError;
+
+		this.descriptions.push(...descriptions);
 	}
 
-	public addPreflight(preflight: PreflightStep) {
-		this.preflights.push(preflight);
+	public addPreflight(...preflights: PreflightStep[]) {
+		this.preflights.push(...preflights);
 	}
 
-	public addStep(step: Step) {
-		this.steps.push(step);
+	public addStep(...steps: Step[]) {
+		this.steps.push(...steps);
 	}
 
 	public copyHooks(base: HooksRouteLifeCycle<any>) {
@@ -90,9 +99,7 @@ export abstract class Duplose<
 			.forEach((step) => void step.parent.copyHooks(base));
 
 		this.preflights.forEach((step) => {
-			if (step instanceof PreflightStep) {
-				step.parent.copyHooks(base);
-			}
+			step.parent.copyHooks(base);
 		});
 	}
 

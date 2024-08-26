@@ -1,14 +1,18 @@
+import type { Description } from "@scripts/description";
 import type { Process, GetProcessGeneric } from "@scripts/duplose/process";
 import type { Floor } from "@scripts/floor";
-import type { CurrentRequestObject } from "@scripts/request";
+import type { CurrentRequestObject, HttpMethod } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import type { ProcessStepParams } from "@scripts/step/process";
 import type { AddOne } from "@utils/incremente";
+import { useRouteBuilder, type RouteBuilder } from "./route";
+import type { ExtractObject } from "@scripts/duplose";
+import { Route } from "@scripts/duplose/route";
 
 export interface Builder<
 	Request extends CurrentRequestObject = CurrentRequestObject,
-	Preflight extends PreflightStep = never,
-	PreflightCount extends number = 0,
+	Preflights extends PreflightStep = never,
+	PreflightsCount extends number = 0,
 	FloorData extends object = object,
 > {
 	preflight<
@@ -24,11 +28,12 @@ export interface Builder<
 			FloorData,
 			F
 		>,
+		...desc: Description[]
 	): Builder<
-		Request,
-		| Preflight
-		| PreflightStep<P, PreflightCount>,
-		AddOne<PreflightCount>,
+		Request & GPG["request"],
+		| Preflights
+		| PreflightStep<P, PreflightsCount>,
+		AddOne<PreflightsCount>,
 		(
 			T extends keyof GPG["floor"]
 				? undefined extends F
@@ -41,26 +46,60 @@ export interface Builder<
 				: Omit<FloorData, T>
 		)
 	>;
+
+	createRoute<
+		RouteRequest extends CurrentRequestObject = CurrentRequestObject,
+	>(
+		method: HttpMethod,
+		path: string[],
+		...desc: Description[]
+	): RouteBuilder<
+		Request & RouteRequest,
+		Preflights,
+		ExtractObject,
+		never,
+		0,
+		FloorData
+	>;
 }
 
-export function useBuilder() {
-	const preflight = (
+export function useBuilder<
+	Request extends CurrentRequestObject = CurrentRequestObject,
+>() {
+	function preflight(
 		process: Process,
 		params?: ProcessStepParams,
 		preflights: PreflightStep[] = [],
-	): ReturnType<Builder["preflight"]> => {
-		const preflightStep = new PreflightStep(process, params);
+		...desc: Description[]
+	): ReturnType<Builder["preflight"]> {
+		const preflightStep = new PreflightStep(process, params, desc);
 
 		return {
-			preflight: (arg1, arg2) => preflight(
-				arg1 as Process,
-				arg2 as ProcessStepParams,
+			preflight: (arg1, arg2, ...desc) => preflight(
+				arg1,
+				arg2,
 				[...preflights, preflightStep],
+				desc,
 			),
-		};
-	};
+			createRoute: (method, path, ...desc) => {
+				const route = new Route(method, path, desc);
+				route.addPreflight(...preflights, preflightStep);
+				return useRouteBuilder(route);
+			},
+		} as ReturnType<Builder["preflight"]>;
+	}
 
 	return {
-		preflight,
-	} as Builder;
+		preflight: (arg1, arg2, ...desc) => preflight(
+			arg1 as Process,
+			arg2 as ProcessStepParams,
+			[],
+			desc,
+		),
+		createRoute: (method, path, ...desc) => {
+			const route = new Route(method, path, desc);
+
+			return useRouteBuilder(route);
+		},
+	} as Builder<Request>;
 }

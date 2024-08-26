@@ -26,8 +26,7 @@ export type GetRouteGeneric<
 	infer Preflight,
 	infer Extract,
 	infer Step,
-	infer Floor,
-	infer ContractResponse
+	infer Floor
 >
 	? {
 		request: Request;
@@ -35,7 +34,6 @@ export type GetRouteGeneric<
 		extract: Extract;
 		step: Step;
 		floor: Floor;
-		contractResponse: ContractResponse;
 	}
 	: never;
 
@@ -44,16 +42,14 @@ export class Route<
 	_Preflight extends PreflightStep = any,
 	_Extract extends ExtractObject = any,
 	_Step extends Step = any,
-	_Floor extends object = any,
-	_ContractResponse extends Response = any,
+	_FloorData extends object = any,
 > extends Duplose<
 		RouteBuildedFunction,
 		Request,
 		_Preflight,
 		_Extract,
 		_Step,
-		_Floor,
-		_ContractResponse
+		_FloorData
 	> {
 	public method: HttpMethod;
 

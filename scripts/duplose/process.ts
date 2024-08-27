@@ -87,6 +87,7 @@ export class Process<
 		descriptions: Description[] = [],
 	) {
 		this.drop = drop;
+		this.descriptions.push(...descriptions);
 	}
 
 	public build() {

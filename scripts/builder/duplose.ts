@@ -63,15 +63,17 @@ export interface Builder<
 	>;
 }
 
+export type AnyBuilder = Builder<any, any, any, any>;
+
 export function useBuilder<
 	Request extends CurrentRequestObject = CurrentRequestObject,
->() {
+>(): Builder<Request> {
 	function preflight(
 		process: Process,
 		params?: ProcessStepParams,
 		preflights: PreflightStep[] = [],
 		...desc: Description[]
-	): ReturnType<Builder["preflight"]> {
+	): ReturnType<AnyBuilder["preflight"]> {
 		const preflightStep = new PreflightStep(process, params, desc);
 
 		return {
@@ -86,7 +88,7 @@ export function useBuilder<
 				route.addPreflight(...preflights, preflightStep);
 				return useRouteBuilder(route);
 			},
-		} as ReturnType<Builder<Request>["preflight"]>;
+		};
 	}
 
 	return {
@@ -101,5 +103,5 @@ export function useBuilder<
 
 			return useRouteBuilder(route);
 		},
-	} as Builder<Request>;
+	};
 }

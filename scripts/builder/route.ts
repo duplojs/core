@@ -195,16 +195,18 @@ export interface RouteBuilder<
 	>;
 }
 
+export type AnyRouteBuilder = RouteBuilder<any, any, any, any, any, any>;
+
 export function useRouteBuilder<
-	Request extends CurrentRequestObject,
+	Request extends CurrentRequestObject = CurrentRequestObject,
 >(
 	route: Route,
-) {
+): RouteBuilder<Request> {
 	function extract(
 		extract: ExtractObject,
 		error?: ExtractErrorFunction,
 		...desc: Description[]
-	) {
+	): ReturnType<AnyRouteBuilder["extract"]> {
 		route.setExtract(extract, error, desc);
 
 		return {
@@ -213,7 +215,7 @@ export function useRouteBuilder<
 			execute,
 			cut,
 			handler,
-		} as ReturnType<RouteBuilder<Request>["extract"]>;
+		};
 	}
 
 	function check(
@@ -221,7 +223,7 @@ export function useRouteBuilder<
 		params: CheckerStepParams,
 		responses: ContractResponse | ContractResponse[] = [],
 		...desc: Description[]
-	) {
+	): ReturnType<AnyRouteBuilder["check"]> {
 		route.addStep(
 			new CheckerStep(
 				checker,
@@ -237,14 +239,14 @@ export function useRouteBuilder<
 			execute,
 			cut,
 			handler,
-		} as ReturnType<RouteBuilder<Request>["check"]>;
+		};
 	}
 
 	function presetCheck(
 		presetChecker: PresetChecker,
 		input: AnyFunction,
 		...desc: Description[]
-	) {
+	): ReturnType<AnyRouteBuilder["presetCheck"]> {
 		const transformInput = presetChecker.params.transformInput;
 
 		return check(
@@ -257,14 +259,14 @@ export function useRouteBuilder<
 			},
 			presetChecker.responses,
 			...desc,
-		) as ReturnType<RouteBuilder<Request>["presetCheck"]>;
+		);
 	}
 
 	function execute(
 		process: Process,
 		params?: ProcessStepParams,
 		...desc: Description[]
-	) {
+	): ReturnType<AnyRouteBuilder["execute"]> {
 		route.addStep(
 			new ProcessStep(
 				process,
@@ -279,7 +281,7 @@ export function useRouteBuilder<
 			execute,
 			cut,
 			handler,
-		} as ReturnType<RouteBuilder<Request>["execute"]>;
+		};
 	}
 
 	function cut(
@@ -287,7 +289,7 @@ export function useRouteBuilder<
 		drop: string | string[] = [],
 		responses: ContractResponse | ContractResponse[] = [],
 		...desc: Description[]
-	) {
+	): ReturnType<AnyRouteBuilder["cut"]> {
 		route.addStep(
 			new CutStep(
 				cutFunction,
@@ -303,14 +305,14 @@ export function useRouteBuilder<
 			execute,
 			cut,
 			handler,
-		} as ReturnType<RouteBuilder<Request>["cut"]>;
+		};
 	}
 
 	function handler(
 		handlerFunction: Handler,
 		responses: ContractResponse | ContractResponse[] = [],
 		...desc: Description[]
-	) {
+	): ReturnType<AnyRouteBuilder["handler"]> {
 		route.addStep(
 			new HandlerStep(
 				handlerFunction,
@@ -329,5 +331,5 @@ export function useRouteBuilder<
 		execute,
 		cut,
 		handler,
-	} as RouteBuilder<Request>;
+	} satisfies AnyRouteBuilder as any;
 }

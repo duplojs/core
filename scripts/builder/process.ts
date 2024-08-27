@@ -208,13 +208,15 @@ export interface ProcessBuilder<
 	>;
 }
 
-interface ProcessBuilderParams<
+export interface ProcessBuilderParams<
 	Options extends object | undefined = undefined,
 	Input extends unknown = undefined,
 > {
 	options?: Options;
 	input?: Input;
 }
+
+export type AnyProcessBuilder = ProcessBuilder<any, any, any, any, any, any, any, any>;
 
 export function useProcessBuilder<
 	Request extends CurrentRequestObject,
@@ -226,7 +228,19 @@ export function useProcessBuilder<
 		Options,
 		Input
 	>,
-) {
+): ProcessBuilder<
+		Request,
+		Options,
+		Input,
+		never,
+		ExtractObject,
+		never,
+		0,
+		{
+			options: Options;
+			input: Input;
+		}
+	> {
 	if (params?.options) {
 		process.setOptions(params?.options);
 	}
@@ -239,7 +253,7 @@ export function useProcessBuilder<
 		extract: ExtractObject,
 		error?: ExtractErrorFunction,
 		...desc: Description[]
-	) {
+	): ReturnType<AnyProcessBuilder["extract"]> {
 		process.setExtract(extract, error, desc);
 
 		return {
@@ -248,7 +262,7 @@ export function useProcessBuilder<
 			execute,
 			cut,
 			exportation,
-		} as ReturnType<ProcessBuilder<Request>["extract"]>;
+		};
 	}
 
 	function check(
@@ -256,7 +270,7 @@ export function useProcessBuilder<
 		params: CheckerStepParams,
 		responses: ContractResponse | ContractResponse[] = [],
 		...desc: Description[]
-	) {
+	): ReturnType<AnyProcessBuilder["check"]> {
 		process.addStep(
 			new CheckerStep(
 				checker,
@@ -272,14 +286,14 @@ export function useProcessBuilder<
 			execute,
 			cut,
 			exportation,
-		} as ReturnType<ProcessBuilder<Request>["check"]>;
+		};
 	}
 
 	function presetCheck(
 		presetChecker: PresetChecker,
 		input: AnyFunction,
 		...desc: Description[]
-	) {
+	): ReturnType<AnyProcessBuilder["presetCheck"]> {
 		const transformInput = presetChecker.params.transformInput;
 
 		return check(
@@ -292,14 +306,14 @@ export function useProcessBuilder<
 			},
 			presetChecker.responses,
 			...desc,
-		) as ReturnType<ProcessBuilder<Request>["presetCheck"]>;
+		);
 	}
 
 	function execute(
 		process: Process,
 		params?: ProcessStepParams,
 		...desc: Description[]
-	) {
+	): ReturnType<AnyProcessBuilder["execute"]> {
 		process.addStep(
 			new ProcessStep(
 				process,
@@ -314,7 +328,7 @@ export function useProcessBuilder<
 			execute,
 			cut,
 			exportation,
-		} as ReturnType<ProcessBuilder<Request>["execute"]>;
+		};
 	}
 
 	function cut(
@@ -322,7 +336,7 @@ export function useProcessBuilder<
 		drop: string | string[] = [],
 		responses: ContractResponse | ContractResponse[] = [],
 		...desc: Description[]
-	) {
+	): ReturnType<AnyProcessBuilder["cut"]> {
 		process.addStep(
 			new CutStep(
 				cutFunction,
@@ -338,13 +352,13 @@ export function useProcessBuilder<
 			execute,
 			cut,
 			exportation,
-		} as ReturnType<ProcessBuilder<Request>["cut"]>;
+		};
 	}
 
 	function exportation(
 		drop: string[] = [],
 		...desc: Description[]
-	) {
+	): ReturnType<AnyProcessBuilder["exportation"]> {
 		process.setDrop(drop, desc);
 
 		return process;
@@ -357,17 +371,5 @@ export function useProcessBuilder<
 		execute,
 		cut,
 		exportation,
-	} as ProcessBuilder<
-		Request,
-		Options,
-		Input,
-		never,
-		ExtractObject,
-		never,
-		0,
-		{
-			options: Options;
-			input: Input;
-		}
-	>;
+	} satisfies AnyProcessBuilder as any;
 }

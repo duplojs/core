@@ -4,7 +4,7 @@ import type { ContractResponse, ContractToResponse, Response } from "@scripts/re
 
 export function createChecker<
 	T extends object | undefined = undefined,
->(name: string, options: T) {
+>(name: string, options: T = undefined as T) {
 	const checker = new Checker(name);
 	checker.setOptions(options);
 

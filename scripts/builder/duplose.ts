@@ -86,7 +86,7 @@ export function useBuilder<
 				route.addPreflight(...preflights, preflightStep);
 				return useRouteBuilder(route);
 			},
-		} as ReturnType<Builder["preflight"]>;
+		} as ReturnType<Builder<Request>["preflight"]>;
 	}
 
 	return {

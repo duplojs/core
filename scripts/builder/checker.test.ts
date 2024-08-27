@@ -6,7 +6,7 @@ import { zod, type Response } from "..";
 
 describe("checker builder", () => {
 	it("create without options", () => {
-		const isOdd = createChecker("isOdd", undefined)
+		const isOdd = createChecker("isOdd")
 			.handler((input: number, output, options) => {
 				type check = ExpectType<
 					typeof options,
@@ -68,7 +68,7 @@ describe("checker builder", () => {
 	});
 
 	it("preset checker", () => {
-		const isOdd = createChecker("isOdd", undefined)
+		const isOdd = createChecker("isOdd")
 			.handler((input: number, output, options) => {
 				if (input % 2 === 1) {
 					return output("odd", input);

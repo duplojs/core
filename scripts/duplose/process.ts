@@ -42,7 +42,7 @@ export type GetProcessGeneric<
 
 export class Process<
 	Request extends CurrentRequestObject = any,
-	_Options extends object = any,
+	_Options extends object | undefined = any,
 	_Input extends unknown = any,
 	_Drop extends string = any,
 	_Preflight extends PreflightStep = any,
@@ -82,7 +82,10 @@ export class Process<
 		this.options = options;
 	}
 
-	public setDrop(drop: string[]) {
+	public setDrop(
+		drop: string[],
+		descriptions: Description[] = [],
+	) {
 		this.drop = drop;
 	}
 

@@ -6,7 +6,7 @@ import { PreflightStep } from "@scripts/step/preflight";
 import type { ProcessStepParams } from "@scripts/step/process";
 import type { AddOne } from "@utils/incremente";
 import { useRouteBuilder, type RouteBuilder } from "./route";
-import type { ExtractObject } from "@scripts/duplose";
+import type { Duplose, ExtractObject } from "@scripts/duplose";
 import { Route } from "@scripts/duplose/route";
 
 export interface Builder<
@@ -51,7 +51,7 @@ export interface Builder<
 		RouteRequest extends CurrentRequestObject = CurrentRequestObject,
 	>(
 		method: HttpMethod,
-		path: string[],
+		path: string[] | string,
 		...desc: Description[]
 	): RouteBuilder<
 		Request & RouteRequest,
@@ -64,6 +64,13 @@ export interface Builder<
 }
 
 export type AnyBuilder = Builder<any, any, any, any>;
+
+export interface CreatedDuplose {
+	duplose: Duplose;
+	viewed: boolean;
+}
+
+const createdDuploseSymbol = Symbol("CreatedDuplose");
 
 export function useBuilder<
 	Request extends CurrentRequestObject = CurrentRequestObject,
@@ -84,8 +91,19 @@ export function useBuilder<
 				desc,
 			),
 			createRoute: (method, path, ...desc) => {
-				const route = new Route(method, path, desc);
+				const route = new Route(
+					method,
+					path instanceof Array ? path : [path],
+					desc,
+				);
+
 				route.addPreflight(...preflights, preflightStep);
+
+				useBuilder[createdDuploseSymbol].push({
+					duplose: route,
+					viewed: false,
+				});
+
 				return useRouteBuilder(route);
 			},
 		};
@@ -99,9 +117,34 @@ export function useBuilder<
 			desc,
 		),
 		createRoute: (method, path, ...desc) => {
-			const route = new Route(method, path, desc);
+			const route = new Route(
+				method,
+				path instanceof Array ? path : [path],
+				desc,
+			);
+
+			useBuilder[createdDuploseSymbol].push({
+				duplose: route,
+				viewed: false,
+			});
 
 			return useRouteBuilder(route);
 		},
 	};
 }
+useBuilder[createdDuploseSymbol] = [] as CreatedDuplose[];
+useBuilder.getAllCreatedDuplose = function *() {
+	for (const createdDuplose of useBuilder[createdDuploseSymbol]) {
+		createdDuplose.viewed = true;
+		yield createdDuplose.duplose;
+	}
+};
+useBuilder.getLastCreatedDuploses = function *() {
+	for (const createdDuplose of useBuilder[createdDuploseSymbol]) {
+		if (createdDuplose.viewed) {
+			continue;
+		}
+		createdDuplose.viewed = true;
+		yield createdDuplose.duplose;
+	}
+};

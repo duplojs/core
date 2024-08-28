@@ -1,7 +1,5 @@
 import { TestDescription } from "@test/utils/testDescription";
 import {
-	OkHttpResponse,
-	Route,
 	zod,
 	Response,
 	NotFoundHttpResponse,
@@ -10,33 +8,39 @@ import {
 	type CurrentRequestObject,
 	ProcessStep,
 	CutStep,
+	Process,
 } from "..";
-import { useRouteBuilder } from "./route";
 import type { ExpectType } from "@test/utils/expectType";
-import { HandlerStep } from "@scripts/step/handler";
 import { manualChecker, manualPresetChecker, manualProcess } from "@test/utils/manualDuplose";
+import { useProcessBuilder } from "./process";
 
-describe("useRouteBuilder", () => {
+describe("useProcessBuilder", () => {
 	it("simple Route", () => {
 		const description = new TestDescription();
 
-		const route = useRouteBuilder(new Route("GET", ["/"]))
-			.handler(
-				() => new OkHttpResponse("test", ""),
-				new OkHttpResponse("test", zod.string()),
+		const process = useProcessBuilder(
+			new Process("test"),
+			{
+				options: { test1: 3 } satisfies { test1: number },
+				input: 2,
+			},
+		)
+			.exportation(
+				["input", "options"],
 				description,
 			);
 
-		expect(route).instanceOf(Route);
-		expect(route.steps[0]).instanceOf(HandlerStep);
-		expect((route.steps[0] as HandlerStep).responses[0]).instanceOf(OkHttpResponse);
-		expect(route.steps[0].descriptions[0]).toBe(description);
+		expect(process).instanceOf(Process);
+		expect(process.descriptions[0]).toBe(description);
+		expect(process.drop).toStrictEqual(["input", "options"]);
+		expect(process.input).toBe(2);
+		expect(process.options).toStrictEqual({ test1: 3 });
 	});
 
 	it("extract", () => {
 		const description = new TestDescription();
 
-		const route = useRouteBuilder(new Route("GET", ["/"]))
+		const process = useProcessBuilder(new Process("test"))
 			.extract(
 				{
 					params: {
@@ -49,31 +53,18 @@ describe("useRouteBuilder", () => {
 				() => new Response(400, "invalide_body", undefined),
 				description,
 			)
-			.handler(
-				({ pickup }) => {
-					const userId = pickup("userId");
+			.exportation(["body", "userId"]);
 
-					type check1 = ExpectType<typeof userId, number, "strict">;
-
-					const body = pickup("body");
-
-					type check2 = ExpectType<typeof body, { test: string }, "strict">;
-
-					return new OkHttpResponse("test", "");
-				},
-				new OkHttpResponse("test", zod.string()),
-			);
-
-		expect(Object.keys(route.extract ?? {})).toStrictEqual(["params", "body"]);
-		expect(route.extractError).not.toBe(undefined);
-		expect(route.descriptions[0]).toBe(description);
+		expect(Object.keys(process.extract ?? {})).toStrictEqual(["params", "body"]);
+		expect(process.extractError).not.toBe(undefined);
+		expect(process.descriptions[0]).toBe(description);
 	});
 
 	it("check", () => {
 		const description1 = new TestDescription();
 		const description2 = new TestDescription();
 
-		const route = useRouteBuilder(new Route("GET", ["/"]))
+		const process = useProcessBuilder(new Process("test"))
 			.extract({
 				params: {
 					userId: zod.coerce.number(),
@@ -126,38 +117,25 @@ describe("useRouteBuilder", () => {
 					},
 				},
 			)
-			.handler(
-				({ pickup }) => {
-					const presetResult = pickup("presetResult");
+			.exportation(["presetResult", "result2", "result1"]);
 
-					type check1 = ExpectType<typeof presetResult, number, "strict">;
-
-					const result2 = pickup("result2");
-
-					type check2 = ExpectType<typeof result2, number | undefined, "strict">;
-
-					return new OkHttpResponse("test", "");
-				},
-				new OkHttpResponse("test", zod.string()),
-			);
-
-		expect(route.steps[0]).instanceOf(CheckerStep);
-		expect((route.steps[0] as CheckerStep).descriptions[0]).toBe(description1);
-		expect(route.steps[1]).instanceOf(CheckerStep);
-		expect((route.steps[1] as CheckerStep).descriptions[0]).toBe(description2);
-		expect(route.steps[2]).instanceOf(CheckerStep);
+		expect(process.steps[0]).instanceOf(CheckerStep);
+		expect((process.steps[0] as CheckerStep).descriptions[0]).toBe(description1);
+		expect(process.steps[1]).instanceOf(CheckerStep);
+		expect((process.steps[1] as CheckerStep).descriptions[0]).toBe(description2);
+		expect(process.steps[2]).instanceOf(CheckerStep);
 
 		const floor = makeFloor<{ result1: string }>();
 		floor.drop("result1", "11");
 
-		expect((route.steps[1] as CheckerStep).params.input(floor.pickup)).toBe(11);
+		expect((process.steps[1] as CheckerStep).params.input(floor.pickup)).toBe(11);
 	});
 
 	it("execute", () => {
 		const description1 = new TestDescription();
 		const description2 = new TestDescription();
 
-		const route = useRouteBuilder(new Route("GET", ["/"]))
+		const process = useProcessBuilder(new Process("test"))
 			.execute(
 				manualProcess,
 				{
@@ -184,27 +162,24 @@ describe("useRouteBuilder", () => {
 				},
 				description2,
 			)
-			.handler(
-				({ pickup }, request) => {
-					const test2 = pickup("test2");
+			.exportation(["test1", "test2"]);
 
-					type check1 = ExpectType<typeof test2, number | undefined, "strict">;
-
-					return new OkHttpResponse("test", "");
-				},
-				new OkHttpResponse("test", zod.string()),
-			);
-
-		expect(route.steps[0]).instanceOf(ProcessStep);
-		expect((route.steps[0] as ProcessStep).descriptions[0]).toBe(description1);
-		expect(route.steps[1]).instanceOf(ProcessStep);
-		expect((route.steps[1] as ProcessStep).descriptions[0]).toBe(description2);
+		expect(process.steps[0]).instanceOf(ProcessStep);
+		expect((process.steps[0] as ProcessStep).descriptions[0]).toBe(description1);
+		expect(process.steps[1]).instanceOf(ProcessStep);
+		expect((process.steps[1] as ProcessStep).descriptions[0]).toBe(description2);
 	});
 
 	it("cut", () => {
 		const description = new TestDescription();
 
-		const route = useRouteBuilder<CurrentRequestObject & { test: string }>(new Route("GET", ["/"]))
+		const process = useProcessBuilder<CurrentRequestObject & { test: string }, { test1: number }, number>(
+			new Process("test"),
+			{
+				options: { test1: 3 },
+				input: 2,
+			},
+		)
 			.extract({
 				params: {
 					userId: zod.coerce.number(),
@@ -213,10 +188,16 @@ describe("useRouteBuilder", () => {
 			.cut(
 				({ pickup }, request) => {
 					const userId = pickup("userId");
+					const options = pickup("options");
+					const input = pickup("input");
 
 					type check1 = ExpectType<typeof userId, number, "strict">;
 
 					type check2 = ExpectType<typeof request["test"], string, "strict">;
+
+					type check3 = ExpectType<typeof options, { test1: number }, "strict">;
+
+					type check4 = ExpectType<typeof input, number, "strict">;
 
 					if (userId) {
 						return new NotFoundHttpResponse("test.notfound", undefined);
@@ -230,22 +211,10 @@ describe("useRouteBuilder", () => {
 			)
 			.cut(() => ({ ttt: "eee" }))
 			.cut(() => ({}), [])
-			.handler(
-				({ pickup }, request) => {
-					const toto = pickup("toto");
+			.exportation(["input", "options"]);
 
-					type check1 = ExpectType<typeof toto, number, "strict">;
-
-					type check2 = ExpectType<typeof request["test"], string, "strict">;
-
-					return new OkHttpResponse("test", "");
-				},
-				new OkHttpResponse("test", zod.string()),
-				description,
-			);
-
-		expect(route.steps[0]).instanceOf(CutStep);
-		expect((route.steps[0] as CutStep).responses[0]).instanceOf(NotFoundHttpResponse);
-		expect(route.steps[0].descriptions[0]).toBe(description);
+		expect(process.steps[0]).instanceOf(CutStep);
+		expect((process.steps[0] as CutStep).responses[0]).instanceOf(NotFoundHttpResponse);
+		expect(process.steps[0].descriptions[0]).toBe(description);
 	});
 });

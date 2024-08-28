@@ -310,13 +310,13 @@ export function useProcessBuilder<
 	}
 
 	function execute(
-		process: Process,
+		currentProcess: Process,
 		params?: ProcessStepParams,
 		...desc: Description[]
 	): ReturnType<AnyProcessBuilder["execute"]> {
 		process.addStep(
 			new ProcessStep(
-				process,
+				currentProcess,
 				params,
 				desc,
 			),

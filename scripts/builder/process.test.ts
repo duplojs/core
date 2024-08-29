@@ -173,7 +173,7 @@ describe("useProcessBuilder", () => {
 	it("cut", () => {
 		const description = new TestDescription();
 
-		const process = useProcessBuilder<CurrentRequestObject & { test: string }, { test1: number }, number>(
+		const process = useProcessBuilder(
 			new Process("test"),
 			{
 				options: { test1: 3 },
@@ -193,11 +193,9 @@ describe("useProcessBuilder", () => {
 
 					type check1 = ExpectType<typeof userId, number, "strict">;
 
-					type check2 = ExpectType<typeof request["test"], string, "strict">;
+					type check2 = ExpectType<typeof options, { test1: number }, "strict">;
 
-					type check3 = ExpectType<typeof options, { test1: number }, "strict">;
-
-					type check4 = ExpectType<typeof input, number, "strict">;
+					type check3 = ExpectType<typeof input, number, "strict">;
 
 					if (userId) {
 						return new NotFoundHttpResponse("test.notfound", undefined);
@@ -216,5 +214,26 @@ describe("useProcessBuilder", () => {
 		expect(process.steps[0]).instanceOf(CutStep);
 		expect((process.steps[0] as CutStep).responses[0]).instanceOf(NotFoundHttpResponse);
 		expect(process.steps[0].descriptions[0]).toBe(description);
+
+		useProcessBuilder<
+			CurrentRequestObject & { test: string }
+		>(new Process("test"))
+			.extract({
+				params: {
+					userId: zod.coerce.number(),
+				},
+			})
+			.cut(
+				({ pickup }, request) => {
+					type check1 = ExpectType<typeof request["test"], string, "strict">;
+
+					type check2 = ExpectType<ReturnType<typeof pickup<"input">>, undefined, "strict">;
+
+					type check3 = ExpectType<ReturnType<typeof pickup<"options">>, undefined, "strict">;
+
+					return { toto: 56 };
+				},
+			)
+			.exportation();
 	});
 });

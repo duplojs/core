@@ -209,37 +209,40 @@ export interface ProcessBuilder<
 }
 
 export interface ProcessBuilderParams<
-	Options extends object | undefined = undefined,
-	Input extends unknown = undefined,
+	Options extends object = object,
+	Input extends unknown = unknown,
 > {
 	options?: Options;
 	input?: Input;
+}
+
+export interface ProcessBuilderParamsToFloorData<P extends ProcessBuilderParams> {
+	options: object extends P["options"]
+		? undefined
+		: P["options"];
+	input: unknown extends P["input"]
+		? undefined
+		: P["input"];
 }
 
 export type AnyProcessBuilder = ProcessBuilder<any, any, any, any, any, any, any, any>;
 
 export function useProcessBuilder<
 	Request extends CurrentRequestObject,
-	Options extends object | undefined = undefined,
-	Input extends unknown = undefined,
+	Params extends ProcessBuilderParams = ProcessBuilderParams,
+	FloorData extends ProcessBuilderParamsToFloorData<Params> = ProcessBuilderParamsToFloorData<Params>,
 >(
 	process: Process,
-	params?: ProcessBuilderParams<
-		Options,
-		Input
-	>,
+	params?: Params,
 ): ProcessBuilder<
 		Request,
-		Options,
-		Input,
+		FloorData["options"],
+		FloorData["input"],
 		never,
 		ExtractObject,
 		never,
 		0,
-		{
-			options: Options;
-			input: Input;
-		}
+		FloorData
 	> {
 	if (params?.options) {
 		process.setOptions(params?.options);

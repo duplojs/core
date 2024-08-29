@@ -15,6 +15,7 @@ import { ProcessStep, type ProcessStepParams } from "@scripts/step/process";
 import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
 import { CutStep, type Cut } from "@scripts/step/cut";
 import type { AnyFunction } from "@utils/types";
+import type { DefineHooksRouteLifeCycle } from "@scripts/hook";
 
 export interface ProcessBuilder<
 	Request extends CurrentRequestObject = CurrentRequestObject,
@@ -26,6 +27,11 @@ export interface ProcessBuilder<
 	StepsCount extends number = 0,
 	FloorData extends object = object,
 > {
+	hook: DefineHooksRouteLifeCycle<
+		Request,
+		this
+	>;
+
 	extract<
 		E extends ExtractObject<Request>,
 	>(
@@ -43,7 +49,7 @@ export interface ProcessBuilder<
 			StepsCount,
 			FloorData & FlatExtract<E>
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	check<
@@ -85,7 +91,7 @@ export interface ProcessBuilder<
 					: Omit<FloorData, I>
 			)
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	presetCheck<
@@ -115,7 +121,7 @@ export interface ProcessBuilder<
 					: Omit<FloorData, GCPG["key"]>
 			)
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	execute<
@@ -153,7 +159,7 @@ export interface ProcessBuilder<
 					: Omit<FloorData, T>
 			)
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	cut<
@@ -186,7 +192,7 @@ export interface ProcessBuilder<
 					: Omit<FloorData, D> & Pick<O, D>
 			)
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	exportation<
@@ -250,6 +256,22 @@ export function useProcessBuilder<
 
 	if (params?.input) {
 		process.setInput(params?.input);
+	}
+
+	function hook(
+		...[name, subscriber]: Parameters<DefineHooksRouteLifeCycle>
+	): ReturnType<AnyProcessBuilder["hook"]> {
+		process.hooks[name].addSubscriber(subscriber as AnyFunction);
+
+		return {
+			extract,
+			check,
+			presetCheck,
+			execute,
+			cut,
+			hook,
+			exportation,
+		};
 	}
 
 	function extract(
@@ -374,5 +396,6 @@ export function useProcessBuilder<
 		execute,
 		cut,
 		exportation,
+		hook,
 	} satisfies AnyProcessBuilder as any;
 }

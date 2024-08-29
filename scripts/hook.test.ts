@@ -1,3 +1,4 @@
+import { CheckpointList } from "@test/utils/checkpointList";
 import { getTypedEntries } from ".";
 import { Hook, copyHooks, makeHooksRouteLifeCycle } from "./hook";
 
@@ -145,6 +146,32 @@ describe("hook", () => {
 		await buidedHook();
 
 		expect(testlaunch).toBe(false);
+	});
+
+	it("test stop execution", () => {
+		const hook = new Hook(0);
+		const checkpointList = new CheckpointList();
+
+		hook.addSubscriber(() => {
+			checkpointList.addPoint("1");
+		});
+		hook.addSubscriber(() => {
+			checkpointList.addPoint("2");
+			return "toto";
+		});
+		hook.addSubscriber(() => {
+			checkpointList.addPoint("3");
+		});
+
+		expect(hook.launchSubscriber()).toBe("toto");
+		expect(checkpointList.getPointList()).toStrictEqual(["start", "1", "2", "end"]);
+
+		checkpointList.reset();
+
+		const buidedHook = hook.build();
+
+		expect(buidedHook()).toBe("toto");
+		expect(checkpointList.getPointList()).toStrictEqual(["start", "1", "2", "end"]);
 	});
 
 	it("makeHooksRouteLifeCycle", () => {

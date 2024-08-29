@@ -10,6 +10,7 @@ import {
 	type CurrentRequestObject,
 	ProcessStep,
 	CutStep,
+	getTypedEntries,
 } from "..";
 import { useRouteBuilder } from "./route";
 import type { ExpectType } from "@test/utils/expectType";
@@ -250,5 +251,34 @@ describe("useRouteBuilder", () => {
 		expect(route.steps[0]).instanceOf(CutStep);
 		expect((route.steps[0] as CutStep).responses[0]).instanceOf(NotFoundHttpResponse);
 		expect(route.steps[0].descriptions[0]).toBe(description);
+	});
+
+	it("add hook", () => {
+		const route = useRouteBuilder<
+			CurrentRequestObject & { test: string }
+		>(new Route("GET", ["/"]))
+			.hook("afterSend", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("beforeRouteExecution", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("beforeSend", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("onError", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("parsingBody", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("serializeBody", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.handler(() => new OkHttpResponse("test", undefined));
+
+		Object.values(route.hooks).forEach((value) => {
+			expect(value.subscribers[0]).toBeTypeOf("function");
+		});
 	});
 });

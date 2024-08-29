@@ -17,6 +17,7 @@ import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
 import { CutStep, type Cut } from "@scripts/step/cut";
 import { HandlerStep, type Handler } from "@scripts/step/handler";
 import type { AnyFunction } from "@utils/types";
+import type { DefineHooksRouteLifeCycle } from "@scripts/hook";
 
 export interface RouteBuilder<
 	Request extends CurrentRequestObject = CurrentRequestObject,
@@ -26,6 +27,11 @@ export interface RouteBuilder<
 	StepsCount extends number = 0,
 	FloorData extends object = object,
 > {
+	hook: DefineHooksRouteLifeCycle<
+		Request,
+		this
+	>;
+
 	extract<
 		E extends ExtractObject<Request>,
 	>(
@@ -41,7 +47,7 @@ export interface RouteBuilder<
 			StepsCount,
 			FloorData & FlatExtract<E>
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	check<
@@ -81,7 +87,7 @@ export interface RouteBuilder<
 					: Omit<FloorData, I>
 			)
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	presetCheck<
@@ -109,7 +115,7 @@ export interface RouteBuilder<
 					: Omit<FloorData, GCPG["key"]>
 			)
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	execute<
@@ -145,7 +151,7 @@ export interface RouteBuilder<
 					: Omit<FloorData, T>
 			)
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	cut<
@@ -176,7 +182,7 @@ export interface RouteBuilder<
 					: Omit<FloorData, D> & Pick<O, D>
 			)
 		>,
-		"extract"
+		"extract" | "hook"
 	>;
 
 	handler<
@@ -202,6 +208,22 @@ export function useRouteBuilder<
 >(
 	route: Route,
 ): RouteBuilder<Request> {
+	function hook(
+		...[name, subscriber]: Parameters<DefineHooksRouteLifeCycle>
+	): ReturnType<AnyRouteBuilder["hook"]> {
+		route.hooks[name].addSubscriber(subscriber as AnyFunction);
+
+		return {
+			extract,
+			check,
+			presetCheck,
+			execute,
+			cut,
+			handler,
+			hook,
+		};
+	}
+
 	function extract(
 		extract: ExtractObject,
 		error?: ExtractErrorFunction,
@@ -331,5 +353,6 @@ export function useRouteBuilder<
 		execute,
 		cut,
 		handler,
+		hook,
 	} satisfies AnyRouteBuilder as any;
 }

@@ -33,13 +33,17 @@ export interface DisabledExtractKey {
 	method: true;
 }
 
-export type ExtractKey = Exclude<
-	keyof CurrentRequestObject,
+export type ExtractKey<
+	T extends object = CurrentRequestObject,
+> = Exclude<
+	keyof T,
 	GetPropsWithTrueValue<DisabledExtractKey>
 >;
 
-export type ExtractObject = {
-	[P in ExtractKey]?: Record<string, ZodType> | ZodType;
+export type ExtractObject<
+	T extends object = CurrentRequestObject,
+> = {
+	[P in ExtractKey<T>]?: Record<string, ZodType> | ZodType;
 };
 
 export abstract class Duplose<

@@ -27,7 +27,7 @@ export interface ProcessBuilder<
 	FloorData extends object = object,
 > {
 	extract<
-		E extends ExtractObject,
+		E extends ExtractObject<Request>,
 	>(
 		extract: E,
 		error?: ExtractErrorFunction,

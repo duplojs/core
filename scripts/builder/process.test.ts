@@ -222,14 +222,17 @@ describe("useProcessBuilder", () => {
 				params: {
 					userId: zod.coerce.number(),
 				},
+				test: zod.string(),
 			})
 			.cut(
 				({ pickup }, request) => {
 					type check1 = ExpectType<typeof request["test"], string, "strict">;
 
-					type check2 = ExpectType<ReturnType<typeof pickup<"input">>, undefined, "strict">;
+					type check2 = ExpectType<ReturnType<typeof pickup<"test">>, string, "strict">;
 
-					type check3 = ExpectType<ReturnType<typeof pickup<"options">>, undefined, "strict">;
+					type check3 = ExpectType<ReturnType<typeof pickup<"input">>, undefined, "strict">;
+
+					type check4 = ExpectType<ReturnType<typeof pickup<"options">>, undefined, "strict">;
 
 					return { toto: 56 };
 				},

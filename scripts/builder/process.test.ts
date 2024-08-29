@@ -239,4 +239,33 @@ describe("useProcessBuilder", () => {
 			)
 			.exportation();
 	});
+
+	it("add hook", () => {
+		const process = useProcessBuilder<
+			CurrentRequestObject & { test: string }
+		>(new Process("test"))
+			.hook("afterSend", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("beforeRouteExecution", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("beforeSend", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("onError", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("parsingBody", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.hook("serializeBody", (request) => {
+				type check = ExpectType<typeof request["test"], string, "strict">;
+			})
+			.exportation();
+
+		Object.values(process.hooks).forEach((value) => {
+			expect(value.subscribers[0]).toBeTypeOf("function");
+		});
+	});
 });

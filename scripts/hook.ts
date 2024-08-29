@@ -32,26 +32,28 @@ export class Hook<
 		this.subscribers = [];
 	}
 
-	public launchSubscriber(...args: Parameters<subscriber>): boolean | void {
+	public launchSubscriber(...args: Parameters<subscriber>): Awaited<ReturnType<subscriber>> | void {
 		for (const subscriber of this.subscribers) {
-			if (subscriber instanceof Hook) {
-				if (subscriber.launchSubscriber(...args) === true) {
-					return true;
-				}
-			} else if (subscriber(...args) === true) {
-				return true;
+			const result = subscriber instanceof Hook
+				? subscriber.launchSubscriber(...args)
+				: subscriber(...args);
+
+			if (result) {
+				return result;
 			}
 		}
 	}
 
-	public async launchSubscriberAsync(...args: Parameters<subscriber>): Promise<boolean | void> {
+	public async launchSubscriberAsync(
+		...args: Parameters<subscriber>
+	): Promise<Awaited<ReturnType<subscriber>> | void> {
 		for (const subscriber of this.subscribers) {
-			if (subscriber instanceof Hook) {
-				if (await subscriber.launchSubscriberAsync(...args) === true) {
-					return true;
-				}
-			} else if (await subscriber(...args) === true) {
-				return true;
+			const result = subscriber instanceof Hook
+				? await subscriber.launchSubscriberAsync(...args)
+				: await subscriber(...args);
+
+			if (result) {
+				return result;
 			}
 		}
 	}
@@ -60,30 +62,33 @@ export class Hook<
 		return !!this.subscribers.find((fnc) => fnc === subscriber);
 	}
 
+	public getFlatSubscribers(): subscriber[] {
+		return this.subscribers.flatMap(
+			(subscriber) => typeof subscriber === "function"
+				? subscriber
+				: subscriber.getFlatSubscribers(),
+		);
+	}
+
 	public build() {
-		const subscribers = this.flatSubscribers();
+		const subscribers = this.getFlatSubscribers();
 
 		const mapArgs = new Array(this.numberArgs).fill(undefined)
 			.map((_v, index) => `arg${index}`)
 			.join(", ");
 
 		const functionContent = subscribers.map((fnc, index) => /* js */`
-			if(${(fnc.constructor.name === "AsyncFunction" ? "await " : "")}this.subscribers[${index}](${mapArgs}) === true) return;
+			result = ${(fnc.constructor.name === "AsyncFunction" ? "await " : "")}this.subscribers[${index}](${mapArgs})
+			if(result) {
+				return result;
+			}
 		`).join("");
 
 		return advancedEval<subscriber>({
-			content: functionContent,
+			content: `let result;\n${functionContent}`,
 			args: [mapArgs],
 			bind: { subscribers },
 		});
-	}
-
-	private flatSubscribers(): subscriber[] {
-		return this.subscribers.flatMap(
-			(subscriber) => typeof subscriber === "function"
-				? subscriber
-				: subscriber.flatSubscribers(),
-		);
 	}
 }
 
@@ -125,3 +130,9 @@ export type BuildedHooksRouteLifeCycle<
 	Request extends CurrentRequestObject = any,
 > = BuildHooks<HooksRouteLifeCycle<Request>>;
 
+export type DefineHooksRouteLifeCycle<
+	Request extends CurrentRequestObject = any,
+	ReturnType extends unknown = undefined,
+> = <
+	T extends keyof BuildedHooksRouteLifeCycle<Request>,
+>(hookName: T, subscriber: BuildedHooksRouteLifeCycle<Request>[T]) => ReturnType;

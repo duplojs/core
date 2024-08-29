@@ -1,12 +1,12 @@
 import { Checker, type CheckerOutput, type GetCheckerGeneric } from "@scripts/checker";
-import { CheckerPreset, createChecker, createCheckerPreset, type GetCheckerPresetGeneric } from "./checker";
+import { PresetChecker, createChecker, createPresetChecker, type GetPresetCheckerGeneric } from "./checker";
 import type { ExpectType } from "@test/utils/expectType";
 import { OkHttpResponse, UnprocessableEntityHttpResponse } from "@scripts/response/simplePreset";
 import { zod, type Response } from "..";
 
 describe("checker builder", () => {
 	it("create without options", () => {
-		const isOdd = createChecker("isOdd", undefined)
+		const isOdd = createChecker("isOdd")
 			.handler((input: number, output, options) => {
 				type check = ExpectType<
 					typeof options,
@@ -68,7 +68,7 @@ describe("checker builder", () => {
 	});
 
 	it("preset checker", () => {
-		const isOdd = createChecker("isOdd", undefined)
+		const isOdd = createChecker("isOdd")
 			.handler((input: number, output, options) => {
 				if (input % 2 === 1) {
 					return output("odd", input);
@@ -77,7 +77,7 @@ describe("checker builder", () => {
 				}
 			});
 
-		const preset = createCheckerPreset(
+		const preset = createPresetChecker(
 			isOdd,
 			{
 				result: "odd",
@@ -90,10 +90,10 @@ describe("checker builder", () => {
 			],
 		);
 
-		expect(preset).instanceOf(CheckerPreset);
+		expect(preset).instanceOf(PresetChecker);
 
-		type check = ExpectType<
-			GetCheckerPresetGeneric<typeof preset>,
+		type check1 = ExpectType<
+			GetPresetCheckerGeneric<typeof preset>,
 			{
 				checker: typeof isOdd;
 				info: "odd";
@@ -101,6 +101,48 @@ describe("checker builder", () => {
 				response:
 					| Response<200, "odd", undefined>
 					| Response<422, "notOdd", undefined>;
+				newInput: unknown;
+			},
+			"strict"
+		>;
+
+		const newPreset = preset.rewriteIndexing("test");
+
+		expect(newPreset).instanceOf(PresetChecker);
+		expect(newPreset.params.indexing).toBe("test");
+
+		type check2 = ExpectType<
+			GetPresetCheckerGeneric<typeof newPreset>,
+			{
+				checker: typeof isOdd;
+				info: "odd";
+				key: "test";
+				response:
+					| Response<200, "odd", undefined>
+					| Response<422, "notOdd", undefined>;
+				newInput: unknown;
+			},
+			"strict"
+		>;
+
+		const presetWithTransformInput = createPresetChecker(
+			isOdd,
+			{
+				result: "notOdd",
+				catch: () => new OkHttpResponse("odd", undefined),
+				transformInput: (input: symbol) => Number(input),
+			},
+			new OkHttpResponse("odd", zod.undefined()),
+		);
+
+		type check3 = ExpectType<
+			GetPresetCheckerGeneric<typeof presetWithTransformInput>,
+			{
+				checker: typeof isOdd;
+				info: "notOdd";
+				key: string;
+				response: Response<200, "odd", undefined>;
+				newInput: symbol;
 			},
 			"strict"
 		>;

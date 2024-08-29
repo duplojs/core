@@ -28,9 +28,9 @@ describe("Duplose", () => {
 	});
 
 	it("addPreflight", () => {
-		duplose.addPreflight(preflight);
+		duplose.addPreflightSteps(preflight);
 
-		expect(duplose.preflights[0]).toBe(preflight);
+		expect(duplose.preflightSteps[0]).toBe(preflight);
 	});
 
 	it("addStep", () => {

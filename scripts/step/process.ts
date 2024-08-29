@@ -17,12 +17,13 @@ export interface ProcessStepParams<
 }
 
 export class ProcessStep<
+	CurrentProcess extends Process = Process,
 	_StepNumber extends number = number,
-> extends Step<Process, _StepNumber> {
+> extends Step<CurrentProcess, _StepNumber> {
 	public params: ProcessStepParams;
 
 	public constructor(
-		process: Process,
+		process: CurrentProcess,
 		params: ProcessStepParams = {},
 		descriptions: Description[] = [],
 	) {

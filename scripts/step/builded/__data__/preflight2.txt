@@ -4,10 +4,10 @@
 /* end_block */
 
 
-			result = this.preflights[1].processFunction(
+			result = this.preflightSteps[1].processFunction(
 				request,
-				this.preflights[1].params.options,
-				this.preflights[1].input(floor.pickup)
+				this.preflightSteps[1].params.options,
+				this.preflightSteps[1].input(floor.pickup)
 			);
 
 			

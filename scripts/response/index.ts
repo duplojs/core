@@ -1,11 +1,15 @@
 import { getTypedEntries } from "@utils/getTypedEntries";
 import type { ZodType } from "zod";
 
+const unique = Symbol("unique");
+
 export class Response<
 	Code extends number = number,
 	Information extends string | undefined = string | undefined,
 	Body extends unknown = unknown,
 > {
+	public readonly [unique] = undefined;
+
 	public code: Code;
 
 	public information: Information;

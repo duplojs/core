@@ -31,4 +31,4 @@ export interface NumberTail {
 	29: 30;
 }
 
-export type AddOne<T extends keyof NumberTail> = NumberTail[T];
+export type AddOne<T extends number> = T extends keyof NumberTail ? NumberTail[T] : never;

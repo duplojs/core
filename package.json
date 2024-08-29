@@ -10,7 +10,9 @@
     "build": "npm run build:types && npm run build:scripts",
     "test:tu": "vitest --coverage",
     "test:tu:watch": "vitest --coverage --watch",
-    "test:types": "tsc && tsc -p test/overrideTypes/tsconfig.json",
+    "test:types": "npm run test:types:scripts && npm run test:types:override",
+    "test:types:scripts": "tsc",
+    "test:types:override": "sh test/overridesTypes/testOverrideTypes.sh",
     "test:lint": "eslint",
     "test:lint:fix": "eslint --fix",
     "prepare": "husky"
@@ -25,11 +27,11 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+	"README.md"
   ],
   "dependencies": {
     "mime": ">=4.0.4 <5.0.0",
-    "vite-tsconfig-paths": "^5.0.1",
     "zod": ">=3.23.8 <4.0.0"
   },
   "devDependencies": {
@@ -45,6 +47,7 @@
     "rollup-plugin-esbuild": "6.1.1",
     "tslib": "^2.6.3",
     "typescript": "5.5.4",
+    "vite-tsconfig-paths": "^5.0.1",
     "vitest": "2.0.5"
   },
   "keywords": []

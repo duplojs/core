@@ -18,7 +18,7 @@ export interface DuploseBuildedFunctionContext {
 	Response: typeof Response;
 	extract?: ExtractObject;
 	extractError: ExtractErrorFunction;
-	preflights: BuildedPreflightStep[];
+	preflightSteps: BuildedPreflightStep[];
 	steps: BuildedStep[];
 	extensions: object;
 }
@@ -45,7 +45,7 @@ export type ExtractObject = {
 export abstract class Duplose<
 	BuildedFunction extends AnyFunction = any,
 	Request extends CurrentRequestObject = any,
-	_Preflight extends PreflightStep = any,
+	_PreflightStep extends PreflightStep = any,
 	_Extract extends ExtractObject = any,
 	_Step extends Step = any,
 	_FloorData extends object = any,
@@ -54,7 +54,7 @@ export abstract class Duplose<
 
 	public hooks = makeHooksRouteLifeCycle<Request>();
 
-	public preflights: PreflightStep[] = [];
+	public preflightSteps: PreflightStep[] = [];
 
 	public extract?: ExtractObject;
 
@@ -83,8 +83,8 @@ export abstract class Duplose<
 		this.descriptions.push(...descriptions);
 	}
 
-	public addPreflight(...preflights: PreflightStep[]) {
-		this.preflights.push(...preflights);
+	public addPreflightSteps(...preflightSteps: PreflightStep[]) {
+		this.preflightSteps.push(...preflightSteps);
 	}
 
 	public addStep(...steps: Step[]) {
@@ -98,7 +98,7 @@ export abstract class Duplose<
 			.filter((step): step is ProcessStep => step instanceof ProcessStep)
 			.forEach((step) => void step.parent.copyHooks(base));
 
-		this.preflights.forEach((step) => {
+		this.preflightSteps.forEach((step) => {
 			step.parent.copyHooks(base);
 		});
 	}

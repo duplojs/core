@@ -6,12 +6,12 @@ export class BuildedPreflightStep extends BuildedProcessStep {
 		const async = this.processFunction.constructor.name === "AsyncFunction";
 
 		const options = typeof this.params.options === "function"
-			? /* js */`this.preflights[${index}].params.options(${StringBuilder.floor}.pickup)`
-			: /* js */`this.preflights[${index}].params.options`;
+			? /* js */`this.preflightSteps[${index}].params.options(${StringBuilder.floor}.pickup)`
+			: /* js */`this.preflightSteps[${index}].params.options`;
 
 		const input = condition(
 			!!this.params.input,
-			() => /* js */`this.preflights[${index}].input(floor.pickup)`,
+			() => /* js */`this.preflightSteps[${index}].input(floor.pickup)`,
 		);
 
 		const drop = mapped(
@@ -22,7 +22,7 @@ export class BuildedPreflightStep extends BuildedProcessStep {
 		return /* js */`
 			${insertBlock(`preflight-process-(${index})-before`)}
 
-			${StringBuilder.result} = ${maybeAwait(async)}this.preflights[${index}].processFunction(
+			${StringBuilder.result} = ${maybeAwait(async)}this.preflightSteps[${index}].processFunction(
 				${StringBuilder.request},
 				${options},
 				${input}

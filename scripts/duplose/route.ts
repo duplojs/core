@@ -23,14 +23,14 @@ export type GetRouteGeneric<
 	T extends Route = Route,
 > = T extends Route<
 	infer Request,
-	infer Preflight,
+	infer PreflightSteps,
 	infer Extract,
 	infer Step,
 	infer Floor
 >
 	? {
 		request: Request;
-		preflights: Preflight;
+		preflightSteps: PreflightSteps;
 		extract: Extract;
 		step: Step;
 		floor: Floor;
@@ -39,14 +39,14 @@ export type GetRouteGeneric<
 
 export class Route<
 	Request extends CurrentRequestObject = any,
-	_Preflight extends PreflightStep = any,
+	_PreflightStep extends PreflightStep = any,
 	_Extract extends ExtractObject = any,
 	_Step extends Step = any,
 	_FloorData extends object = any,
 > extends Duplose<
 		RouteBuildedFunction,
 		Request,
-		_Preflight,
+		_PreflightStep,
 		_Extract,
 		_Step,
 		_FloorData
@@ -79,7 +79,7 @@ export class Route<
 		this.copyHooks(hooks);
 		copyHooks(hooks, this.instance.hooksRouteLifeCycle);
 
-		const buildedPreflight = this.preflights.map(
+		const buildedPreflight = this.preflightSteps.map(
 			(step) => step.build(),
 		);
 
@@ -181,7 +181,7 @@ export class Route<
 				Response,
 				extract: simpleClone(this.extract),
 				extractError: this.extractError ?? this.instance.extractError,
-				preflights: buildedPreflight,
+				preflightSteps: buildedPreflight,
 				steps: buildedStep,
 				extensions: simpleClone(this.extensions),
 			} satisfies RouteBuildedFunctionContext,

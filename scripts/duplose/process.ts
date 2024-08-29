@@ -23,7 +23,7 @@ export type GetProcessGeneric<
 	infer Options,
 	infer Input,
 	infer Drop,
-	infer Preflight,
+	infer PreflightStep,
 	infer Extract,
 	infer Steps,
 	infer Floor
@@ -33,7 +33,7 @@ export type GetProcessGeneric<
 		options: Options;
 		input: Input;
 		drop: Drop;
-		preflight: Preflight;
+		preflightStep: PreflightStep;
 		extract: Extract;
 		steps: Steps;
 		floor: Floor;
@@ -45,14 +45,14 @@ export class Process<
 	_Options extends object | undefined = any,
 	_Input extends unknown = any,
 	_Drop extends string = any,
-	_Preflight extends PreflightStep = any,
+	_PreflightStep extends PreflightStep = any,
 	_Extract extends ExtractObject = any,
 	_Step extends Step = any,
 	_FloorData extends object = any,
 > extends Duplose<
 		ProcessBuildedFunction,
 		Request,
-		_Preflight,
+		_PreflightStep,
 		_Extract,
 		_Step,
 		_FloorData
@@ -95,7 +95,7 @@ export class Process<
 			throw new BuildNoRegisteredDuploseError(this);
 		}
 
-		const buildedPreflight = this.preflights.map(
+		const buildedPreflight = this.preflightSteps.map(
 			(step) => step.build(),
 		);
 
@@ -146,7 +146,7 @@ export class Process<
 				Response,
 				extract: simpleClone(this.extract),
 				extractError: this.extractError ?? this.instance.extractError,
-				preflights: buildedPreflight,
+				preflightSteps: buildedPreflight,
 				steps: buildedStep,
 				extensions: simpleClone(this.extensions),
 			} satisfies DuploseBuildedFunctionContext,

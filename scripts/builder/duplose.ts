@@ -82,7 +82,7 @@ export interface Builder<
 		FloorData
 	>;
 
-	preflights: Preflights[];
+	preflightSteps: Preflights[];
 }
 
 export type AnyBuilder = Builder<any, any, any, any>;
@@ -100,7 +100,7 @@ export function useBuilder<
 	function createRoute(
 		method: HttpMethod,
 		path: string | string[],
-		preflights: PreflightStep[],
+		preflightSteps: PreflightStep[],
 		desc: Description[],
 	): AnyRouteBuilder {
 		const route = new Route(
@@ -109,7 +109,7 @@ export function useBuilder<
 			desc,
 		);
 
-		route.addPreflight(...preflights);
+		route.addPreflightSteps(...preflightSteps);
 
 		useBuilder[createdDuploseSymbol].add({
 			duplose: route,
@@ -122,7 +122,7 @@ export function useBuilder<
 	function createProcess(
 		name: string,
 		params: ProcessBuilderParams | undefined,
-		preflights: PreflightStep[],
+		preflightSteps: PreflightStep[],
 		desc: Description[],
 	): AnyProcessBuilder {
 		const process = new Process(
@@ -130,7 +130,7 @@ export function useBuilder<
 			desc,
 		);
 
-		process.addPreflight(...preflights);
+		process.addPreflightSteps(...preflightSteps);
 
 		useBuilder[createdDuploseSymbol].add({
 			duplose: process,
@@ -144,27 +144,27 @@ export function useBuilder<
 		process: Process,
 		params?: ProcessStepParams,
 		lastPreflights: PreflightStep[] = [],
-		...desc: Description[]
+		desc: Description[] = [],
 	): ReturnType<AnyBuilder["preflight"]> {
 		const preflightStep = new PreflightStep(process, params, desc);
-		const preflights = [...lastPreflights, preflightStep];
+		const preflightSteps = [...lastPreflights, preflightStep];
 
 		return {
 			preflight(process, params, ...desc) {
 				return preflight(
 					process,
 					params,
-					preflights,
+					preflightSteps,
 					desc,
 				);
 			},
 			createRoute(method, path, ...desc) {
-				return createRoute(method, path, preflights, desc);
+				return createRoute(method, path, preflightSteps, desc);
 			},
 			createProcess(name, params, ...desc) {
-				return createProcess(name, params, preflights, desc);
+				return createProcess(name, params, preflightSteps, desc);
 			},
-			preflights,
+			preflightSteps,
 		};
 	}
 
@@ -183,7 +183,7 @@ export function useBuilder<
 		createProcess(name, params, ...desc) {
 			return createProcess(name, params, [], desc);
 		},
-		preflights: [],
+		preflightSteps: [],
 	} satisfies AnyBuilder as any;
 }
 useBuilder[createdDuploseSymbol] = new Set<CreatedDuplose>();

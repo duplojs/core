@@ -209,6 +209,7 @@ describe("useRouteBuilder", () => {
 				params: {
 					userId: zod.coerce.number(),
 				},
+				test: zod.string(),
 			})
 			.cut(
 				({ pickup }, request) => {
@@ -217,6 +218,8 @@ describe("useRouteBuilder", () => {
 					type check1 = ExpectType<typeof userId, number, "strict">;
 
 					type check2 = ExpectType<typeof request["test"], string, "strict">;
+
+					type check3 = ExpectType<ReturnType<typeof pickup<"test">>, string, "strict">;
 
 					if (userId) {
 						return new NotFoundHttpResponse("test.notfound", undefined);

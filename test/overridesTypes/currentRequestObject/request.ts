@@ -7,4 +7,4 @@ declare module "@scripts/request" {
 	}
 }
 
-type CheckOverrideRequestObject = ExpectType<string, CurrentRequestObject, "strict">;
+type check = ExpectType<string, CurrentRequestObject, "strict">;

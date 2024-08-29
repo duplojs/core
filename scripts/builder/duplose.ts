@@ -49,13 +49,13 @@ export interface Builder<
 	>;
 
 	createRoute<
-		RouteRequest extends CurrentRequestObject = CurrentRequestObject,
+		R extends CurrentRequestObject = CurrentRequestObject,
 	>(
 		method: HttpMethod,
 		path: string | string[],
 		...desc: Description[]
 	): RouteBuilder<
-		Request & RouteRequest,
+		Request & R,
 		Preflights,
 		ExtractObject,
 		never,
@@ -64,22 +64,22 @@ export interface Builder<
 	>;
 
 	createProcess<
-		ProcessRequest extends CurrentRequestObject = CurrentRequestObject,
-		Params extends ProcessBuilderParams = ProcessBuilderParams,
-		FloorData extends ProcessBuilderParamsToFloorData<Params> = ProcessBuilderParamsToFloorData<Params>,
+		R extends CurrentRequestObject = CurrentRequestObject,
+		P extends ProcessBuilderParams = ProcessBuilderParams,
+		D extends ProcessBuilderParamsToFloorData<P> = ProcessBuilderParamsToFloorData<P>,
 	>(
 		name: string,
-		params?: Params,
+		params?: P,
 		...desc: Description[]
 	): ProcessBuilder<
-		Request & ProcessRequest,
-		FloorData["options"],
-		FloorData["input"],
+		Request & R,
+		D["options"],
+		D["input"],
 		never,
 		ExtractObject,
 		never,
 		0,
-		FloorData
+		FloorData & D
 	>;
 
 	preflightSteps: Preflights[];
@@ -210,4 +210,8 @@ useBuilder.getFirstCreatedDuploses = function *() {
 		createdDuplose.count++;
 		yield createdDuplose.duplose;
 	}
+};
+
+useBuilder.resetCreatedDuploses = function() {
+	useBuilder[createdDuploseSymbol] = new Set<CreatedDuplose>();
 };

@@ -6,6 +6,7 @@ export * from "@scripts/floor";
 
 export * from "@scripts/builder/duplose";
 export * from "@scripts/builder/route";
+export * from "@scripts/builder/process";
 export * from "@scripts/builder/checker";
 
 export * from "@scripts/response";
@@ -41,6 +42,7 @@ export * from "@utils/getTypedEntries";
 export * from "@utils/overrideInterface";
 export * from "@utils/simpleClone";
 export * from "@utils/stringBuilder";
+export * from "@utils/typeInput";
 export * from "@utils/types";
 export * from "@utils/unionToIntersection";
 export * from "@utils/unionToTuple";

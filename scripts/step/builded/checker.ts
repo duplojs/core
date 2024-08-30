@@ -3,11 +3,15 @@ import { BuildedStep } from ".";
 import type { CheckerStep, CheckerStepParams } from "../checker";
 import { simpleClone } from "@utils/simpleClone";
 import type { CheckerHandler } from "@scripts/checker";
+import type { ZodType, ZodUnion } from "zod";
+import { zod } from "@scripts/index";
 
 export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 	public checkerFunction: CheckerHandler;
 
 	public params: CheckerStepParams;
+
+	public responseZodSchema?: ZodUnion<any>;
 
 	public constructor(step: CheckerStep) {
 		super(step);
@@ -30,6 +34,18 @@ export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 			info: "<([{|none|}])>",
 			data: undefined,
 		}));
+
+		if (step.responses.length !== 0) {
+			this.responseZodSchema = zod.union(
+				step.responses.map(
+					(contractResponse) => zod.object({
+						code: zod.literal(contractResponse.code),
+						info: zod.literal(contractResponse.information),
+						body: contractResponse.body,
+					}) satisfies ZodType,
+				) as any,
+			);
+		}
 	}
 
 	public toString(index: number) {
@@ -46,6 +62,17 @@ export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 		const indexing = condition(
 			!!this.params.indexing,
 			() => /* js */`${StringBuilder.floor}.drop(this.steps[${index}].params.indexing, ${StringBuilder.result}.data)`,
+		);
+
+		const contractResponses = condition(
+			!!this.responseZodSchema,
+			() => /* js */`
+				let temp = this.steps[${index}].responseZodSchema.safeParse(${StringBuilder.result});
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, ${StringBuilder.result});
+				}
+			`,
 		);
 
 		return skipStep(
@@ -68,6 +95,8 @@ export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 					${StringBuilder.result}.data, 
 					${StringBuilder.floor}.pickup
 				);
+
+				${contractResponses}
 
 				break ${StringBuilder.label};
 			}

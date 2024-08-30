@@ -12,6 +12,7 @@ import { simpleClone } from "@utils/simpleClone";
 import { HandlerStep } from "@scripts/step/handler";
 import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
 import type { PreflightStep } from "@scripts/step/preflight";
+import { ContractResponseError } from "@scripts/error/contractResponseError";
 
 interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext {
 	hooks: BuildedHooksRouteLifeCycle;
@@ -137,31 +138,31 @@ export class Route<
 				${insertBlock("steps-after")}
 
 				${insertBlock("defaultResponse-before")}
-				${StringBuilder.result} = new this.Response(503, "NO_RESPONSE_SENT", undefined)
+				${StringBuilder.result} = new this.Response(503, "NO_RESPONSE_SENT", undefined);
 			}
-
-			${insertBlock("hook-beforeSend-before")}
-
-			await this.hooks.beforeSend(${StringBuilder.request}, ${StringBuilder.result})
-
-			${insertBlock("hook-beforeSend-after")}
-			${insertBlock("hook-serializeBody-before")}
-
-			await this.hooks.serializeBody(${StringBuilder.request}, ${StringBuilder.result})
-
-			${insertBlock("hook-serializeBody-after")}
-			${insertBlock("hook-afterSend-before")}
-
-			await this.hooks.afterSend(${StringBuilder.request}, ${StringBuilder.result})
-
-			${insertBlock("hook-afterSend-after")}
 		} catch (error) {
 			${insertBlock("hook-onError-before")}
 
-			await this.hooks.onError(${StringBuilder.request}, error)
+			${StringBuilder.result} = await this.hooks.onError(${StringBuilder.request}, error) ?? new this.Response(500, "SERVER_ERROR", undefined);
 
 			${insertBlock("hook-onError-after")}
 		}
+
+		${insertBlock("hook-beforeSend-before")}
+
+		await this.hooks.beforeSend(${StringBuilder.request}, ${StringBuilder.result})
+
+		${insertBlock("hook-beforeSend-after")}
+		${insertBlock("hook-serializeBody-before")}
+
+		await this.hooks.serializeBody(${StringBuilder.request}, ${StringBuilder.result})
+
+		${insertBlock("hook-serializeBody-after")}
+		${insertBlock("hook-afterSend-before")}
+
+		await this.hooks.afterSend(${StringBuilder.request}, ${StringBuilder.result})
+
+		${insertBlock("hook-afterSend-after")}
 		`;
 
 		return advancedEval<RouteBuildedFunction>({
@@ -184,6 +185,7 @@ export class Route<
 				preflightSteps: buildedPreflight,
 				steps: buildedStep,
 				extensions: simpleClone(this.extensions),
+				ContractResponseError,
 			} satisfies RouteBuildedFunctionContext,
 		});
 	}

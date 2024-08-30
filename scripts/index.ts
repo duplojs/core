@@ -29,6 +29,7 @@ export * from "@scripts/duplose/route";
 export * from "@scripts/description";
 
 export * from "@scripts/error/buildNoRegisteredDuplose";
+export * from "@scripts/error/contractResponseError";
 export * from "@scripts/error/lastStepMustBeHandlerError";
 
 export * from "@utils/addThis";

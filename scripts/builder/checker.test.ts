@@ -3,6 +3,7 @@ import { PresetChecker, createChecker, createPresetChecker, type GetPresetChecke
 import type { ExpectType } from "@test/utils/expectType";
 import { OkHttpResponse, UnprocessableEntityHttpResponse } from "@scripts/response/simplePreset";
 import { zod, type Response } from "..";
+import type { ZodUndefined } from "zod";
 
 describe("checker builder", () => {
 	it("create without options", () => {
@@ -99,8 +100,8 @@ describe("checker builder", () => {
 				info: "odd";
 				key: "number";
 				response:
-					| Response<200, "odd", undefined>
-					| Response<422, "notOdd", undefined>;
+					| Response<200, "odd", ZodUndefined>
+					| Response<422, "notOdd", ZodUndefined>;
 				newInput: unknown;
 			},
 			"strict"
@@ -118,8 +119,8 @@ describe("checker builder", () => {
 				info: "odd";
 				key: "test";
 				response:
-					| Response<200, "odd", undefined>
-					| Response<422, "notOdd", undefined>;
+					| Response<200, "odd", ZodUndefined>
+					| Response<422, "notOdd", ZodUndefined>;
 				newInput: unknown;
 			},
 			"strict"
@@ -141,7 +142,7 @@ describe("checker builder", () => {
 				checker: typeof isOdd;
 				info: "notOdd";
 				key: string;
-				response: Response<200, "odd", undefined>;
+				response: Response<200, "odd", ZodUndefined>;
 				newInput: symbol;
 			},
 			"strict"

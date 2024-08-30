@@ -1,4 +1,4 @@
-import { Checker, CheckerStep, makeFloor, type CheckerStepParams } from "../..";
+import { Checker, CheckerStep, makeFloor, zod, type CheckerStepParams } from "../..";
 import { Response } from "@scripts/response";
 import { BuildedCheckerStep } from "./checker";
 import { readFile } from "fs/promises";
@@ -85,7 +85,7 @@ describe("BuildedCheckerStep", () => {
 			}),
 		};
 
-		const step = new CheckerStep(checker, params);
+		const step = new CheckerStep(checker, params, [new Response(100, "toto", zod.undefined())]);
 
 		const buildedCheckerStep = new BuildedCheckerStep(step);
 
@@ -106,11 +106,11 @@ describe("BuildedCheckerStep", () => {
 			skip: () => true,
 		};
 
-		const step = new CheckerStep(checker, params);
+		const step = new CheckerStep(checker, params, [new Response(100, "toto", zod.undefined())]);
 
 		const buildedCheckerStep = new BuildedCheckerStep(step);
 
-		expect(buildedCheckerStep.toString(1)).toBe(
+		expect(buildedCheckerStep.toString(1)).toStrictEqual(
 			await readFile(resolve(import.meta.dirname, "__data__/checker2.txt"), "utf-8"),
 		);
 	});

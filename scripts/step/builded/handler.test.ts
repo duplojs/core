@@ -3,11 +3,12 @@ import { resolve } from "path";
 import { BuildedHandlerStep } from "./handler";
 import { HandlerStep } from "../handler";
 import { Response } from "@scripts/response";
+import { zod } from "@scripts/index";
 
 it("BuildedHandlerStep", async() => {
 	const handlerFunction = () => new Response(300, "test", 11);
 
-	const step = new HandlerStep(handlerFunction);
+	const step = new HandlerStep(handlerFunction, [new Response(100, "toto", zod.undefined())]);
 	const buildedCutStep = new BuildedHandlerStep(step);
 
 	expect(buildedCutStep.step).toBe(step);

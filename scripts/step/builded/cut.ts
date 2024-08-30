@@ -1,17 +1,33 @@
 import { simpleClone } from "@utils/simpleClone";
 import { BuildedStep } from ".";
 import type { CutStep, Cut } from "../cut";
-import { checkResult, insertBlock, mapped, maybeAwait, StringBuilder } from "@utils/stringBuilder";
+import { checkResult, condition, insertBlock, mapped, maybeAwait, StringBuilder } from "@utils/stringBuilder";
+import type { ZodType, ZodUnion } from "zod";
+import { zod } from "@scripts/index";
 
 export class BuildedCutStep extends BuildedStep<CutStep> {
 	public cutFunction: Cut;
 
 	public drop: string[];
 
+	public responseZodSchema?: ZodUnion<any>;
+
 	public constructor(step: CutStep) {
 		super(step);
 		this.drop = simpleClone(step.drop);
 		this.cutFunction = step.parent;
+
+		if (step.responses.length !== 0) {
+			this.responseZodSchema = zod.union(
+				step.responses.map(
+					(contractResponse) => zod.object({
+						code: zod.literal(contractResponse.code),
+						info: zod.literal(contractResponse.information),
+						body: contractResponse.body,
+					}) satisfies ZodType,
+				) as any,
+			);
+		}
 	}
 
 	public toString(index: number): string {
@@ -22,6 +38,17 @@ export class BuildedCutStep extends BuildedStep<CutStep> {
 			(key) => /* js */`${StringBuilder.floor}.drop("${key}", ${StringBuilder.result}["${key}"]);`,
 		);
 
+		const contractResponses = condition(
+			!!this.responseZodSchema,
+			() => /* js */`
+				let temp = this.steps[${index}].responseZodSchema.safeParse(${StringBuilder.result});
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, ${StringBuilder.result});
+				}
+			`,
+		);
+
 		return /* js */`
 		${insertBlock(`step-cut-(${index})-before`)}
 
@@ -29,7 +56,7 @@ export class BuildedCutStep extends BuildedStep<CutStep> {
 
 		${insertBlock(`step-cut-(${index})-before-check-result`)}
 
-		${checkResult()}
+		${checkResult(contractResponses)}
 
 		${insertBlock(`step-cut-(${index})-before-drop`)}
 

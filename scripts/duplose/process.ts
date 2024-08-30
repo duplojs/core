@@ -9,6 +9,7 @@ import { extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBu
 import { simpleClone } from "@utils/simpleClone";
 import { makeFloor } from "@scripts/floor";
 import type { PreflightStep } from "@scripts/step/preflight";
+import { ContractResponseError } from "@scripts/error/contractResponseError";
 
 export type ProcessBuildedFunction = (
 	request: CurrentRequestObject,
@@ -149,6 +150,7 @@ export class Process<
 				preflightSteps: buildedPreflight,
 				steps: buildedStep,
 				extensions: simpleClone(this.extensions),
+				ContractResponseError,
 			} satisfies DuploseBuildedFunctionContext,
 		});
 	}

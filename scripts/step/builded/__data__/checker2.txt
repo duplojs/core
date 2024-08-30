@@ -29,6 +29,14 @@
 					floor.pickup
 				);
 
+				
+				let temp = this.steps[1].responseZodSchema.safeParse(result);
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, result);
+				}
+			
+
 				break Execution;
 			}
 

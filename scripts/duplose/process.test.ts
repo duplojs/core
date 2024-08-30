@@ -1,5 +1,5 @@
 import { advancedEval } from "@utils/advancedEval";
-import { readFile, writeFile } from "fs/promises";
+import { readFile } from "fs/promises";
 import { Process } from "./process";
 import { resolve } from "path";
 import { Duplo } from "@scripts/duplo";
@@ -7,6 +7,8 @@ import { BuildNoRegisteredDuploseError, CutStep, zod } from "..";
 import type { Mock } from "vitest";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
+import { Response } from "@scripts/response";
+import { CheckpointList } from "@test/utils/checkpointList";
 
 vi.mock("@utils/advancedEval", async(original) => ({
 	advancedEval: vi.fn(),
@@ -14,12 +16,20 @@ vi.mock("@utils/advancedEval", async(original) => ({
 }));
 
 describe("Process", async() => {
+	const checkpointList = new CheckpointList();
 	const duplo = new Duplo();
 	const process = new Process("test");
 	process.setExtract({
 		params: { userId: zod.coerce.number() },
 	});
-	const step = new CutStep(() => ({ toto: "true" }), ["toto"]);
+	const step = new CutStep(
+		() => {
+			checkpointList.addPoint("cut");
+			return { toto: "true" };
+		},
+		["toto"],
+		[new Response(100, "toto", zod.undefined())],
+	);
 	process.addStep(step);
 	const preflightProcess = new Process("preflightProcess");
 	preflightProcess.instance = duplo;
@@ -54,11 +64,14 @@ describe("Process", async() => {
 	});
 
 	it("build", async() => {
+		checkpointList.reset();
+
 		expect(() => process.build()).toThrowError(BuildNoRegisteredDuploseError);
 
 		process.instance = duplo;
 
 		spy.mockImplementation(async(arg) => {
+			// await writeFile(resolve(import.meta.dirname, "__data__/process.txt"), arg.content);
 			expect(arg.content).toBe(
 				await readFile(resolve(import.meta.dirname, "__data__/process.txt"), "utf-8"),
 			);
@@ -74,5 +87,11 @@ describe("Process", async() => {
 			toto: "true",
 			userId: 2,
 		});
+
+		expect(checkpointList.getPointList()).toStrictEqual([
+			"start",
+			"cut",
+			"end",
+		]);
 	});
 });

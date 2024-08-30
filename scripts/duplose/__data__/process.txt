@@ -27,6 +27,7 @@
 
 
 			if(result instanceof this.Response){
+
 break Execution;
 }
 
@@ -105,6 +106,13 @@ break Execution;
 
 
 		if(result instanceof this.Response){
+
+				let temp = this.steps[0].responseZodSchema.safeParse(result);
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, result);
+				}
+			
 break Execution;
 }
 

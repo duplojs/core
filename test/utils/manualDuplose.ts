@@ -4,7 +4,7 @@ import { zod } from "@scripts/index";
 import { PresetChecker } from "@scripts/builder/checker";
 import { BadRequestHttpResponse } from "@scripts/response/simplePreset";
 import type { CurrentRequestObject } from "@scripts/request";
-import type { ZodString } from "zod";
+import type { ZodString, ZodType } from "zod";
 
 export const manualChecker = new Checker<
 	{ test1: number },
@@ -17,7 +17,7 @@ export const manualPresetChecker = new PresetChecker<
 	typeof manualChecker,
 	"test1",
 	"presetResult",
-	BadRequestHttpResponse,
+	BadRequestHttpResponse<string | undefined, ZodType>,
 	string
 >(
 	manualChecker,

@@ -75,7 +75,7 @@ export interface RouteBuilder<
 			Request,
 			Preflights,
 			Extracted,
-			Steps | CheckerStep<C, CR, StepsCount>,
+			Steps | CheckerStep<C, R, StepsCount>,
 			AddOne<StepsCount>,
 			(
 				string extends K
@@ -174,7 +174,7 @@ export interface RouteBuilder<
 			Request,
 			Preflights,
 			Extracted,
-			Steps | CutStep<CR, StepsCount>,
+			Steps | CutStep<R, StepsCount>,
 			AddOne<StepsCount>,
 			(
 				string extends D
@@ -196,7 +196,7 @@ export interface RouteBuilder<
 		Request,
 		Preflights,
 		Extracted,
-		Steps | HandlerStep<CR, StepsCount>,
+		Steps | HandlerStep<R, StepsCount>,
 		FloorData
 	>;
 }

@@ -79,7 +79,7 @@ export interface ProcessBuilder<
 			Input,
 			Preflights,
 			Extracted,
-			Steps | CheckerStep<C, CR, StepsCount>,
+			Steps | CheckerStep<C, R, StepsCount>,
 			AddOne<StepsCount>,
 			(
 				string extends K
@@ -184,7 +184,7 @@ export interface ProcessBuilder<
 			Input,
 			Preflights,
 			Extracted,
-			Steps | CutStep<CR, StepsCount>,
+			Steps | CutStep<R, StepsCount>,
 			AddOne<StepsCount>,
 			(
 				string extends D

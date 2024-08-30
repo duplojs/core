@@ -17,6 +17,7 @@
 
 
 				if(result instanceof this.Response){
+
 break Execution;
 }
 
@@ -48,6 +49,7 @@ break Execution;
 
 
 			if(result instanceof this.Response){
+
 break Execution;
 }
 
@@ -84,6 +86,7 @@ break Execution;
 
 
 				if(result instanceof this.Response){
+
 break Execution;
 }
 
@@ -180,6 +183,13 @@ break Execution;
 
 
 		if(result instanceof this.Response){
+
+				let temp = this.steps[0].responseZodSchema.safeParse(result);
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, result);
+				}
+			
 break Execution;
 }
 
@@ -209,6 +219,7 @@ break Execution;
 
 
 		if(result instanceof this.Response){
+
 break Execution;
 }
 
@@ -227,53 +238,53 @@ break Execution;
 /* defaultResponse-before */
 /* end_block */
 
-				result = new this.Response(503, "NO_RESPONSE_SENT", undefined)
+				result = new this.Response(503, "NO_RESPONSE_SENT", undefined);
 			}
-
-			
-/* hook-beforeSend-before */
-/* end_block */
-
-
-			await this.hooks.beforeSend(request, result)
-
-			
-/* hook-beforeSend-after */
-/* end_block */
-
-			
-/* hook-serializeBody-before */
-/* end_block */
-
-
-			await this.hooks.serializeBody(request, result)
-
-			
-/* hook-serializeBody-after */
-/* end_block */
-
-			
-/* hook-afterSend-before */
-/* end_block */
-
-
-			await this.hooks.afterSend(request, result)
-
-			
-/* hook-afterSend-after */
-/* end_block */
-
 		} catch (error) {
 			
 /* hook-onError-before */
 /* end_block */
 
 
-			await this.hooks.onError(request, error)
+			result = await this.hooks.onError(request, error) ?? new this.Response(500, "SERVER_ERROR", undefined);
 
 			
 /* hook-onError-after */
 /* end_block */
 
 		}
+
+		
+/* hook-beforeSend-before */
+/* end_block */
+
+
+		await this.hooks.beforeSend(request, result)
+
+		
+/* hook-beforeSend-after */
+/* end_block */
+
+		
+/* hook-serializeBody-before */
+/* end_block */
+
+
+		await this.hooks.serializeBody(request, result)
+
+		
+/* hook-serializeBody-after */
+/* end_block */
+
+		
+/* hook-afterSend-before */
+/* end_block */
+
+
+		await this.hooks.afterSend(request, result)
+
+		
+/* hook-afterSend-after */
+/* end_block */
+
 		

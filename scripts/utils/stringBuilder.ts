@@ -35,8 +35,8 @@ export function insertBlock(name: string) {
 	return `\n/* ${name} */\n/* end_block */\n`;
 }
 
-export function checkResult() {
-	return `if(${StringBuilder.result} instanceof this.Response){\nbreak ${StringBuilder.label};\n}`;
+export function checkResult(block = "") {
+	return `if(${StringBuilder.result} instanceof this.Response){\n${block}\nbreak ${StringBuilder.label};\n}`;
 }
 
 export function maybeAwait(async: boolean) {

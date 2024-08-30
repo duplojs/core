@@ -115,7 +115,7 @@ export function makeHooksRouteLifeCycle<
 	return {
 		beforeRouteExecution: new Hook<(request: Request) => PromiseOrNot<boolean | Response | void>>(1),
 		parsingBody: new Hook<(request: Request) => PromiseOrNot<boolean | Response | void>>(1),
-		onError: new Hook<(request: Request, error: unknown) => PromiseOrNot<boolean | Response | void>>(2),
+		onError: new Hook<(request: Request, error: unknown) => PromiseOrNot<Response | void>>(2),
 		beforeSend: new Hook<(request: Request, response: Response) => PromiseOrNot<boolean | void>>(2),
 		serializeBody: new Hook<(request: Request, response: Response) => PromiseOrNot<boolean | void>>(2),
 		afterSend: new Hook<(request: Request, response: Response) => PromiseOrNot<boolean | void>>(2),

@@ -1,5 +1,5 @@
 import { advancedEval } from "@utils/advancedEval";
-import { readFile, writeFile } from "fs/promises";
+import { readFile } from "fs/promises";
 import { Process } from "./process";
 import { resolve } from "path";
 import { Duplo } from "@scripts/duplo";
@@ -17,6 +17,8 @@ import type { Mock } from "vitest";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { HandlerStep } from "@scripts/step/handler";
+import { Response } from "@scripts/response";
+import { CheckpointList } from "@test/utils/checkpointList";
 
 vi.mock("@utils/advancedEval", async(original) => ({
 	advancedEval: vi.fn(),
@@ -24,6 +26,7 @@ vi.mock("@utils/advancedEval", async(original) => ({
 }));
 
 describe("Route", async() => {
+	const checkpointList = new CheckpointList();
 	const duplo = new Duplo();
 	const route = new Route("GET", ["/"]);
 	route.setExtract({
@@ -32,7 +35,14 @@ describe("Route", async() => {
 			test: zod.string(),
 		}).optional(),
 	});
-	const step = new CutStep(() => ({ toto: "true" }), ["toto"]);
+	const step = new CutStep(
+		() => {
+			checkpointList.addPoint("cut");
+			return { toto: "true" };
+		},
+		["toto"],
+		[new Response(100, "toto", zod.undefined())],
+	);
 	route.addStep(step);
 	const preflightProcess = new Process("preflightProcess");
 	preflightProcess.instance = duplo;
@@ -48,6 +58,8 @@ describe("Route", async() => {
 	});
 
 	it("build", async() => {
+		checkpointList.reset();
+
 		expect(() => route.build()).toThrowError(BuildNoRegisteredDuploseError);
 
 		route.instance = duplo;
@@ -67,6 +79,7 @@ describe("Route", async() => {
 		route.addStep(handlerStep);
 
 		spy.mockImplementation(async(arg) => {
+			// await writeFile(resolve(import.meta.dirname, "__data__/route.txt"), arg.content);
 			expect(arg.content).toBe(
 				await readFile(resolve(import.meta.dirname, "__data__/route.txt"), "utf-8"),
 			);
@@ -77,10 +90,12 @@ describe("Route", async() => {
 		spy.mockImplementation(advancedEvalOriginal);
 
 		route.hooks.onError.addSubscriber((_request, error) => {
+			checkpointList.addPoint("onError");
 			throw error;
 		});
 
 		route.hooks.beforeSend.addSubscriber((_request, response) => {
+			checkpointList.addPoint("beforeSend");
 			expect(response.code).toBe(200);
 			expect(response.information).toBe("true");
 			expect(response.body).toBe(2);
@@ -89,5 +104,12 @@ describe("Route", async() => {
 		const routeFunction = route.build();
 
 		await routeFunction(new Request({ params: { userId: "2" } } as any));
+
+		expect(checkpointList.getPointList()).toStrictEqual([
+			"start",
+			"cut",
+			"beforeSend",
+			"end",
+		]);
 	});
 });

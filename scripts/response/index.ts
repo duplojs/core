@@ -61,7 +61,7 @@ export class Response<
 	}
 }
 
-export type ContractResponse = Response<number, string, ZodType>;
+export type ContractResponse = Response<number, string | undefined, ZodType>;
 
 export type ContractToResponse<
 	T extends ContractResponse,

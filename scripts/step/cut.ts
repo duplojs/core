@@ -3,7 +3,7 @@ import { Step } from ".";
 import type { Description } from "@scripts/description";
 import { BuildedCutStep } from "./builded/cut";
 import type { CurrentRequestObject } from "@scripts/request";
-import type { Response } from "@scripts/response";
+import type { ContractResponse, Response } from "@scripts/response";
 import type { Floor } from "@scripts/floor";
 
 export type Cut<
@@ -13,17 +13,17 @@ export type Cut<
 > = (floor: Floor<FloorData>, request: Request) => PromiseOrNot<ReturnValue>;
 
 export class CutStep<
-	CatchResponse extends Response = Response,
+	R extends ContractResponse = ContractResponse,
 	_StepNumber extends number = number,
 > extends Step<Cut, _StepNumber> {
 	public drop: string[];
 
-	public responses: CatchResponse[];
+	public responses: R[];
 
 	public constructor(
 		cutFunction: Cut,
 		drop: string[],
-		responses: CatchResponse[] = [],
+		responses: R[] = [],
 		descriptions: Description[] = [],
 	) {
 		super(cutFunction, descriptions);

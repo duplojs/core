@@ -12,6 +12,13 @@
 
 
 		if(result instanceof this.Response){
+
+				let temp = this.steps[4].responseZodSchema.safeParse(result);
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, result);
+				}
+			
 break Execution;
 }
 

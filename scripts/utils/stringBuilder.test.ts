@@ -25,7 +25,7 @@ describe("stringBuilder", () => {
 	});
 
 	it("checkResult", () => {
-		expect(checkResult()).toBe("if(result instanceof this.Response){\nbreak Execution;\n}");
+		expect(checkResult("toto")).toBe("if(result instanceof this.Response){\ntoto\nbreak Execution;\n}");
 	});
 
 	it("maybeAwait", () => {

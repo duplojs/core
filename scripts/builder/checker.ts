@@ -42,7 +42,7 @@ export class PresetChecker<
 	_Checker extends Checker = Checker,
 	_Info extends string = string,
 	_Key extends string = string,
-	_Response extends Response = Response,
+	_Response extends ContractResponse = ContractResponse,
 	_NewInput extends unknown = unknown,
 > {
 	public constructor(
@@ -89,7 +89,7 @@ export function createPresetChecker<
 	responses: R | R[],
 
 ) {
-	return new PresetChecker<C, I, K, ContractToResponse<R>, T>(
+	return new PresetChecker<C, I, K, R, T>(
 		checker,
 		params,
 		responses instanceof Array ? responses : [responses],

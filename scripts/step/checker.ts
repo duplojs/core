@@ -1,5 +1,5 @@
 import { Step } from ".";
-import type { Response } from "@scripts/response";
+import type { ContractResponse, Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Floor } from "@scripts/floor";
@@ -31,17 +31,17 @@ export interface CheckerStepParams<
 
 export class CheckerStep<
 	CurrentChecker extends Checker = Checker,
-	CatchResponse extends Response = Response,
+	R extends ContractResponse = ContractResponse,
 	_StepNumber extends number = number,
 > extends Step<CurrentChecker, _StepNumber> {
 	public params: CheckerStepParams;
 
-	public responses: CatchResponse[];
+	public responses: R[];
 
 	public constructor(
 		checker: CurrentChecker,
 		params: CheckerStepParams,
-		responses: CatchResponse[] = [],
+		responses: R[] = [],
 		descriptions: Description[] = [],
 	) {
 		super(checker, descriptions);

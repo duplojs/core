@@ -31,6 +31,7 @@ export default [
 			"@typescript-eslint/no-unsafe-member-access": "off",
 			"@typescript-eslint/no-unsafe-argument": "off",
 			"@typescript-eslint/no-shadow": "off",
+			"@typescript-eslint/unified-signatures": "off",
 			"no-implicit-coercion": [
 				"error",
 				{
@@ -51,6 +52,7 @@ export default [
 			"@typescript-eslint/no-magic-numbers": "off",
 			"id-denylist": ["error", "tmp", "temp", "err", "e"],
 			"@typescript-eslint/member-ordering": "off",
+			"@typescript-eslint/unified-signatures": "off",
 			"no-implicit-coercion": [
 				"error",
 				{

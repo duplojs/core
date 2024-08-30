@@ -3,7 +3,16 @@ import { readFile, writeFile } from "fs/promises";
 import { Process } from "./process";
 import { resolve } from "path";
 import { Duplo } from "@scripts/duplo";
-import { BuildNoRegisteredDuploseError, CutStep, LastStepMustBeHandlerError, OkHttpResponse, Route, zod } from "..";
+import {
+	BuildNoRegisteredDuploseError,
+	CutStep,
+	LastStepMustBeHandlerError,
+	OkHttpResponse,
+	Route,
+	zod,
+	type AnyFunction,
+	type Floor,
+} from "..";
 import type { Mock } from "vitest";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
@@ -45,7 +54,16 @@ describe("Route", async() => {
 
 		expect(() => route.build()).toThrowError(LastStepMustBeHandlerError);
 
-		const handlerStep = new HandlerStep(({ pickup }) => new OkHttpResponse(pickup("toto" as never), pickup("userId" as never)));
+		const handlerStep = new HandlerStep(
+			(
+				(
+					{ pickup }: Floor<{
+						toto: string;
+						userId: number;
+					}>,
+				) => new OkHttpResponse(pickup("toto"), pickup("userId"))
+			) as AnyFunction,
+		);
 		route.addStep(handlerStep);
 
 		spy.mockImplementation(async(arg) => {

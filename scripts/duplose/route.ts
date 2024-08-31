@@ -14,11 +14,11 @@ import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandler
 import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 
-interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext {
+export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext {
 	hooks: BuildedHooksRouteLifeCycle;
 }
 
-type RouteBuildedFunction = (request: CurrentRequestObject) => Promise<void>;
+export type RouteBuildedFunction = (request: CurrentRequestObject) => Promise<void>;
 
 export type GetRouteGeneric<
 	T extends Route = Route,

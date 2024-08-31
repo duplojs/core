@@ -15,7 +15,7 @@ export type ProcessBuildedFunction = (
 	request: CurrentRequestObject,
 	options?: object,
 	input?: unknown
-) => Promise<void>;
+) => Promise<unknown>;
 
 export type GetProcessGeneric<
 	T extends Process = Process,

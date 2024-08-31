@@ -19,9 +19,9 @@ export interface RequestInitializationData {
 	readonly matchedPath: string | null;
 	readonly method: HttpMethod;
 	readonly origin: string;
-	readonly params: Record<string, string>;
+	readonly params: Partial<Record<string, string>>;
 	readonly path: string;
-	readonly query: Record<string, string | string[]>;
+	readonly query: Partial<Record<string, string | string[]>>;
 	readonly url: string;
 }
 
@@ -38,9 +38,9 @@ export class Request implements RequestInitializationData {
 
 	public path: string;
 
-	public params: Record<string, string>;
+	public params: Partial<Record<string, string>>;
 
-	public query: Record<string, string | string[]>;
+	public query: Partial<Record<string, string | string[]>>;
 
 	public matchedPath: string | null;
 

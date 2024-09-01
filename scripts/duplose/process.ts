@@ -11,11 +11,14 @@ import { makeFloor } from "@scripts/floor";
 import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 
-export type ProcessBuildedFunction = (
-	request: CurrentRequestObject,
-	options?: object,
-	input?: unknown
-) => Promise<unknown>;
+export interface ProcessBuildedFunction {
+	(
+		request: CurrentRequestObject,
+		options?: object,
+		input?: unknown
+	): Promise<unknown>;
+	context: DuploseBuildedFunctionContext<Process>;
+}
 
 export type GetProcessGeneric<
 	T extends Process = Process,
@@ -139,19 +142,26 @@ export class Process<
 		}
 		`;
 
-		return advancedEval<ProcessBuildedFunction>({
+		const context: DuploseBuildedFunctionContext<Process> = {
+			makeFloor,
+			Response,
+			extract: simpleClone(this.extract),
+			extractError: this.extractError ?? this.instance.extractError,
+			preflightSteps: buildedPreflight,
+			steps: buildedStep,
+			extensions: simpleClone(this.extensions),
+			ContractResponseError,
+			duplose: this,
+		};
+
+		const buildedFunction = advancedEval<ProcessBuildedFunction>({
 			args: [StringBuilder.request, StringBuilder.options, StringBuilder.input],
 			content,
-			bind: {
-				makeFloor,
-				Response,
-				extract: simpleClone(this.extract),
-				extractError: this.extractError ?? this.instance.extractError,
-				preflightSteps: buildedPreflight,
-				steps: buildedStep,
-				extensions: simpleClone(this.extensions),
-				ContractResponseError,
-			} satisfies DuploseBuildedFunctionContext,
+			bind: context,
 		});
+
+		buildedFunction.context = context;
+
+		return buildedFunction;
 	}
 }

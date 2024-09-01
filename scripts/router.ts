@@ -3,7 +3,6 @@ import type { Route, RouteBuildedFunction } from "./duplose/route";
 import type { HttpMethod, RequestInitializationData } from "./request";
 import { getTypedEntries } from "@utils/getTypedEntries";
 import { StringBuilder } from "@utils/stringBuilder";
-import { pathToStringRegExp } from "@utils/pathToStringRegExp";
 import { hasKey } from "@utils/hasKey";
 
 export interface RouterFinderResult {
@@ -26,20 +25,21 @@ export class Router {
 	public constructor(
 		public routes: Route[],
 	) {
-		this.methodToRoutesMapper = routes.reduce<Router["methodToRoutesMapper"]>(
-			(pv, route) => {
-				const routeMethod = route.method;
+		this.methodToRoutesMapper = routes
+			.reduce<Router["methodToRoutesMapper"]>(
+				(pv, route) => {
+					const routeMethod = route.method;
 
-				if (!pv[routeMethod]) {
-					pv[routeMethod] = [];
-				}
+					if (!pv[routeMethod]) {
+						pv[routeMethod] = [];
+					}
 
-				pv[routeMethod].push(route);
+					pv[routeMethod].push(route);
 
-				return pv;
-			},
-			{},
-		);
+					return pv;
+				},
+				{},
+			);
 
 		this.methodToFinderMapper = getTypedEntries(this.methodToRoutesMapper)
 			.reduce<Router["methodToFinderMapper"]>(
@@ -47,9 +47,9 @@ export class Router {
 					const functionContent = routes.flatMap(
 						(route, index) => route.paths.map(
 							(path) => /* js */`
-								${StringBuilder.result} = ${pathToStringRegExp(path)}.exec(path);
+								${StringBuilder.result} = ${Router.pathToStringRegExp(path)}.exec(path);
 								if(${StringBuilder.result} !== null) return {
-									routeFunction: this.buildedRoutes[${index}],
+									buildedRoute: this.buildedRoutes[${index}],
 									params: ${StringBuilder.result}.groups || {},
 									matchedPath: "${path}",
 								};
@@ -85,5 +85,19 @@ export class Router {
 		} else {
 			return null;
 		}
+	}
+
+	public static pathToStringRegExp(path: string) {
+		let regExpPath = path
+			.replace(/\//g, "\\/")
+			.replace(/\.?\*/g, ".*")
+			.replace(
+				/\{([A-zÀ-ÿ0-9_-]+)\}/g,
+				(match, group1) => `(?<${group1}>[A-zÀ-ÿ0-9_\\- ]+)`,
+			);
+
+		regExpPath = `/^${regExpPath}\\/?(?:\\?[^]*)?$/`;
+
+		return regExpPath;
 	}
 }

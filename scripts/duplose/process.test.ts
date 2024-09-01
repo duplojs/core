@@ -9,11 +9,7 @@ import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
-
-vi.mock("@utils/advancedEval", async(original) => ({
-	advancedEval: vi.fn(),
-	advancedEvalOriginal: (await original<{ advancedEval: unknown }>()).advancedEval,
-}));
+import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 
 describe("Process", async() => {
 	const checkpointList = new CheckpointList();
@@ -36,8 +32,10 @@ describe("Process", async() => {
 	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
 	process.addPreflightSteps(preflight);
 
-	const spy = advancedEval as Mock;
-	const { advancedEvalOriginal } = (await import("@utils/advancedEval")) as any as { advancedEvalOriginal: typeof advancedEval };
+	const {
+		advancedEval: spy,
+		advancedEvalOriginal,
+	} = await mokeAdvancedEval();
 
 	it("name", () => {
 		expect(process.name).toBe("test");

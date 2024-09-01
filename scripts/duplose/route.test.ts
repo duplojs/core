@@ -13,17 +13,12 @@ import {
 	type AnyFunction,
 	type Floor,
 } from "..";
-import type { Mock } from "vitest";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { HandlerStep } from "@scripts/step/handler";
 import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
-
-vi.mock("@utils/advancedEval", async(original) => ({
-	advancedEval: vi.fn(),
-	advancedEvalOriginal: (await original<{ advancedEval: unknown }>()).advancedEval,
-}));
+import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 
 describe("Route", async() => {
 	const checkpointList = new CheckpointList();
@@ -49,8 +44,10 @@ describe("Route", async() => {
 	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
 	route.addPreflightSteps(preflight);
 
-	const spy = advancedEval as Mock;
-	const { advancedEvalOriginal } = (await import("@utils/advancedEval")) as any as { advancedEvalOriginal: typeof advancedEval };
+	const {
+		advancedEval: spy,
+		advancedEvalOriginal,
+	} = await mokeAdvancedEval();
 
 	it("constructor props", () => {
 		expect(route.method).toBe("GET");

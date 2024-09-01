@@ -14,11 +14,14 @@ import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandler
 import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 
-interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext {
+export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
 	hooks: BuildedHooksRouteLifeCycle;
 }
 
-type RouteBuildedFunction = (request: CurrentRequestObject) => Promise<void>;
+export interface RouteBuildedFunction {
+	(request: CurrentRequestObject): Promise<void>;
+	context: RouteBuildedFunctionContext;
+}
 
 export type GetRouteGeneric<
 	T extends Route = Route,
@@ -165,28 +168,35 @@ export class Route<
 		${insertBlock("hook-afterSend-after")}
 		`;
 
-		return advancedEval<RouteBuildedFunction>({
+		const context: RouteBuildedFunctionContext = {
+			hooks: {
+				beforeRouteExecution: hooks.beforeRouteExecution.build(),
+				parsingBody: hooks.parsingBody.build(),
+				beforeSend: hooks.beforeSend.build(),
+				serializeBody: hooks.serializeBody.build(),
+				afterSend: hooks.afterSend.build(),
+				onError: hooks.onError.build(),
+			},
+			makeFloor,
+			Response,
+			extract: simpleClone(this.extract),
+			extractError: this.extractError ?? this.instance.extractError,
+			preflightSteps: buildedPreflight,
+			steps: buildedStep,
+			extensions: simpleClone(this.extensions),
+			ContractResponseError,
+			duplose: this,
+		};
+
+		const buildedFunction = advancedEval<RouteBuildedFunction>({
 			forceAsync: true,
 			args: [StringBuilder.request],
 			content,
-			bind: {
-				hooks: {
-					beforeRouteExecution: hooks.beforeRouteExecution.build(),
-					parsingBody: hooks.parsingBody.build(),
-					beforeSend: hooks.beforeSend.build(),
-					serializeBody: hooks.serializeBody.build(),
-					afterSend: hooks.afterSend.build(),
-					onError: hooks.onError.build(),
-				},
-				makeFloor,
-				Response,
-				extract: simpleClone(this.extract),
-				extractError: this.extractError ?? this.instance.extractError,
-				preflightSteps: buildedPreflight,
-				steps: buildedStep,
-				extensions: simpleClone(this.extensions),
-				ContractResponseError,
-			} satisfies RouteBuildedFunctionContext,
+			bind: context,
 		});
+
+		buildedFunction.context = context;
+
+		return buildedFunction;
 	}
 }

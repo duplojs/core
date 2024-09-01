@@ -3,6 +3,7 @@ export * from "@scripts/request";
 export * from "@scripts/hook";
 export * from "@scripts/checker";
 export * from "@scripts/floor";
+export * from "@scripts/router";
 
 export * from "@scripts/builder/duplose";
 export * from "@scripts/builder/route";
@@ -40,6 +41,10 @@ export * from "@utils/flatExtract";
 export * from "@utils/getLastOfUnion";
 export * from "@utils/getPropsWithTrueValue";
 export * from "@utils/getTypedEntries";
+export * from "@utils/getTypedKeys";
+export * from "@utils/hasKey";
+export * from "@utils/incremente";
+export * from "@utils/isAny";
 export * from "@utils/overrideInterface";
 export * from "@utils/simpleClone";
 export * from "@utils/stringBuilder";

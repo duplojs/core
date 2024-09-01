@@ -14,7 +14,9 @@ import type { BuildedPreflightStep } from "@scripts/step/builded/preflight";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import type { ContractResponseError } from "@scripts/error/contractResponseError";
 
-export interface DuploseBuildedFunctionContext {
+export interface DuploseBuildedFunctionContext<
+	T extends Duplose = Duplose,
+> {
 	makeFloor: typeof makeFloor;
 	Response: typeof Response;
 	extract?: ExtractObject;
@@ -23,6 +25,7 @@ export interface DuploseBuildedFunctionContext {
 	steps: BuildedStep[];
 	extensions: object;
 	ContractResponseError: typeof ContractResponseError;
+	duplose: T;
 }
 
 export type ExtractErrorFunction = (

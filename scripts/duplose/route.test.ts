@@ -1,5 +1,5 @@
-import { advancedEval } from "@utils/advancedEval";
-import { readFile } from "fs/promises";
+import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
+import { readFile, writeFile } from "fs/promises";
 import { Process } from "./process";
 import { resolve } from "path";
 import { Duplo } from "@scripts/duplo";
@@ -8,21 +8,21 @@ import {
 	CutStep,
 	LastStepMustBeHandlerError,
 	OkHttpResponse,
-	Route,
 	zod,
 	type AnyFunction,
 	type Floor,
 } from "..";
+import { Route } from "./route";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { HandlerStep } from "@scripts/step/handler";
 import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
-import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 
 describe("Route", async() => {
 	const checkpointList = new CheckpointList();
-	const duplo = new Duplo();
+	const duplo = new Duplo({ environment: "TEST" });
+
 	const route = new Route("GET", ["/"]);
 	route.setExtract({
 		params: { userId: zod.coerce.number() },
@@ -75,14 +75,12 @@ describe("Route", async() => {
 		);
 		route.addStep(handlerStep);
 
-		spy.mockImplementation(async(arg) => {
-			// await writeFile(resolve(import.meta.dirname, "__data__/route.txt"), arg.content);
-			expect(arg.content).toBe(
-				await readFile(resolve(import.meta.dirname, "__data__/route.txt"), "utf-8"),
-			);
-		});
+		route.build();
 
-		await Promise.resolve(route.build());
+		expect(spy).toBeCalled();
+
+		expect(spy.mock.lastCall?.[0].content)
+			.toBe(await readFile(resolve(import.meta.dirname, "__data__/route.txt"), "utf-8"));
 
 		spy.mockImplementation(advancedEvalOriginal);
 
@@ -105,7 +103,6 @@ describe("Route", async() => {
 		expect(checkpointList.getPointList()).toStrictEqual([
 			"start",
 			"cut",
-			"beforeSend",
 			"end",
 		]);
 	});

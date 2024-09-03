@@ -3,6 +3,7 @@ import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
 import { Step } from ".";
 import type { Floor } from "@scripts/floor";
 import { BuildedProcessStep } from "./builded/process";
+import { type Duplo } from "@scripts/duplo";
 
 export interface ProcessStepParams<
 	ProcessGeneric extends GetProcessGeneric = GetProcessGeneric,
@@ -31,7 +32,7 @@ export class ProcessStep<
 		this.params = params;
 	}
 
-	public build() {
-		return new BuildedProcessStep(this);
+	public build(instance: Duplo) {
+		return new BuildedProcessStep(instance, this);
 	}
 }

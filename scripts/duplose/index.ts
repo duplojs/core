@@ -26,6 +26,7 @@ export interface DuploseBuildedFunctionContext<
 	extensions: object;
 	ContractResponseError: typeof ContractResponseError;
 	duplose: T;
+	duplo: Duplo;
 }
 
 export type ExtractErrorFunction = (

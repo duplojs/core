@@ -4,12 +4,13 @@ import { BuildedCutStep } from "./cut";
 import { Response } from "@scripts/response";
 import { resolve } from "path";
 import { zod } from "@scripts/index";
+import { duploTest } from "@test/utils/duploTest";
 
 it("BuildedCutStep", async() => {
 	const cutFunction = () => ({});
 
 	const step = new CutStep(cutFunction, ["test"], [new Response(100, "toto", zod.undefined())]);
-	const buildedCutStep = new BuildedCutStep(step);
+	const buildedCutStep = new BuildedCutStep(duploTest, step);
 
 	expect(buildedCutStep.step).toBe(step);
 

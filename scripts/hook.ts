@@ -2,6 +2,8 @@ import { advancedEval } from "@utils/advancedEval";
 import type { AnyFunction, PromiseOrNot } from "@utils/types";
 import type { CurrentRequestObject } from "./request";
 import type { Response } from "./response";
+import type { Duplo } from "./duplo";
+import type { Duplose } from "./duplose";
 
 export class Hook<
 	subscriber extends AnyFunction = AnyFunction,
@@ -122,6 +124,15 @@ export function makeHooksRouteLifeCycle<
 	};
 }
 
+export function makeHooksInstanceLifeCycle() {
+	return {
+		onStart: new Hook<(duplo: Duplo) => PromiseOrNot<boolean | void>>(1),
+		onHttpServerError: new Hook<(request: CurrentRequestObject, error: unknown) => PromiseOrNot<boolean | void>>(2),
+		onRegistered: new Hook<(duplose: Duplose) => boolean | void>(1),
+		beforeBuildRouter: new Hook<(duplose: Duplo) => PromiseOrNot<boolean | void>>(1),
+	};
+}
+
 export type HooksRouteLifeCycle<
 	Request extends CurrentRequestObject = any,
 > = ReturnType<typeof makeHooksRouteLifeCycle<Request>>;
@@ -129,6 +140,12 @@ export type HooksRouteLifeCycle<
 export type BuildedHooksRouteLifeCycle<
 	Request extends CurrentRequestObject = any,
 > = BuildHooks<HooksRouteLifeCycle<Request>>;
+
+export type HooksInstanceifeCycle = ReturnType<typeof makeHooksInstanceLifeCycle>;
+
+export type BuildedHooksInstanceLifeCycle = BuildHooks<HooksInstanceifeCycle>;
+
+export type DuploHooks = BuildedHooksInstanceLifeCycle & BuildedHooksRouteLifeCycle;
 
 export type DefineHooksRouteLifeCycle<
 	Request extends CurrentRequestObject = any,

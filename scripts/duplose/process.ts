@@ -100,11 +100,11 @@ export class Process<
 		}
 
 		const buildedPreflight = this.preflightSteps.map(
-			(step) => step.build(),
+			(step) => step.build(this.instance!),
 		);
 
 		const buildedStep = this.steps.map(
-			(step) => step.build(),
+			(step) => step.build(this.instance!),
 		);
 
 		const drop = mapped(
@@ -152,6 +152,7 @@ export class Process<
 			extensions: simpleClone(this.extensions),
 			ContractResponseError,
 			duplose: this,
+			duplo: this.instance,
 		};
 
 		const buildedFunction = advancedEval<ProcessBuildedFunction>({

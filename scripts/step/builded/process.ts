@@ -3,14 +3,18 @@ import { BuildedStep } from ".";
 import type { ProcessStepParams, ProcessStep } from "../process";
 import { checkResult, condition, insertBlock, mapped, maybeAwait, skipStep, StringBuilder } from "@utils/stringBuilder";
 import type { ProcessBuildedFunction } from "@scripts/duplose/process";
+import { type Duplo } from "@scripts/duplo";
 
 export class BuildedProcessStep extends BuildedStep<ProcessStep> {
 	public processFunction: ProcessBuildedFunction;
 
 	public params: ProcessStepParams;
 
-	public constructor(step: ProcessStep) {
-		super(step);
+	public constructor(
+		instance: Duplo,
+		step: ProcessStep,
+	) {
+		super(instance, step);
 		this.params = simpleClone(step.params);
 
 		if (typeof this.params.options === "function") {

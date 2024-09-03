@@ -5,6 +5,7 @@ import type { CurrentRequestObject } from "@scripts/request";
 import type { ContractResponse, Response } from "@scripts/response";
 import type { Floor } from "@scripts/floor";
 import { BuildedHandlerStep } from "./builded/handler";
+import { type Duplo } from "@scripts/duplo";
 
 export type Handler<
 	FloorData extends object = object,
@@ -27,7 +28,7 @@ export class HandlerStep<
 		this.responses = responses;
 	}
 
-	public build() {
-		return new BuildedHandlerStep(this);
+	public build(instance: Duplo) {
+		return new BuildedHandlerStep(instance, this);
 	}
 }

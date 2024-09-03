@@ -38,6 +38,8 @@ export default [
 					allow: ["!!"],
 				},
 			],
+			"@typescript-eslint/await-thenable": "off",
+			"@typescript-eslint/no-non-null-assertion": "off",
 		},
 		files: ["**/*.test.ts", "test/**/*.ts"],
 		ignores: ["**/*.d.ts"]
@@ -61,6 +63,8 @@ export default [
 			],
 			"@typescript-eslint/unbound-method": "off",
 			"@typescript-eslint/no-shadow": "off",
+			"@typescript-eslint/await-thenable": "off",
+			"@typescript-eslint/no-non-null-assertion": "off",
 		},
 		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],

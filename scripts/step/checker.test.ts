@@ -1,3 +1,4 @@
+import { duploTest } from "@test/utils/duploTest";
 import { BuildedCheckerStep, Checker, CheckerStep, type CheckerStepParams } from "..";
 import { Response } from "@scripts/response";
 
@@ -16,5 +17,5 @@ it("CheckerStep", () => {
 
 	expect(step.params).toBe(params);
 
-	expect(step.build()).instanceOf(BuildedCheckerStep);
+	expect(step.build(duploTest)).instanceOf(BuildedCheckerStep);
 });

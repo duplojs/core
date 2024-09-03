@@ -1,5 +1,6 @@
 import type { Description } from "@scripts/description";
 import type { BuildedStep } from "./builded";
+import { type Duplo } from "@scripts/duplo";
 
 export abstract class Step<
 	Parent extends any = any,
@@ -10,5 +11,5 @@ export abstract class Step<
 		public descriptions: Description[] = [],
 	) {}
 
-	public abstract build(): BuildedStep;
+	public abstract build(instance: Duplo): BuildedStep;
 }

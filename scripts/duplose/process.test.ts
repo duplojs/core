@@ -1,19 +1,17 @@
-import { advancedEval } from "@utils/advancedEval";
+import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 import { readFile } from "fs/promises";
 import { Process } from "./process";
 import { resolve } from "path";
 import { Duplo } from "@scripts/duplo";
 import { BuildNoRegisteredDuploseError, CutStep, zod } from "..";
-import type { Mock } from "vitest";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
-import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 
 describe("Process", async() => {
 	const checkpointList = new CheckpointList();
-	const duplo = new Duplo();
+	const duplo = new Duplo({ environment: "TEST" });
 	const process = new Process("test");
 	process.setExtract({
 		params: { userId: zod.coerce.number() },
@@ -68,14 +66,12 @@ describe("Process", async() => {
 
 		process.instance = duplo;
 
-		spy.mockImplementation(async(arg) => {
-			// await writeFile(resolve(import.meta.dirname, "__data__/process.txt"), arg.content);
-			expect(arg.content).toBe(
-				await readFile(resolve(import.meta.dirname, "__data__/process.txt"), "utf-8"),
-			);
-		});
+		process.build();
 
-		await Promise.resolve(process.build());
+		expect(spy).toBeCalled();
+
+		expect(spy.mock.lastCall?.[0].content)
+			.toBe(await readFile(resolve(import.meta.dirname, "__data__/process.txt"), "utf-8"));
 
 		spy.mockImplementation(advancedEvalOriginal);
 

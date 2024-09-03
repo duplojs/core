@@ -1,8 +1,9 @@
 
-		let floor = this.makeFloor();
 		let result = undefined;
 
 		try {
+			let floor = this.makeFloor();
+
 			Execution: {
 				
 /* hook-beforeRouteExecution-before */
@@ -238,6 +239,7 @@ break Execution;
 /* defaultResponse-before */
 /* end_block */
 
+
 				result = new this.Response(503, "NO_RESPONSE_SENT", undefined);
 			}
 		} catch (error) {
@@ -246,7 +248,7 @@ break Execution;
 /* end_block */
 
 
-			result = await this.hooks.onError(request, error) ?? new this.Response(500, "SERVER_ERROR", undefined);
+			result = await this.hooks.onError(request, error) 
 
 			
 /* hook-onError-after */
@@ -255,36 +257,18 @@ break Execution;
 		}
 
 		
-/* hook-beforeSend-before */
+/* check-result-before */
 /* end_block */
 
 
-		await this.hooks.beforeSend(request, result)
+		if(!(result instanceof this.Response)){
+			throw new this.ResultIsNotAResponse(result)
+		}
 
 		
-/* hook-beforeSend-after */
-/* end_block */
-
-		
-/* hook-serializeBody-before */
+/* check-result-after */
 /* end_block */
 
 
-		await this.hooks.serializeBody(request, result)
-
-		
-/* hook-serializeBody-after */
-/* end_block */
-
-		
-/* hook-afterSend-before */
-/* end_block */
-
-
-		await this.hooks.afterSend(request, result)
-
-		
-/* hook-afterSend-after */
-/* end_block */
-
+		return result
 		

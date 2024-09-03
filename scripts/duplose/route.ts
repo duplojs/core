@@ -13,13 +13,15 @@ import { HandlerStep } from "@scripts/step/handler";
 import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
 import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
+import { ResultIsNotAResponse } from "@scripts/error/resultIsNotAResponse";
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
 	hooks: BuildedHooksRouteLifeCycle;
+	ResultIsNotAResponse: typeof ResultIsNotAResponse;
 }
 
 export interface RouteBuildedFunction {
-	(request: CurrentRequestObject): Promise<void>;
+	(request: CurrentRequestObject): Promise<Response>;
 	context: RouteBuildedFunctionContext;
 }
 
@@ -84,7 +86,7 @@ export class Route<
 		copyHooks(hooks, this.instance.hooksRouteLifeCycle);
 
 		const buildedPreflight = this.preflightSteps.map(
-			(step) => step.build(),
+			(step) => step.build(this.instance!),
 		);
 
 		const bodyTreat = condition(
@@ -105,14 +107,15 @@ export class Route<
 		);
 
 		const buildedStep = this.steps.map(
-			(step) => step.build(),
+			(step) => step.build(this.instance!),
 		);
 
 		const content = /* js */`
-		let ${StringBuilder.floor} = this.makeFloor();
 		let ${StringBuilder.result} = undefined;
 
 		try {
+			let ${StringBuilder.floor} = this.makeFloor();
+
 			${StringBuilder.label}: {
 				${insertBlock("hook-beforeRouteExecution-before")}
 
@@ -141,31 +144,26 @@ export class Route<
 				${insertBlock("steps-after")}
 
 				${insertBlock("defaultResponse-before")}
+
 				${StringBuilder.result} = new this.Response(503, "NO_RESPONSE_SENT", undefined);
 			}
 		} catch (error) {
 			${insertBlock("hook-onError-before")}
 
-			${StringBuilder.result} = await this.hooks.onError(${StringBuilder.request}, error) ?? new this.Response(500, "SERVER_ERROR", undefined);
+			${StringBuilder.result} = await this.hooks.onError(${StringBuilder.request}, error) 
 
 			${insertBlock("hook-onError-after")}
 		}
 
-		${insertBlock("hook-beforeSend-before")}
+		${insertBlock("check-result-before")}
 
-		await this.hooks.beforeSend(${StringBuilder.request}, ${StringBuilder.result})
+		if(!(${StringBuilder.result} instanceof this.Response)){
+			throw new this.ResultIsNotAResponse(${StringBuilder.result})
+		}
 
-		${insertBlock("hook-beforeSend-after")}
-		${insertBlock("hook-serializeBody-before")}
+		${insertBlock("check-result-after")}
 
-		await this.hooks.serializeBody(${StringBuilder.request}, ${StringBuilder.result})
-
-		${insertBlock("hook-serializeBody-after")}
-		${insertBlock("hook-afterSend-before")}
-
-		await this.hooks.afterSend(${StringBuilder.request}, ${StringBuilder.result})
-
-		${insertBlock("hook-afterSend-after")}
+		return ${StringBuilder.result}
 		`;
 
 		const context: RouteBuildedFunctionContext = {
@@ -185,7 +183,9 @@ export class Route<
 			steps: buildedStep,
 			extensions: simpleClone(this.extensions),
 			ContractResponseError,
+			ResultIsNotAResponse,
 			duplose: this,
+			duplo: this.instance,
 		};
 
 		const buildedFunction = advancedEval<RouteBuildedFunction>({

@@ -1,3 +1,4 @@
+import { duploTest } from "@test/utils/duploTest";
 import { BuildedHandlerStep } from "./builded/handler";
 import { HandlerStep } from "./handler";
 import { Response } from "@scripts/response";
@@ -9,5 +10,5 @@ it("HandlerStep", () => {
 
 	expect(step.parent).toBe(handlerFunction);
 
-	expect(step.build()).instanceOf(BuildedHandlerStep);
+	expect(step.build(duploTest)).instanceOf(BuildedHandlerStep);
 });

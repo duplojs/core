@@ -1,3 +1,4 @@
+import { duploTest } from "@test/utils/duploTest";
 import { BuildedCutStep, CutStep } from "..";
 
 it("CutStep", () => {
@@ -9,5 +10,5 @@ it("CutStep", () => {
 
 	expect(step.drop).toStrictEqual(["test"]);
 
-	expect(step.build()).instanceOf(BuildedCutStep);
+	expect(step.build(duploTest)).instanceOf(BuildedCutStep);
 });

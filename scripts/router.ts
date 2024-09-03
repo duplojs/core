@@ -22,9 +22,14 @@ export class Router {
 		Record<HttpMethod, RouterFinder>
 	>;
 
+	public readonly buildedNotfoundRoutes: RouteBuildedFunction;
+
 	public constructor(
-		public routes: Route[],
+		public readonly routes: Route[],
+		public readonly notfoundRoutes: Route,
 	) {
+		this.buildedNotfoundRoutes = notfoundRoutes.build();
+
 		this.methodToRoutesMapper = routes
 			.reduce<Router["methodToRoutesMapper"]>(
 				(pv, route) => {
@@ -76,15 +81,21 @@ export class Router {
 			);
 	}
 
-	public find(method: string, path: string): RouterFinderResult | null {
+	public find(method: string, path: string): RouterFinderResult {
+		let finder: RouterFinder | undefined = undefined;
+
 		if (
 			hasKey(this.methodToFinderMapper, method)
 			&& this.methodToFinderMapper[method]
 		) {
-			return this.methodToFinderMapper[method](path);
-		} else {
-			return null;
+			finder = this.methodToFinderMapper[method];
 		}
+
+		return finder?.(path) ?? {
+			buildedRoute: this.buildedNotfoundRoutes,
+			params: {},
+			matchedPath: null,
+		};
 	}
 
 	public static pathToStringRegExp(path: string) {

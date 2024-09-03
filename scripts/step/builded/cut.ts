@@ -4,6 +4,7 @@ import type { CutStep, Cut } from "../cut";
 import { checkResult, condition, insertBlock, mapped, maybeAwait, StringBuilder } from "@utils/stringBuilder";
 import type { ZodType, ZodUnion } from "zod";
 import { zod } from "@scripts/index";
+import { type Duplo } from "@scripts/duplo";
 
 export class BuildedCutStep extends BuildedStep<CutStep> {
 	public cutFunction: Cut;
@@ -12,8 +13,11 @@ export class BuildedCutStep extends BuildedStep<CutStep> {
 
 	public responseZodSchema?: ZodUnion<any>;
 
-	public constructor(step: CutStep) {
-		super(step);
+	public constructor(
+		instance: Duplo,
+		step: CutStep,
+	) {
+		super(instance, step);
 		this.drop = simpleClone(step.drop);
 		this.cutFunction = step.parent;
 

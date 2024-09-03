@@ -1,6 +1,6 @@
 import { CheckpointList } from "@test/utils/checkpointList";
 import { getTypedEntries } from ".";
-import { Hook, copyHooks, makeHooksRouteLifeCycle } from "./hook";
+import { Hook, copyHooks, makeHooksInstanceLifeCycle, makeHooksRouteLifeCycle } from "./hook";
 
 describe("hook", () => {
 	const hook = new Hook<(test?: boolean) => any>(1);
@@ -176,6 +176,13 @@ describe("hook", () => {
 
 	it("makeHooksRouteLifeCycle", () => {
 		const hooks = makeHooksRouteLifeCycle();
+		Object.values(hooks).forEach((hook) => {
+			expect(hook).instanceOf(Hook);
+		});
+	});
+
+	it("makeHooksInstanceLifeCycle", () => {
+		const hooks = makeHooksInstanceLifeCycle();
 		Object.values(hooks).forEach((hook) => {
 			expect(hook).instanceOf(Hook);
 		});

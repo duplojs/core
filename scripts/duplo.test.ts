@@ -4,7 +4,7 @@ import { Process } from "./duplose/process";
 import { Response } from "@scripts/response";
 
 describe("duplo", () => {
-	const duplo = new Duplo();
+	const duplo = new Duplo({ environment: "TEST" });
 
 	it("register duplo", () => {
 		const process = new Process("test");

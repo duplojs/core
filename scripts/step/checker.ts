@@ -4,6 +4,7 @@ import type { Description } from "@scripts/description";
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Floor } from "@scripts/floor";
 import { BuildedCheckerStep } from "./builded/checker";
+import { type Duplo } from "@scripts/duplo";
 
 export interface CheckerStepParams<
 	CheckerGeneric extends GetCheckerGeneric = GetCheckerGeneric,
@@ -49,7 +50,7 @@ export class CheckerStep<
 		this.responses = responses;
 	}
 
-	public build() {
-		return new BuildedCheckerStep(this);
+	public build(instance: Duplo) {
+		return new BuildedCheckerStep(instance, this);
 	}
 }

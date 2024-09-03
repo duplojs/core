@@ -1,4 +1,5 @@
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
+import { getTypedEntries } from "@utils/getTypedEntries";
 import type { OverrideInterface } from "@utils/overrideInterface";
 
 export interface HttpMethods {

@@ -20,5 +20,12 @@ describe("duplo", () => {
 		expect(response.code).toBe(422);
 		expect(response.information).toBe("TYPE_ERROR.params.userId");
 		expect(response.body).instanceOf(ZodError);
+
+		const extractError = () => new Response(200, "test", undefined);
+		duplo.setExtractError(extractError);
+	});
+
+	it("notfoundHandler", () => {
+
 	});
 });

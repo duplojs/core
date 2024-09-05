@@ -5,7 +5,6 @@ import type { Step } from "@scripts/step";
 import type { Description } from "@scripts/description";
 import { advancedEval } from "@utils/advancedEval";
 import { checkResult, condition, extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
-import { copyHooks, makeHooksRouteLifeCycle, type BuildedHooksRouteLifeCycle } from "@scripts/hook";
 import { makeFloor } from "@scripts/floor";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
 import { simpleClone } from "@utils/simpleClone";
@@ -14,6 +13,7 @@ import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandler
 import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { ResultIsNotAResponse } from "@scripts/error/resultIsNotAResponse";
+import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
 	hooks: BuildedHooksRouteLifeCycle;
@@ -80,10 +80,8 @@ export class Route<
 			throw new LastStepMustBeHandlerError(this);
 		}
 
-		const hooks = makeHooksRouteLifeCycle<Request>();
-
-		this.copyHooks(hooks);
-		copyHooks(hooks, this.instance.hooksRouteLifeCycle);
+		const hooks = this.getAllHooks();
+		hooks.import(this.instance.hooksRouteLifeCycle);
 
 		const buildedPreflight = this.preflightSteps.map(
 			(step) => step.build(this.instance!),

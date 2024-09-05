@@ -1,14 +1,14 @@
 import { hasKey } from "@utils/hasKey";
 import type { Duplose, ExtractErrorFunction } from "./duplose";
 import { Route } from "./duplose/route";
-import { type DuploHooks, makeHooksInstanceLifeCycle, makeHooksRouteLifeCycle } from "./hook";
 import { NotFoundHttpResponse, UnprocessableEntityHttpResponse } from "./response/simplePreset";
-import { Router } from "./router";
-import type { AnyFunction, PromiseOrNot } from "@utils/types";
+import type { AnyFunction } from "@utils/types";
 import type { CurrentRequestObject } from "./request";
 import type { Response } from "./response";
 import { useRouteBuilder } from "./builder/route";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
+import { type BuildedHooksInstanceLifeCycle, HooksInstanceifeCycle } from "./hook/instanceLifeCycle";
+import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "./hook/routeLifeCycle";
 
 export interface Environments {
 	DEV: true;
@@ -20,16 +20,19 @@ export type Environment = GetPropsWithTrueValue<Environments>;
 
 export interface DuploConfig {
 	environment: Environment;
+	disabledRuntimeEndPointCheck?: boolean;
 }
 
 export type NotfoundHandler = (request: CurrentRequestObject) => Response;
 
+export type DuploHooks = BuildedHooksInstanceLifeCycle & BuildedHooksRouteLifeCycle;
+
 export class Duplo {
 	public duploses: Duplose[] = [];
 
-	public hooksRouteLifeCycle = makeHooksRouteLifeCycle();
+	public hooksRouteLifeCycle = new HooksRouteLifeCycle<CurrentRequestObject>();
 
-	public hooksInstanceLifeCycle = makeHooksInstanceLifeCycle();
+	public hooksInstanceLifeCycle = new HooksInstanceifeCycle();
 
 	public constructor(
 		public config: DuploConfig,

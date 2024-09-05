@@ -43,7 +43,7 @@ export class BuildedCutStep extends BuildedStep<CutStep> {
 		);
 
 		const contractResponses = condition(
-			!!this.responseZodSchema,
+			!!this.responseZodSchema && !this.instance.config.disabledRuntimeEndPointCheck,
 			() => /* js */`
 				let temp = this.steps[${index}].responseZodSchema.safeParse(${StringBuilder.result});
 

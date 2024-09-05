@@ -35,7 +35,7 @@ export class BuildedHandlerStep extends BuildedStep<HandlerStep> {
 		const async = this.handlerFunction.constructor.name === "AsyncFunction";
 
 		const contractResponses = condition(
-			!!this.responseZodSchema,
+			!!this.responseZodSchema && !this.instance.config.disabledRuntimeEndPointCheck,
 			() => /* js */`
 				let temp = this.steps[${index}].responseZodSchema.safeParse(${StringBuilder.result});
 

@@ -1,6 +1,5 @@
 import type { Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
-import { copyHooks, makeHooksRouteLifeCycle, type HooksRouteLifeCycle } from "@scripts/hook";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
 import type { AnyFunction } from "@utils/types";
@@ -13,6 +12,7 @@ import type { PreflightStep } from "@scripts/step/preflight";
 import type { BuildedPreflightStep } from "@scripts/step/builded/preflight";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import type { ContractResponseError } from "@scripts/error/contractResponseError";
+import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 
 export interface DuploseBuildedFunctionContext<
 	T extends Duplose = Duplose,
@@ -52,6 +52,13 @@ export type ExtractObject<
 	[P in ExtractKey<T>]?: Record<string, ZodType> | ZodType;
 };
 
+export type DefineHooksRouteLifeCycle<
+	Request extends CurrentRequestObject = any,
+	ReturnType extends unknown = undefined,
+> = <
+	T extends keyof BuildedHooksRouteLifeCycle<Request>,
+>(hookName: T, subscriber: BuildedHooksRouteLifeCycle<Request>[T]) => ReturnType;
+
 export abstract class Duplose<
 	BuildedFunction extends AnyFunction = any,
 	Request extends CurrentRequestObject = any,
@@ -62,7 +69,7 @@ export abstract class Duplose<
 > {
 	public instance?: Duplo;
 
-	public hooks = makeHooksRouteLifeCycle<Request>();
+	public hooks = new HooksRouteLifeCycle<Request>();
 
 	public preflightSteps: PreflightStep[] = [];
 
@@ -101,16 +108,20 @@ export abstract class Duplose<
 		this.steps.push(...steps);
 	}
 
-	public copyHooks(base: HooksRouteLifeCycle<any>) {
-		copyHooks(base, this.hooks);
+	public getAllHooks() {
+		const hooks = new HooksRouteLifeCycle();
+
+		hooks.import(this.hooks);
 
 		this.steps
 			.filter((step): step is ProcessStep => step instanceof ProcessStep)
-			.forEach((step) => void step.parent.copyHooks(base));
+			.forEach((step) => void hooks.import(step.parent.getAllHooks()));
 
 		this.preflightSteps.forEach((step) => {
-			step.parent.copyHooks(base);
+			hooks.import(step.parent.getAllHooks());
 		});
+
+		return hooks;
 	}
 
 	public abstract build(): BuildedFunction;

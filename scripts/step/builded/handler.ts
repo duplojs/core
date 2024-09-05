@@ -3,14 +3,18 @@ import { checkResult, condition, insertBlock, maybeAwait, StringBuilder } from "
 import type { Handler, HandlerStep } from "../handler";
 import type { ZodType, ZodUnion } from "zod";
 import { zod } from "@scripts/index";
+import { type Duplo } from "@scripts/duplo";
 
 export class BuildedHandlerStep extends BuildedStep<HandlerStep> {
 	public handlerFunction: Handler;
 
 	public responseZodSchema?: ZodUnion<any>;
 
-	public constructor(step: HandlerStep) {
-		super(step);
+	public constructor(
+		instance: Duplo,
+		step: HandlerStep,
+	) {
+		super(instance, step);
 
 		this.handlerFunction = step.parent;
 
@@ -31,7 +35,7 @@ export class BuildedHandlerStep extends BuildedStep<HandlerStep> {
 		const async = this.handlerFunction.constructor.name === "AsyncFunction";
 
 		const contractResponses = condition(
-			!!this.responseZodSchema,
+			!!this.responseZodSchema && !this.instance.config.disabledRuntimeEndPointCheck,
 			() => /* js */`
 				let temp = this.steps[${index}].responseZodSchema.safeParse(${StringBuilder.result});
 

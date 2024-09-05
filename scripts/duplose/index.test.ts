@@ -4,6 +4,7 @@ import { ProcessStep } from "@scripts/step/process";
 import { getTypedEntries } from "@utils/getTypedEntries";
 import { Response } from "@scripts/response";
 import { PreflightStep } from "@scripts/step/preflight";
+import { Hook } from "@scripts/hook";
 
 describe("Duplose", () => {
 	class SubDuplo extends Duplose {
@@ -39,20 +40,22 @@ describe("Duplose", () => {
 		expect(duplose.steps[0]).toBe(step);
 	});
 
-	it("copyHooks", () => {
-		const tempDuplose = new SubDuplo();
+	it("getAllHooks", () => {
+		const hooks = duplose.getAllHooks();
 
-		duplose.copyHooks(tempDuplose.hooks);
-
-		getTypedEntries(tempDuplose.hooks)
+		getTypedEntries(hooks)
 			.forEach(([key, value]) => {
+				if (!(value instanceof Hook)) {
+					return;
+				}
+
 				expect(value.subscribers[0])
 					.toBe(duplose.hooks[key]);
 
-				expect(value.subscribers[1])
+				expect((value.subscribers[1] as Hook).subscribers[0])
 					.toBe(process2.hooks[key]);
 
-				expect(value.subscribers[2])
+				expect((value.subscribers[2] as Hook).subscribers[0])
 					.toBe(process1.hooks[key]);
 			});
 	});

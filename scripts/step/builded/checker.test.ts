@@ -3,6 +3,7 @@ import { Response } from "@scripts/response";
 import { BuildedCheckerStep } from "./checker";
 import { readFile } from "fs/promises";
 import { resolve } from "path";
+import { duploTest } from "@test/utils/duploTest";
 
 describe("BuildedCheckerStep", () => {
 	const checker = new Checker("test");
@@ -24,7 +25,7 @@ describe("BuildedCheckerStep", () => {
 
 		const step = new CheckerStep(checker, params);
 
-		const buildedCheckerStep = new BuildedCheckerStep(step);
+		const buildedCheckerStep = new BuildedCheckerStep(duploTest, step);
 
 		expect(buildedCheckerStep.params.options).toStrictEqual({
 			toto: 2,
@@ -60,7 +61,7 @@ describe("BuildedCheckerStep", () => {
 
 		const step = new CheckerStep(checker, params);
 
-		const buildedCheckerStep = new BuildedCheckerStep(step);
+		const buildedCheckerStep = new BuildedCheckerStep(duploTest, step);
 
 		expect(
 			typeof buildedCheckerStep.params.options === "function"
@@ -87,7 +88,7 @@ describe("BuildedCheckerStep", () => {
 
 		const step = new CheckerStep(checker, params, [new Response(100, "toto", zod.undefined())]);
 
-		const buildedCheckerStep = new BuildedCheckerStep(step);
+		const buildedCheckerStep = new BuildedCheckerStep(duploTest, step);
 
 		expect(buildedCheckerStep.toString(1)).toBe(
 			await readFile(resolve(import.meta.dirname, "__data__/checker1.txt"), "utf-8"),
@@ -108,7 +109,7 @@ describe("BuildedCheckerStep", () => {
 
 		const step = new CheckerStep(checker, params, [new Response(100, "toto", zod.undefined())]);
 
-		const buildedCheckerStep = new BuildedCheckerStep(step);
+		const buildedCheckerStep = new BuildedCheckerStep(duploTest, step);
 
 		expect(buildedCheckerStep.toString(1)).toStrictEqual(
 			await readFile(resolve(import.meta.dirname, "__data__/checker2.txt"), "utf-8"),

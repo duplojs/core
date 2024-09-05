@@ -1,7 +1,7 @@
 import { advancedEval } from "@utils/advancedEval";
-import type { AnyFunction, PromiseOrNot } from "@utils/types";
-import type { CurrentRequestObject } from "./request";
-import type { Response } from "./response";
+import type { AnyFunction } from "@utils/types";
+import type { HooksRouteLifeCycle } from "./routeLifeCycle";
+import type { HooksInstanceifeCycle } from "./instanceLifeCycle";
 
 export class Hook<
 	subscriber extends AnyFunction = AnyFunction,
@@ -92,47 +92,10 @@ export class Hook<
 	}
 }
 
-export type BuildHooks<T extends Record<string, Hook>> = {
-	[P in keyof T]: ReturnType<T[P]["build"]>
+export type Hooks = HooksRouteLifeCycle | HooksInstanceifeCycle;
+
+export type BuildHooks<T extends Hooks> = {
+	[P in keyof T]: T[P] extends Hook
+		? ReturnType<T[P]["build"]>
+		: never
 };
-
-export function copyHooks<
-	T extends Record<string, Hook>,
->(
-	base: T,
-	copy: NoInfer<T>,
-) {
-	Object.keys(base).forEach((key) => {
-		base[key].addSubscriber(
-			copy[key],
-		);
-	});
-}
-
-export function makeHooksRouteLifeCycle<
-	Request extends CurrentRequestObject = any,
->() {
-	return {
-		beforeRouteExecution: new Hook<(request: Request) => PromiseOrNot<boolean | Response | void>>(1),
-		parsingBody: new Hook<(request: Request) => PromiseOrNot<boolean | Response | void>>(1),
-		onError: new Hook<(request: Request, error: unknown) => PromiseOrNot<Response | void>>(2),
-		beforeSend: new Hook<(request: Request, response: Response) => PromiseOrNot<boolean | void>>(2),
-		serializeBody: new Hook<(request: Request, response: Response) => PromiseOrNot<boolean | void>>(2),
-		afterSend: new Hook<(request: Request, response: Response) => PromiseOrNot<boolean | void>>(2),
-	};
-}
-
-export type HooksRouteLifeCycle<
-	Request extends CurrentRequestObject = any,
-> = ReturnType<typeof makeHooksRouteLifeCycle<Request>>;
-
-export type BuildedHooksRouteLifeCycle<
-	Request extends CurrentRequestObject = any,
-> = BuildHooks<HooksRouteLifeCycle<Request>>;
-
-export type DefineHooksRouteLifeCycle<
-	Request extends CurrentRequestObject = any,
-	ReturnType extends unknown = undefined,
-> = <
-	T extends keyof BuildedHooksRouteLifeCycle<Request>,
->(hookName: T, subscriber: BuildedHooksRouteLifeCycle<Request>[T]) => ReturnType;

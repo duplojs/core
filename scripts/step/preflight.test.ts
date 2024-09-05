@@ -1,13 +1,13 @@
 import { duploTest } from "@test/utils/duploTest";
-import { BuildedProcessStep, Process, ProcessStep, type ProcessStepParams } from "..";
+import { BuildedProcessStep, Process, PreflightStep, type ProcessStepParams } from "..";
 
-it("ProcessStep", () => {
+it("PreflightStep", () => {
 	const process = new Process("test");
 	process.instance = duploTest;
 
 	const params: ProcessStepParams = {};
 
-	const step = new ProcessStep(process, params);
+	const step = new PreflightStep(process, params);
 
 	expect(step.parent).toBe(process);
 

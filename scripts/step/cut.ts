@@ -5,6 +5,7 @@ import { BuildedCutStep } from "./builded/cut";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { ContractResponse, Response } from "@scripts/response";
 import type { Floor } from "@scripts/floor";
+import { type Duplo } from "@scripts/duplo";
 
 export type Cut<
 	FloorData extends object = object,
@@ -31,7 +32,7 @@ export class CutStep<
 		this.responses = responses;
 	}
 
-	public build() {
-		return new BuildedCutStep(this);
+	public build(instance: Duplo) {
+		return new BuildedCutStep(instance, this);
 	}
 }

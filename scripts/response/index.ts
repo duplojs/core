@@ -18,6 +18,8 @@ export class Response<
 
 	public headers: Record<string, string | string[]> = {};
 
+	public keepAlive = false;
+
 	public constructor(
 		code: Code,
 		information: Information,

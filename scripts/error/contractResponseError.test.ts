@@ -10,5 +10,5 @@ it("ContractResponseError", () => {
 
 	expect(error).instanceOf(Error);
 	expect(error.zodError).instanceOf(ZodError);
-	expect(error.reponse).instanceOf(Response);
+	expect(error.response).instanceOf(Response);
 });

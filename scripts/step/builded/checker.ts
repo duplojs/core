@@ -5,6 +5,7 @@ import { simpleClone } from "@utils/simpleClone";
 import type { CheckerHandler } from "@scripts/checker";
 import type { ZodType, ZodUnion } from "zod";
 import { zod } from "@scripts/index";
+import { type Duplo } from "@scripts/duplo";
 
 export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 	public checkerFunction: CheckerHandler;
@@ -13,8 +14,11 @@ export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 
 	public responseZodSchema?: ZodUnion<any>;
 
-	public constructor(step: CheckerStep) {
-		super(step);
+	public constructor(
+		instance: Duplo,
+		step: CheckerStep,
+	) {
+		super(instance, step);
 		this.params = simpleClone(step.params);
 
 		if (typeof this.params.options === "function") {
@@ -65,7 +69,7 @@ export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 		);
 
 		const contractResponses = condition(
-			!!this.responseZodSchema,
+			!!this.responseZodSchema && !this.instance.config.disabledRuntimeEndPointCheck,
 			() => /* js */`
 				let temp = this.steps[${index}].responseZodSchema.safeParse(${StringBuilder.result});
 

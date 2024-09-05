@@ -6,11 +6,11 @@ import { readFile, writeFile } from "fs/promises";
 import { resolve } from "path";
 import { BuildedPreflightStep } from "./preflight";
 import { PreflightStep } from "../preflight";
+import { duploTest } from "@test/utils/duploTest";
 
 describe("BuildedPreflightStep", () => {
-	const instance = new Duplo();
 	const process = new Process("test");
-	process.instance = instance;
+	process.instance = duploTest;
 	process.setOptions({
 		toto: 1,
 		test: "",
@@ -27,7 +27,7 @@ describe("BuildedPreflightStep", () => {
 
 		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedPreflightStep(step);
+		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
 
 		expect(buildedProcessStep.params.options).toStrictEqual({
 			toto: 2,
@@ -48,7 +48,7 @@ describe("BuildedPreflightStep", () => {
 
 		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedPreflightStep(step);
+		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
 
 		expect(
 			typeof buildedProcessStep.params.options === "function"
@@ -72,7 +72,7 @@ describe("BuildedPreflightStep", () => {
 
 		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedPreflightStep(step);
+		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
 
 		expect(buildedProcessStep.toString(1)).toBe(
 			await readFile(resolve(import.meta.dirname, "__data__/preflight1.txt"), "utf-8"),
@@ -90,7 +90,7 @@ describe("BuildedPreflightStep", () => {
 
 		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedPreflightStep(step);
+		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
 
 		expect(buildedProcessStep.toString(1)).toBe(
 			await readFile(resolve(import.meta.dirname, "__data__/preflight2.txt"), "utf-8"),

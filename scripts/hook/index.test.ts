@@ -1,6 +1,5 @@
 import { CheckpointList } from "@test/utils/checkpointList";
-import { getTypedEntries } from ".";
-import { Hook, copyHooks, makeHooksRouteLifeCycle } from "./hook";
+import { Hook } from ".";
 
 describe("hook", () => {
 	const hook = new Hook<(test?: boolean) => any>(1);
@@ -172,23 +171,5 @@ describe("hook", () => {
 
 		expect(buidedHook()).toBe("toto");
 		expect(checkpointList.getPointList()).toStrictEqual(["start", "1", "2", "end"]);
-	});
-
-	it("makeHooksRouteLifeCycle", () => {
-		const hooks = makeHooksRouteLifeCycle();
-		Object.values(hooks).forEach((hook) => {
-			expect(hook).instanceOf(Hook);
-		});
-	});
-
-	it("copy HooksRouteLifeCycle", () => {
-		const hooks = makeHooksRouteLifeCycle();
-		const copyedHooks = makeHooksRouteLifeCycle();
-
-		copyHooks(hooks, copyedHooks);
-
-		getTypedEntries(hooks).forEach(([key, hook]) => {
-			expect(hook.hasSubscriber(copyedHooks[key])).toBe(true);
-		});
 	});
 });

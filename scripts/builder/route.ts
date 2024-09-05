@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Description } from "@scripts/description";
-import type { ExtractErrorFunction, ExtractObject } from "@scripts/duplose";
+import type { DefineHooksRouteLifeCycle, ExtractErrorFunction, ExtractObject } from "@scripts/duplose";
 import type { Route } from "@scripts/duplose/route";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
@@ -17,7 +17,6 @@ import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
 import { CutStep, type Cut } from "@scripts/step/cut";
 import { HandlerStep, type Handler } from "@scripts/step/handler";
 import type { AnyFunction } from "@utils/types";
-import type { DefineHooksRouteLifeCycle } from "@scripts/hook";
 
 export interface RouteBuilder<
 	Request extends CurrentRequestObject = CurrentRequestObject,

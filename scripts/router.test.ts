@@ -2,11 +2,11 @@
 import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 import { Router } from "./router";
 import { Route } from "./duplose/route";
-import { Duplo } from "./duplo";
 import { HandlerStep } from "./step/handler";
 import type { AnyFunction } from "@utils/types";
 import { readFile } from "fs/promises";
 import { resolve } from "path";
+import { DuploTest } from "@test/utils/duploTest";
 
 describe("Router", async() => {
 	const {
@@ -14,7 +14,7 @@ describe("Router", async() => {
 		advancedEvalOriginal,
 	} = await mokeAdvancedEval();
 
-	const duplo = new Duplo();
+	const duplo = new DuploTest({ environment: "TEST" });
 
 	const routes = [
 		new Route("GET", ["/users", "/users/{userId}"]),
@@ -24,6 +24,12 @@ describe("Router", async() => {
 		new Route("PATCH", ["/users/{userId}"]),
 		new Route("PATCH", ["/posts/{postId}"]),
 	];
+
+	const notfoundRoute = new Route("GET", ["/*"]);
+	notfoundRoute.addStep(
+		new HandlerStep((() => ({})) as AnyFunction),
+	);
+	duplo.register(notfoundRoute);
 
 	routes.forEach((route) => {
 		route.addStep(
@@ -38,7 +44,7 @@ describe("Router", async() => {
 	});
 
 	it("mapper and function builder", async() => {
-		const router = new Router(routes);
+		const router = new Router(routes, notfoundRoute);
 
 		expect(router.methodToRoutesMapper).toStrictEqual({
 			GET: [routes[0], routes[1]],
@@ -62,7 +68,7 @@ describe("Router", async() => {
 	it("test finder", () => {
 		spy.mockImplementation(advancedEvalOriginal);
 
-		const router = new Router(routes);
+		const router = new Router(routes, notfoundRoute);
 
 		expect({
 			...router.find("GET", "/users"),
@@ -82,9 +88,17 @@ describe("Router", async() => {
 			buildedRoute: undefined,
 		});
 
-		expect(router.find("GET", "/user")).toStrictEqual(null);
+		expect(router.find("GET", "/user")).toStrictEqual({
+			buildedRoute: router.buildedNotfoundRoutes,
+			matchedPath: null,
+			params: {},
+		});
 
-		expect(router.find("PUT", "/user")).toStrictEqual(null);
+		expect(router.find("PUT", "/user")).toStrictEqual({
+			buildedRoute: router.buildedNotfoundRoutes,
+			matchedPath: null,
+			params: {},
+		});
 
 		expect(
 			router.find("GET", "/users/15")?.buildedRoute.context.duplose,

@@ -5,11 +5,11 @@ import { Duplo } from "@scripts/duplo";
 import { makeFloor } from "@scripts/floor";
 import { readFile } from "fs/promises";
 import { resolve } from "path";
+import { duploTest } from "@test/utils/duploTest";
 
 describe("BuildedProcessStep", () => {
-	const instance = new Duplo();
 	const process = new Process("test");
-	process.instance = instance;
+	process.instance = duploTest;
 	process.setOptions({
 		toto: 1,
 		test: "",
@@ -26,7 +26,7 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
 
 		expect(buildedProcessStep.params.options).toStrictEqual({
 			toto: 2,
@@ -47,7 +47,7 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
 
 		expect(
 			typeof buildedProcessStep.params.options === "function"
@@ -71,7 +71,7 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
 
 		expect(buildedProcessStep.toString(1)).toBe(
 			await readFile(resolve(import.meta.dirname, "__data__/process1.txt"), "utf-8"),
@@ -90,7 +90,7 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(step);
+		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
 
 		expect(buildedProcessStep.toString(1)).toBe(
 			await readFile(resolve(import.meta.dirname, "__data__/process2.txt"), "utf-8"),

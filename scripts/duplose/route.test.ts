@@ -1,8 +1,7 @@
 import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
-import { readFile, writeFile } from "fs/promises";
+import { readFile } from "fs/promises";
 import { Process } from "./process";
 import { resolve } from "path";
-import { Duplo } from "@scripts/duplo";
 import {
 	BuildNoRegisteredDuploseError,
 	CutStep,
@@ -18,10 +17,11 @@ import { PreflightStep } from "@scripts/step/preflight";
 import { HandlerStep } from "@scripts/step/handler";
 import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
+import { DuploTest } from "@test/utils/duploTest";
 
 describe("Route", async() => {
 	const checkpointList = new CheckpointList();
-	const duplo = new Duplo({ environment: "TEST" });
+	const duplo = new DuploTest({ environment: "TEST" });
 
 	const route = new Route("GET", ["/"]);
 	route.setExtract({

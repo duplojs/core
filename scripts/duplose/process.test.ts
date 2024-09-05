@@ -2,16 +2,16 @@ import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 import { readFile } from "fs/promises";
 import { Process } from "./process";
 import { resolve } from "path";
-import { Duplo } from "@scripts/duplo";
 import { BuildNoRegisteredDuploseError, CutStep, zod } from "..";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
+import { DuploTest } from "@test/utils/duploTest";
 
 describe("Process", async() => {
 	const checkpointList = new CheckpointList();
-	const duplo = new Duplo({ environment: "TEST" });
+	const duplo = new DuploTest({ environment: "TEST" });
 	const process = new Process("test");
 	process.setExtract({
 		params: { userId: zod.coerce.number() },

@@ -2,11 +2,11 @@
 import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 import { Router } from "./router";
 import { Route } from "./duplose/route";
-import { Duplo } from "./duplo";
 import { HandlerStep } from "./step/handler";
 import type { AnyFunction } from "@utils/types";
 import { readFile } from "fs/promises";
 import { resolve } from "path";
+import { DuploTest } from "@test/utils/duploTest";
 
 describe("Router", async() => {
 	const {
@@ -14,7 +14,7 @@ describe("Router", async() => {
 		advancedEvalOriginal,
 	} = await mokeAdvancedEval();
 
-	const duplo = new Duplo({ environment: "TEST" });
+	const duplo = new DuploTest({ environment: "TEST" });
 
 	const routes = [
 		new Route("GET", ["/users", "/users/{userId}"]),

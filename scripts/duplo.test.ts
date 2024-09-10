@@ -3,7 +3,8 @@ import { Process } from "./duplose/process";
 import { Response } from "@scripts/response";
 import { Request } from "@scripts/request";
 import { DuploTest } from "@test/utils/duploTest";
-import { Router } from "./router";
+import { CheckpointList } from "@test/utils/checkpointList";
+import { Duplo } from "./duplo";
 
 describe("duplo", () => {
 	const duplo = new DuploTest({ environment: "TEST" });
@@ -64,5 +65,24 @@ describe("duplo", () => {
 
 		expect(response.code).toBe(404);
 		expect(response.information).toBe("55");
+	});
+
+	it("plugins", () => {
+		const checkpoint = new CheckpointList();
+
+		new Duplo({
+			environment: "TEST",
+			plugins: [
+				() => void checkpoint.addPoint("1"),
+				() => void checkpoint.addPoint("2"),
+			],
+		});
+
+		expect(checkpoint.getPointList()).toStrictEqual([
+			"start",
+			"1",
+			"2",
+			"end",
+		]);
 	});
 });

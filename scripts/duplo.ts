@@ -18,10 +18,13 @@ export interface Environments {
 
 export type Environment = GetPropsWithTrueValue<Environments>;
 
+export type DuploPlugins = (instance: Duplo) => void;
+
 export interface DuploConfig {
 	environment: Environment;
 	disabledRuntimeEndPointCheck?: boolean;
 	disabledZodAccelerator?: boolean;
+	plugins?: DuploPlugins[];
 }
 
 export type NotfoundHandler = (request: CurrentRequestObject) => Response;
@@ -37,7 +40,9 @@ export class Duplo {
 
 	public constructor(
 		public config: DuploConfig,
-	) { }
+	) {
+		config.plugins?.forEach((plugin) => void plugin(this));
+	}
 
 	public extractError: ExtractErrorFunction = (type, key, error) => new UnprocessableEntityHttpResponse(`TYPE_ERROR.${type}${key ? `.${key}` : ""}`, error);
 

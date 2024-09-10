@@ -2,8 +2,8 @@ import type { Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
-import type { AnyFunction } from "@utils/types";
-import type { ZodError, ZodType } from "zod";
+import type { AnyFunction, ObjectKey } from "@utils/types";
+import { ZodType, type ZodError } from "zod";
 import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
 import type { makeFloor } from "@scripts/floor";
@@ -13,13 +13,15 @@ import type { BuildedPreflightStep } from "@scripts/step/builded/preflight";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import type { ContractResponseError } from "@scripts/error/contractResponseError";
 import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
+import { type ZodAcceleratorParser, type ZodAcceleratorError, ZodAccelerator } from "@duplojs/zod-accelerator";
+import { getTypedEntries } from "@utils/getTypedEntries";
 
 export interface DuploseBuildedFunctionContext<
 	T extends Duplose = Duplose,
 > {
 	makeFloor: typeof makeFloor;
 	Response: typeof Response;
-	extract?: ExtractObject;
+	extract?: ExtractObject | AcceleratedExtractObject;
 	extractError: ExtractErrorFunction;
 	preflightSteps: BuildedPreflightStep[];
 	steps: BuildedStep[];
@@ -32,7 +34,7 @@ export interface DuploseBuildedFunctionContext<
 export type ExtractErrorFunction = (
 	type: keyof ExtractObject,
 	key: string,
-	error: ZodError
+	error: ZodError | ZodAcceleratorError
 ) => Response;
 
 export interface DisabledExtractKey {
@@ -49,8 +51,14 @@ export type ExtractKey<
 export type ExtractObject<
 	T extends object = CurrentRequestObject,
 > = {
-	[P in ExtractKey<T>]?: Record<string, ZodType> | ZodType;
+	[P in ExtractKey<T>]?: { [x: string]: ZodType } | ZodType;
 };
+
+export interface AcceleratedExtractObject {
+	[x: ObjectKey]:
+		| Record<string, ZodAcceleratorParser<ZodType, unknown>>
+		| ZodAcceleratorParser<ZodType, unknown>;
+}
 
 export type DefineHooksRouteLifeCycle<
 	Request extends CurrentRequestObject = any,
@@ -122,6 +130,33 @@ export abstract class Duplose<
 		});
 
 		return hooks;
+	}
+
+	public acceleratedExtract() {
+		if (this.extract) {
+			return getTypedEntries(this.extract)
+				.reduce<AcceleratedExtractObject>(
+					(pv, [key, value]) => {
+						if (value instanceof ZodType) {
+							pv[key] = ZodAccelerator.build(value);
+						} else {
+							const deepExtract: Record<string, ZodAcceleratorParser<ZodType, unknown>> = {};
+
+							getTypedEntries(value)
+								.forEach(
+									([subKey, subValue]) => {
+										deepExtract[subKey] = ZodAccelerator.build(subValue);
+									},
+								);
+
+							pv[key] = deepExtract;
+						}
+
+						return pv;
+					},
+					{},
+				);
+		}
 	}
 
 	public abstract build(): BuildedFunction;

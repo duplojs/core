@@ -3,7 +3,7 @@ import { CutStep } from "../cut";
 import { BuildedCutStep } from "./cut";
 import { Response } from "@scripts/response";
 import { resolve } from "path";
-import { zod } from "@scripts/index";
+import { zod } from "@scripts/zod";
 import { duploTest } from "@test/utils/duploTest";
 
 it("BuildedCutStep", async() => {

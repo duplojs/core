@@ -1,6 +1,6 @@
 import { Checker, type CheckerOutput } from "@scripts/checker";
 import { Process } from "@scripts/duplose/process";
-import { zod } from "@scripts/index";
+import { zod } from "@scripts/zod";
 import { PresetChecker } from "@scripts/builder/checker";
 import { BadRequestHttpResponse } from "@scripts/response/simplePreset";
 import type { CurrentRequestObject } from "@scripts/request";

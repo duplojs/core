@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Description } from "@scripts/description";
@@ -33,6 +34,7 @@ export interface ProcessBuilder<
 
 	extract<
 		E extends ExtractObject<Request>,
+		F extends FlatExtract<E>,
 	>(
 		extract: E,
 		error?: ExtractErrorFunction,
@@ -46,7 +48,7 @@ export interface ProcessBuilder<
 			E,
 			Steps,
 			StepsCount,
-			FloorData & FlatExtract<E>
+			Omit<FloorData, keyof F> & NoInfer<F>
 		>,
 		"extract" | "hook"
 	>;
@@ -257,9 +259,9 @@ export function useProcessBuilder<
 		process.setInput(params?.input);
 	}
 
-	function hook(
-		...[name, subscriber]: Parameters<DefineHooksRouteLifeCycle>
-	): ReturnType<AnyProcessBuilder["hook"]> {
+	const hook: AnyProcessBuilder["hook"] = (
+		...[name, subscriber]
+	) => {
 		process.hooks[name].addSubscriber(subscriber as AnyFunction);
 
 		return {
@@ -271,13 +273,13 @@ export function useProcessBuilder<
 			hook,
 			exportation,
 		};
-	}
+	};
 
-	function extract(
-		extract: ExtractObject,
-		error?: ExtractErrorFunction,
-		...desc: Description[]
-	): ReturnType<AnyProcessBuilder["extract"]> {
+	const extract: AnyProcessBuilder["extract"] = (
+		extract,
+		error,
+		...desc
+	) => {
 		process.setExtract(extract, error, desc);
 
 		return {
@@ -287,14 +289,14 @@ export function useProcessBuilder<
 			cut,
 			exportation,
 		};
-	}
+	};
 
-	function check(
-		checker: Checker,
+	const check: AnyProcessBuilder["check"] = (
+		checker,
 		params: CheckerStepParams,
-		responses: ContractResponse | ContractResponse[] = [],
-		...desc: Description[]
-	): ReturnType<AnyProcessBuilder["check"]> {
+		responses = [],
+		...desc
+	) => {
 		process.addStep(
 			new CheckerStep(
 				checker,
@@ -311,13 +313,13 @@ export function useProcessBuilder<
 			cut,
 			exportation,
 		};
-	}
+	};
 
-	function presetCheck(
-		presetChecker: PresetChecker,
-		input: AnyFunction,
-		...desc: Description[]
-	): ReturnType<AnyProcessBuilder["presetCheck"]> {
+	const presetCheck: AnyProcessBuilder["presetCheck"] = (
+		presetChecker,
+		input,
+		...desc
+	) => {
 		const transformInput = presetChecker.params.transformInput;
 
 		return check(
@@ -331,13 +333,13 @@ export function useProcessBuilder<
 			presetChecker.responses,
 			...desc,
 		);
-	}
+	};
 
-	function execute(
-		currentProcess: Process,
-		params?: ProcessStepParams,
-		...desc: Description[]
-	): ReturnType<AnyProcessBuilder["execute"]> {
+	const execute: AnyProcessBuilder["execute"] = (
+		currentProcess,
+		params,
+		...desc
+	) => {
 		process.addStep(
 			new ProcessStep(
 				currentProcess,
@@ -353,14 +355,14 @@ export function useProcessBuilder<
 			cut,
 			exportation,
 		};
-	}
+	};
 
-	function cut(
-		cutFunction: Cut,
-		drop: string | string[] = [],
-		responses: ContractResponse | ContractResponse[] = [],
-		...desc: Description[]
-	): ReturnType<AnyProcessBuilder["cut"]> {
+	const cut: AnyProcessBuilder["cut"] = (
+		cutFunction,
+		drop = [],
+		responses = [],
+		...desc
+	) => {
 		process.addStep(
 			new CutStep(
 				cutFunction,
@@ -377,16 +379,16 @@ export function useProcessBuilder<
 			cut,
 			exportation,
 		};
-	}
+	};
 
-	function exportation(
+	const exportation: AnyProcessBuilder["exportation"] = (
 		drop: string[] = [],
 		...desc: Description[]
-	): ReturnType<AnyProcessBuilder["exportation"]> {
+	) => {
 		process.setDrop(drop, desc);
 
 		return process;
-	}
+	};
 
 	return {
 		extract,

@@ -53,7 +53,8 @@ describe("useProcessBuilder", () => {
 				() => new Response(400, "invalide_body", undefined),
 				description,
 			)
-			.exportation(["body", "userId"]);
+			.cut(({ pickup }) => ({ test1: 1 }), ["test1"])
+			.exportation(["body", "userId", "test1"]);
 
 		expect(Object.keys(process.extract ?? {})).toStrictEqual(["params", "body"]);
 		expect(process.extractError).not.toBe(undefined);

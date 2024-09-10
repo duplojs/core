@@ -1,6 +1,6 @@
 import type { CurrentRequestObject, HttpMethod } from "@scripts/request";
 import { Response } from "@scripts/response";
-import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext } from ".";
+import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext, type AcceleratedExtractObject } from ".";
 import type { Step } from "@scripts/step";
 import type { Description } from "@scripts/description";
 import { advancedEval } from "@utils/advancedEval";
@@ -86,6 +86,12 @@ export class Route<
 		const buildedPreflight = this.preflightSteps.map(
 			(step) => step.build(this.instance!),
 		);
+
+		let extract: ExtractObject | AcceleratedExtractObject | undefined = simpleClone(this.extract);
+
+		if (!this.instance.config.disabledZodAccelerator) {
+			extract = this.acceleratedExtract();
+		}
 
 		const bodyTreat = condition(
 			!!this.extract?.body,
@@ -175,7 +181,7 @@ export class Route<
 			},
 			makeFloor,
 			Response,
-			extract: simpleClone(this.extract),
+			extract,
 			extractError: this.extractError ?? this.instance.extractError,
 			preflightSteps: buildedPreflight,
 			steps: buildedStep,

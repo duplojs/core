@@ -1,6 +1,6 @@
 import type { CurrentRequestObject } from "@scripts/request";
 import { Response } from "@scripts/response";
-import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext } from ".";
+import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext, type AcceleratedExtractObject } from ".";
 import type { Step } from "@scripts/step";
 import type { Description } from "@scripts/description";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
@@ -103,6 +103,12 @@ export class Process<
 			(step) => step.build(this.instance!),
 		);
 
+		let extract: ExtractObject | AcceleratedExtractObject | undefined = simpleClone(this.extract);
+
+		if (!this.instance.config.disabledZodAccelerator) {
+			extract = this.acceleratedExtract();
+		}
+
 		const buildedStep = this.steps.map(
 			(step) => step.build(this.instance!),
 		);
@@ -145,7 +151,7 @@ export class Process<
 		const context: DuploseBuildedFunctionContext<Process> = {
 			makeFloor,
 			Response,
-			extract: simpleClone(this.extract),
+			extract,
 			extractError: this.extractError ?? this.instance.extractError,
 			preflightSteps: buildedPreflight,
 			steps: buildedStep,

@@ -2,7 +2,7 @@ import { BuildedStep } from ".";
 import { checkResult, condition, insertBlock, maybeAwait, StringBuilder } from "@utils/stringBuilder";
 import type { Handler, HandlerStep } from "../handler";
 import type { ZodType, ZodUnion } from "zod";
-import { zod } from "@scripts/index";
+import { zod } from "@scripts/zod";
 import { type Duplo } from "@scripts/duplo";
 
 export class BuildedHandlerStep extends BuildedStep<HandlerStep> {

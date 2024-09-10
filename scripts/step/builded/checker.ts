@@ -4,7 +4,7 @@ import type { CheckerStep, CheckerStepParams } from "../checker";
 import { simpleClone } from "@utils/simpleClone";
 import type { CheckerHandler } from "@scripts/checker";
 import type { ZodType, ZodUnion } from "zod";
-import { zod } from "@scripts/index";
+import { zod } from "@scripts/zod";
 import { type Duplo } from "@scripts/duplo";
 
 export class BuildedCheckerStep extends BuildedStep<CheckerStep> {

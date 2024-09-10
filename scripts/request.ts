@@ -57,6 +57,15 @@ export class Request implements RequestInitializationData {
 		this.params = initializationData.params;
 		this.query = initializationData.query;
 		this.matchedPath = initializationData.matchedPath;
+
+		getTypedEntries(initializationData).forEach(
+			([key, value]) => {
+				if (key in this) {
+					return;
+				}
+				this[key] = value as never;
+			},
+		);
 	}
 }
 

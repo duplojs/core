@@ -49,6 +49,7 @@ describe("useRouteBuilder", () => {
 				() => new Response(400, "invalide_body", undefined),
 				description,
 			)
+			.cut(({ pickup }) => ({ test1: 1 }), ["test1"])
 			.handler(
 				({ pickup }) => {
 					const userId = pickup("userId");
@@ -58,6 +59,10 @@ describe("useRouteBuilder", () => {
 					const body = pickup("body");
 
 					type check2 = ExpectType<typeof body, { test: string }, "strict">;
+
+					const test1 = pickup("test1");
+
+					type check3 = ExpectType<typeof test1, number, "strict">;
 
 					return new OkHttpResponse("test", "");
 				},

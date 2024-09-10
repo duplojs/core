@@ -4,6 +4,7 @@ export * from "@scripts/hook";
 export * from "@scripts/checker";
 export * from "@scripts/floor";
 export * from "@scripts/router";
+export * from "@scripts/zod";
 
 export * from "@scripts/builder/duplose";
 export * from "@scripts/builder/route";
@@ -34,6 +35,7 @@ export * from "@scripts/description";
 export * from "@scripts/error/buildNoRegisteredDuplose";
 export * from "@scripts/error/contractResponseError";
 export * from "@scripts/error/lastStepMustBeHandlerError";
+export * from "@scripts/error/resultIsNotAResponse";
 
 export * from "@utils/addThis";
 export * from "@utils/advancedEval";
@@ -55,5 +57,3 @@ export * from "@utils/types";
 export * from "@utils/unionToIntersection";
 export * from "@utils/unionToTuple";
 export * from "@utils/unPartial";
-
-export { z as zod } from "zod";

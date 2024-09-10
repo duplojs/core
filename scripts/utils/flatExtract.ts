@@ -1,32 +1,26 @@
 import type { ExtractObject } from "@scripts/duplose";
 import type { infer as zodInfer, ZodType } from "zod";
+import type { ObjectKey } from "./types";
 
-interface FlatPath {
-	path: string;
-	type: unknown;
+export interface KeyToType<
+	K extends ObjectKey = ObjectKey,
+	V extends unknown = unknown,
+> {
+	key: K;
+	value: V;
 }
-
-type ToPaths<T extends ExtractObject> = {
-	[K in keyof T]: T[K] extends ZodType
-		? {
-			path: K;
-			type: zodInfer<T[K]>;
-		}
-		: {
-			[P in keyof T[K]]: T[K][P] extends ZodType
-				? {
-					path: P;
-					type: zodInfer<T[K][P]>;
-				}
-				: never
-		}[keyof T[K]];
-}[keyof T];
-
-type FromPaths<T extends FlatPath> = {
-	[P in T as P["path"]]: P["type"];
-};
 
 export type FlatExtract<
 	T extends ExtractObject,
-	flatPath = ToPaths<T>,
-> = FromPaths<flatPath extends FlatPath ? flatPath : never>;
+	O extends KeyToType = {
+		[P in keyof T]: T[P] extends ZodType
+			? KeyToType<P, zodInfer<T[P]>>
+			: {
+				[S in keyof T[P]]: T[P][S] extends ZodType
+					? KeyToType<S, zodInfer<T[P][S]>>
+					: never
+			}[keyof T[P]]
+	}[keyof T],
+> = {
+	[P in O as P["key"]]: P["value"];
+};

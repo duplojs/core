@@ -5,6 +5,8 @@ import { getTypedEntries } from "@utils/getTypedEntries";
 import { Response } from "@scripts/response";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Hook } from "@scripts/hook";
+import { zod } from "@scripts/zod";
+import { ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 
 describe("Duplose", () => {
 	class SubDuplo extends Duplose {
@@ -21,7 +23,12 @@ describe("Duplose", () => {
 
 	it("setExtract", () => {
 		const errorHandler = () => new Response(300, "test", 11);
-		const extract = {};
+		const extract = {
+			body: zod.string(),
+			params: {
+				userId: zod.number(),
+			},
+		};
 		duplose.setExtract(extract, errorHandler);
 
 		expect(duplose.extractError).toBe(errorHandler);
@@ -58,5 +65,13 @@ describe("Duplose", () => {
 				expect((value.subscribers[2] as Hook).subscribers[0])
 					.toBe(process1.hooks[key]);
 			});
+	});
+
+	it("acceleratedExtract", () => {
+		const acceleratedExtact: any = duplose.acceleratedExtract();
+
+		expect(acceleratedExtact).not.toBe(undefined);
+		expect(acceleratedExtact.body).instanceOf(ZodAcceleratorParser);
+		expect(acceleratedExtact.params.userId).instanceOf(ZodAcceleratorParser);
 	});
 });

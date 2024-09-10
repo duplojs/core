@@ -1,3 +1,4 @@
+/* eslint-disable func-style */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Description } from "@scripts/description";
@@ -33,6 +34,7 @@ export interface RouteBuilder<
 
 	extract<
 		E extends ExtractObject<Request>,
+		F extends FlatExtract<E>,
 	>(
 		extract: E,
 		error?: ExtractErrorFunction,
@@ -44,7 +46,7 @@ export interface RouteBuilder<
 			E,
 			Steps,
 			StepsCount,
-			FloorData & FlatExtract<E>
+			Omit<FloorData, keyof F> & NoInfer<F>
 		>,
 		"extract" | "hook"
 	>;
@@ -207,9 +209,9 @@ export function useRouteBuilder<
 >(
 	route: Route,
 ): RouteBuilder<Request> {
-	function hook(
-		...[name, subscriber]: Parameters<DefineHooksRouteLifeCycle>
-	): ReturnType<AnyRouteBuilder["hook"]> {
+	const hook: AnyRouteBuilder["hook"] = (
+		...[name, subscriber]
+	) => {
 		route.hooks[name].addSubscriber(subscriber as AnyFunction);
 
 		return {
@@ -221,13 +223,13 @@ export function useRouteBuilder<
 			handler,
 			hook,
 		};
-	}
+	};
 
-	function extract(
-		extract: ExtractObject,
-		error?: ExtractErrorFunction,
-		...desc: Description[]
-	): ReturnType<AnyRouteBuilder["extract"]> {
+	const extract: AnyRouteBuilder["extract"] = (
+		extract,
+		error,
+		...desc
+	) => {
 		route.setExtract(extract, error, desc);
 
 		return {
@@ -237,14 +239,14 @@ export function useRouteBuilder<
 			cut,
 			handler,
 		};
-	}
+	};
 
-	function check(
-		checker: Checker,
+	const check: AnyRouteBuilder["check"] = (
+		checker,
 		params: CheckerStepParams,
-		responses: ContractResponse | ContractResponse[] = [],
-		...desc: Description[]
-	): ReturnType<AnyRouteBuilder["check"]> {
+		responses = [],
+		...desc
+	) => {
 		route.addStep(
 			new CheckerStep(
 				checker,
@@ -261,13 +263,13 @@ export function useRouteBuilder<
 			cut,
 			handler,
 		};
-	}
+	};
 
-	function presetCheck(
-		presetChecker: PresetChecker,
-		input: AnyFunction,
-		...desc: Description[]
-	): ReturnType<AnyRouteBuilder["presetCheck"]> {
+	const presetCheck: AnyRouteBuilder["presetCheck"] = (
+		presetChecker,
+		input,
+		...desc
+	) => {
 		const transformInput = presetChecker.params.transformInput;
 
 		return check(
@@ -281,13 +283,13 @@ export function useRouteBuilder<
 			presetChecker.responses,
 			...desc,
 		);
-	}
+	};
 
-	function execute(
-		process: Process,
-		params?: ProcessStepParams,
-		...desc: Description[]
-	): ReturnType<AnyRouteBuilder["execute"]> {
+	const execute: AnyRouteBuilder["execute"] = (
+		process,
+		params,
+		...desc
+	) => {
 		route.addStep(
 			new ProcessStep(
 				process,
@@ -303,14 +305,14 @@ export function useRouteBuilder<
 			cut,
 			handler,
 		};
-	}
+	};
 
-	function cut(
+	const cut: AnyRouteBuilder["cut"] = (
 		cutFunction: Cut,
 		drop: string | string[] = [],
 		responses: ContractResponse | ContractResponse[] = [],
 		...desc: Description[]
-	): ReturnType<AnyRouteBuilder["cut"]> {
+	) => {
 		route.addStep(
 			new CutStep(
 				cutFunction,
@@ -327,13 +329,13 @@ export function useRouteBuilder<
 			cut,
 			handler,
 		};
-	}
+	};
 
-	function handler(
+	const handler: AnyRouteBuilder["handler"] = (
 		handlerFunction: Handler,
 		responses: ContractResponse | ContractResponse[] = [],
 		...desc: Description[]
-	): ReturnType<AnyRouteBuilder["handler"]> {
+	) => {
 		route.addStep(
 			new HandlerStep(
 				handlerFunction,
@@ -343,7 +345,7 @@ export function useRouteBuilder<
 		);
 
 		return route;
-	}
+	};
 
 	return {
 		extract,

@@ -21,6 +21,7 @@ export type Environment = GetPropsWithTrueValue<Environments>;
 export interface DuploConfig {
 	environment: Environment;
 	disabledRuntimeEndPointCheck?: boolean;
+	disabledZodAccelerator?: boolean;
 }
 
 export type NotfoundHandler = (request: CurrentRequestObject) => Response;

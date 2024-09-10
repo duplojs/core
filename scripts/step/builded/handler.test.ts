@@ -3,7 +3,7 @@ import { resolve } from "path";
 import { BuildedHandlerStep } from "./handler";
 import { HandlerStep } from "../handler";
 import { Response } from "@scripts/response";
-import { zod } from "@scripts/index";
+import { zod } from "@scripts/zod";
 import { duploTest } from "@test/utils/duploTest";
 
 it("BuildedHandlerStep", async() => {

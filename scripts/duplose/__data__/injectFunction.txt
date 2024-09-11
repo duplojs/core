@@ -1,0 +1,60 @@
+
+							
+							
+							
+							
+							
+
+							let toto = 1;
+							
+							
+							
+							
+							
+							
+							
+							
+						this.extensions.injectedFunction[0](
+							request, 
+							this,
+							result,
+						);
+					
+							/* test */
+							
+							
+							
+							
+							
+							
+							toto = 2;
+							
+							
+							
+
+							
+							
+							
+							
+							toto = 3;
+							
+							
+							
+							
+							/* end_block */
+							
+							
+							toto = 4;
+							
+							
+							
+							
+							
+							
+							
+
+						
+						
+						
+						
+						

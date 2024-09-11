@@ -5,13 +5,14 @@ import { checkResult, condition, insertBlock, mapped, maybeAwait, StringBuilder 
 import type { ZodType, ZodUnion } from "zod";
 import { zod } from "@scripts/zod";
 import { type Duplo } from "@scripts/duplo";
+import ZodAccelerator, { type ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 
 export class BuildedCutStep extends BuildedStep<CutStep> {
 	public cutFunction: Cut;
 
 	public drop: string[];
 
-	public responseZodSchema?: ZodUnion<any>;
+	public responseZodSchema?: ZodUnion<any> | ZodAcceleratorParser<ZodUnion<any>>;
 
 	public constructor(
 		instance: Duplo,
@@ -31,6 +32,10 @@ export class BuildedCutStep extends BuildedStep<CutStep> {
 					}) satisfies ZodType,
 				) as any,
 			);
+
+			if (!instance.config.disabledZodAccelerator) {
+				this.responseZodSchema = ZodAccelerator.build(this.responseZodSchema);
+			}
 		}
 	}
 

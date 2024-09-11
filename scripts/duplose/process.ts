@@ -118,7 +118,7 @@ export class Process<
 			(key) => /* js */`"${key}": floor.pickup("${key}"),`,
 		);
 
-		const content = /* js */`
+		let content = /* js */`
 		let ${StringBuilder.floor} = this.makeFloor();
 		let ${StringBuilder.result} = undefined;
 		floor.drop("options", ${StringBuilder.options});
@@ -147,6 +147,8 @@ export class Process<
 			};
 		}
 		`;
+
+		content = this.applyEditingFunctions(content);
 
 		const context: DuploseBuildedFunctionContext<Process> = {
 			makeFloor,

@@ -7,11 +7,22 @@ import { PreflightStep } from "@scripts/step/preflight";
 import { Hook } from "@scripts/hook";
 import { zod } from "@scripts/zod";
 import { ZodAcceleratorParser } from "@duplojs/zod-accelerator";
+import { insertBlock } from "@utils/stringBuilder";
+import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKeyError";
+import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 
 describe("Duplose", () => {
 	class SubDuplo extends Duplose {
 		public build() {
 			throw new Error("Method not implemented.");
+		}
+
+		public get aef() {
+			return this.applyEditingFunctions;
+		}
+
+		public resetEditingFunction() {
+			this.editingFunctions = [];
 		}
 	}
 
@@ -73,5 +84,63 @@ describe("Duplose", () => {
 		expect(acceleratedExtact).not.toBe(undefined);
 		expect(acceleratedExtact.body).instanceOf(ZodAcceleratorParser);
 		expect(acceleratedExtact.params.userId).instanceOf(ZodAcceleratorParser);
+	});
+
+	it("injectCode", async() => {
+		duplose.edition.injectCode(
+			"(ttt)",
+			"let toto = 1;",
+			"top",
+		);
+
+		expect(() => duplose.aef(insertBlock("test"))).toThrowError(InjectBlockNotfoundError);
+
+		duplose.resetEditingFunction();
+
+		duplose.edition.injectCode(
+			"test",
+			"let toto = 1;",
+			"top",
+		);
+
+		duplose.edition.injectCode(
+			"test",
+			"toto = 2;",
+			"first",
+		);
+
+		duplose.edition.injectCode(
+			"test",
+			"toto = 3;",
+			"last",
+		);
+
+		duplose.edition.injectCode(
+			"test",
+			"toto = 4;",
+			"bottom",
+		);
+
+		await expect(duplose.aef(insertBlock("test"))).toMatchFileSnapshot("__data__/injectCode.txt");
+	});
+
+	it("injectFunction", async() => {
+		duplose.edition.injectFunction(
+			"test",
+			() => void "",
+			"top",
+		);
+
+		await expect(duplose.aef(insertBlock("test"))).toMatchFileSnapshot("__data__/injectFunction.txt");
+	});
+
+	it("addExtensions", () => {
+		expect(() => void duplose.edition.addExtensions({ injectedFunction: [] }))
+			.toThrowError(Error);
+
+		duplose.edition.addExtensions({ test: "toto" });
+
+		expect(duplose.extensions.test)
+			.toBe("toto");
 	});
 });

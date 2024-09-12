@@ -79,8 +79,8 @@ describe("Route", async() => {
 
 		expect(spy).toBeCalled();
 
-		expect(spy.mock.lastCall?.[0].content)
-			.toBe(await readFile(resolve(import.meta.dirname, "__data__/route.txt"), "utf-8"));
+		await expect(spy.mock.lastCall?.[0].content)
+			.toMatchFileSnapshot("__data__/route.txt");
 
 		spy.mockImplementation(advancedEvalOriginal);
 

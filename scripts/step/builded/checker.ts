@@ -6,13 +6,14 @@ import type { CheckerHandler } from "@scripts/checker";
 import type { ZodType, ZodUnion } from "zod";
 import { zod } from "@scripts/zod";
 import { type Duplo } from "@scripts/duplo";
+import ZodAccelerator, { type ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 
 export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 	public checkerFunction: CheckerHandler;
 
 	public params: CheckerStepParams;
 
-	public responseZodSchema?: ZodUnion<any>;
+	public responseZodSchema?: ZodUnion<any> | ZodAcceleratorParser<ZodUnion<any>>;
 
 	public constructor(
 		instance: Duplo,
@@ -49,6 +50,10 @@ export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 					}) satisfies ZodType,
 				) as any,
 			);
+
+			if (!instance.config.disabledZodAccelerator) {
+				this.responseZodSchema = ZodAccelerator.build(this.responseZodSchema);
+			}
 		}
 	}
 

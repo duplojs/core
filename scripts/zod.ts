@@ -1,1 +1,8 @@
-export { z as zod } from "zod";
+import ZodAccelerator from "@duplojs/zod-accelerator";
+import * as zod from "zod";
+
+ZodAccelerator.injectZod(zod);
+
+export {
+	zod,
+};

@@ -1,7 +1,5 @@
 import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
-import { readFile } from "fs/promises";
 import { Process } from "./process";
-import { resolve } from "path";
 import { BuildNoRegisteredDuploseError, CutStep, zod } from "..";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
@@ -70,8 +68,8 @@ describe("Process", async() => {
 
 		expect(spy).toBeCalled();
 
-		expect(spy.mock.lastCall?.[0].content)
-			.toBe(await readFile(resolve(import.meta.dirname, "__data__/process.txt"), "utf-8"));
+		await expect(spy.mock.lastCall?.[0].content)
+			.toMatchFileSnapshot("__data__/process.txt");
 
 		spy.mockImplementation(advancedEvalOriginal);
 

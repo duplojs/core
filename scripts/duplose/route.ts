@@ -114,7 +114,7 @@ export class Route<
 			(step) => step.build(this.instance!),
 		);
 
-		const content = /* js */`
+		let content = /* js */`
 		let ${StringBuilder.result} = undefined;
 
 		try {
@@ -169,6 +169,8 @@ export class Route<
 
 		return ${StringBuilder.result}
 		`;
+
+		content = this.applyEditingFunctions(content);
 
 		const context: RouteBuildedFunctionContext = {
 			hooks: {

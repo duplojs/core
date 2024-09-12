@@ -15,6 +15,10 @@ import type { ContractResponseError } from "@scripts/error/contractResponseError
 import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 import { type ZodAcceleratorParser, type ZodAcceleratorError, ZodAccelerator } from "@duplojs/zod-accelerator";
 import { getTypedEntries } from "@utils/getTypedEntries";
+import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
+import type { IsAny } from "@utils/isAny";
+import { StringBuilder } from "@utils/stringBuilder";
+import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKeyError";
 
 export interface DuploseBuildedFunctionContext<
 	T extends Duplose = Duplose,
@@ -25,10 +29,15 @@ export interface DuploseBuildedFunctionContext<
 	extractError: ExtractErrorFunction;
 	preflightSteps: BuildedPreflightStep[];
 	steps: BuildedStep[];
-	extensions: object;
+	extensions: DuploseContextExtensions;
 	ContractResponseError: typeof ContractResponseError;
 	duplose: T;
 	duplo: Duplo;
+}
+
+export interface DuploseContextExtensions {
+	injectedFunction: EditInjectFunction<any>[];
+	[x: ObjectKey]: unknown;
 }
 
 export type ExtractErrorFunction = (
@@ -67,6 +76,18 @@ export type DefineHooksRouteLifeCycle<
 	T extends keyof BuildedHooksRouteLifeCycle<Request>,
 >(hookName: T, subscriber: BuildedHooksRouteLifeCycle<Request>[T]) => ReturnType;
 
+export type EditingDuploseFunction = (input: string) => string;
+
+export type EditInjectPos = "first" | "last" | "top" | "bottom";
+
+export type EditInjectFunction<
+	Request extends CurrentRequestObject = CurrentRequestObject,
+> = (
+	request: Request,
+	context: DuploseBuildedFunctionContext,
+	result: unknown,
+) => void;
+
 export abstract class Duplose<
 	BuildedFunction extends AnyFunction = any,
 	Request extends CurrentRequestObject = any,
@@ -89,7 +110,9 @@ export abstract class Duplose<
 
 	public modifiers: AnyFunction[] = [];
 
-	public extensions: object = {};
+	public extensions: DuploseContextExtensions = {
+		injectedFunction: [],
+	};
 
 	public descriptions: Description[] = [];
 
@@ -157,6 +180,92 @@ export abstract class Duplose<
 					{},
 				);
 		}
+	}
+
+	protected editingFunctions: EditingDuploseFunction[] = [];
+
+	protected applyEditingFunctions(content: string) {
+		let editedContent = content;
+
+		this.editingFunctions.forEach(
+			(editingFunction) => {
+				editedContent = editingFunction(editedContent);
+			},
+		);
+
+		return editedContent;
+	}
+
+	public get edition() {
+		return {
+			injectCode: (
+				entryPoint: string,
+				code: string,
+				pos: EditInjectPos = "last",
+			) => {
+				const formatedEntryPoint = entryPoint.replace(/(\(|\))/g, (match) => `\\${match}`);
+				const regExpBlockName = new RegExp(`\\/\\* ${formatedEntryPoint} \\*\\/([^]*)`, "s");
+				const regExpEndBlock = /\/\* end_block \*\/([^]*)/s;
+
+				this.editingFunctions.push(
+					(input) => {
+						if (!regExpBlockName.test(input)) {
+							throw new InjectBlockNotfoundError(entryPoint, this);
+						}
+
+						const [beforeBlockName, afterBlockName] = input.split(regExpBlockName);
+
+						const [insideBlock, afterEndBlock] = afterBlockName.split(regExpEndBlock);
+
+						return `
+							${beforeBlockName}
+							${pos === "top" ? code : ""}
+							/* ${entryPoint} */
+							${pos === "first" ? code : ""}
+							${insideBlock}
+							${pos === "last" ? code : ""}
+							/* end_block */
+							${pos === "bottom" ? code : ""}
+							${afterEndBlock}
+						`;
+					},
+				);
+			},
+			injectFunction: (
+				entryPoint: string,
+				editInjectFunction: IsAny<Request> extends true
+					? EditInjectFunction
+					: EditInjectFunction<Request>,
+				pos: EditInjectPos = "last",
+			) => {
+				const index = this.extensions.injectedFunction.length;
+				this.extensions.injectedFunction.push(editInjectFunction as EditInjectFunction);
+				this.edition.injectCode(
+					entryPoint,
+					/* js */`
+						this.extensions.injectedFunction[${index}](
+							${StringBuilder.request}, 
+							this,
+							${StringBuilder.result},
+						);
+					`,
+					pos,
+				);
+			},
+			addExtensions: (
+				extensions: Partial<DuploseContextExtensions> & Record<ObjectKey, unknown>,
+			) => {
+				getTypedEntries(extensions).forEach(
+					([key, value]) => {
+						if (key in this.extensions) {
+							throw new DuplicateExtentionkeyError(key, this);
+						}
+
+						this.extensions[key] = value;
+					},
+				);
+			},
+		};
 	}
 
 	public abstract build(): BuildedFunction;

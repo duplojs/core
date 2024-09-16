@@ -1,6 +1,7 @@
 import type { ExtractObject } from "@scripts/duplose";
 import { getTypedEntries } from "./getTypedEntries";
 import { ZodType } from "zod";
+import { zodSchemaHasPresetChecker } from "@scripts/zod";
 
 export class StringBuilder {
 	public static result = "result";
@@ -55,7 +56,17 @@ export function skipStep(bool: boolean, index: number, block: string) {
 		: block;
 }
 
-export function extractLevelOne(one: string) {
+export function extractPresetCheckerCheckResult() {
+	return /* js */`
+	${StringBuilder.result} = temp.error.issues.at(-1)?.params?.response;
+
+	if(${StringBuilder.result} instanceof this.Response) {
+		break ${StringBuilder.label};
+	}
+	`;
+}
+
+export function extractLevelOne(one: string, zodSchemaContainPresetChecker: boolean) {
 	return /* js */`
 	${insertBlock(`extract-(${one})-before`)}
 
@@ -63,6 +74,7 @@ export function extractLevelOne(one: string) {
 		let temp = this.extract["${one}"].safeParse(${StringBuilder.request}["${one}"])
 
 		if(!temp.success){
+			${zodSchemaContainPresetChecker ? extractPresetCheckerCheckResult() : ""}
 			${StringBuilder.result} = this.extractError(
 				"${one}",
 				undefined,
@@ -81,7 +93,7 @@ export function extractLevelOne(one: string) {
 	`;
 }
 
-export function extractLevelTwo(one: string, two: string) {
+export function extractLevelTwo(one: string, two: string, zodSchemaContainPresetChecker: boolean) {
 	return /* js */`
 	${insertBlock(`extract-(${one})-(${two})-before`)}
 
@@ -89,6 +101,7 @@ export function extractLevelTwo(one: string, two: string) {
 		let temp = this.extract["${one}"]["${two}"].safeParse(${StringBuilder.request}["${one}"]?.["${two}"])
 
 		if(!temp.success){
+			${zodSchemaContainPresetChecker ? extractPresetCheckerCheckResult() : ""}
 			${StringBuilder.result} = this.extractError(
 				"${one}",
 				"${two}",
@@ -114,10 +127,10 @@ export function extractPart(extract?: ExtractObject) {
 			mapped(
 				getTypedEntries(extract),
 				([key, value]) => value instanceof ZodType
-					? extractLevelOne(key)
+					? extractLevelOne(key, zodSchemaHasPresetChecker(value))
 					: mapped(
-						Object.keys(value),
-						(subKey) => extractLevelTwo(key, subKey),
+						getTypedEntries(value),
+						([subKey, subValue]) => extractLevelTwo(key, subKey, zodSchemaHasPresetChecker(subValue)),
 					),
 			),
 			insertBlock("extract-after"),

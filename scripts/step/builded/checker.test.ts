@@ -1,8 +1,6 @@
 import { Checker, CheckerStep, makeFloor, zod, type CheckerStepParams } from "../..";
 import { Response } from "@scripts/response";
 import { BuildedCheckerStep } from "./checker";
-import { readFile } from "fs/promises";
-import { resolve } from "path";
 import { duploTest } from "@test/utils/duploTest";
 
 describe("BuildedCheckerStep", () => {
@@ -90,9 +88,7 @@ describe("BuildedCheckerStep", () => {
 
 		const buildedCheckerStep = new BuildedCheckerStep(duploTest, step);
 
-		expect(buildedCheckerStep.toString(1)).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/checker1.txt"), "utf-8"),
-		);
+		await expect(buildedCheckerStep.toString(1)).toMatchFileSnapshot("__data__/checker1.txt");
 	});
 
 	it("toString options: object, result: array", async() => {
@@ -111,8 +107,6 @@ describe("BuildedCheckerStep", () => {
 
 		const buildedCheckerStep = new BuildedCheckerStep(duploTest, step);
 
-		expect(buildedCheckerStep.toString(1)).toStrictEqual(
-			await readFile(resolve(import.meta.dirname, "__data__/checker2.txt"), "utf-8"),
-		);
+		await expect(buildedCheckerStep.toString(1)).toMatchFileSnapshot("__data__/checker2.txt");
 	});
 });

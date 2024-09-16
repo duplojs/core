@@ -1,5 +1,3 @@
-import { readFile } from "fs/promises";
-import { resolve } from "path";
 import { BuildedHandlerStep } from "./handler";
 import { HandlerStep } from "../handler";
 import { Response } from "@scripts/response";
@@ -16,7 +14,5 @@ it("BuildedHandlerStep", async() => {
 
 	expect(buildedCutStep.handlerFunction).toBe(handlerFunction);
 
-	expect(buildedCutStep.toString(4)).toBe(
-		await readFile(resolve(import.meta.dirname, "__data__/handler.txt"), "utf-8"),
-	);
+	await expect(buildedCutStep.toString(4)).toMatchFileSnapshot("__data__/handler.txt");
 });

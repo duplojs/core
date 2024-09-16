@@ -1,5 +1,6 @@
 import ZodAccelerator from "@duplojs/zod-accelerator";
-import * as zod from "zod";
+import { z as zod } from "zod";
+export * from "./presetCheck";
 
 ZodAccelerator.injectZod(zod);
 

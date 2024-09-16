@@ -1,6 +1,4 @@
-import { readFile } from "fs/promises";
 import { checkResult, condition, extractLevelOne, extractLevelTwo, extractPart, insertBlock, mapped, maybeAwait, skipStep, spread } from "./stringBuilder";
-import { resolve } from "path";
 import { zod } from "..";
 
 describe("stringBuilder", () => {
@@ -35,33 +33,25 @@ describe("stringBuilder", () => {
 	});
 
 	it("skipStep", async() => {
-		expect(skipStep(true, 1, "")).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/skipStep.txt"), "utf-8"),
-		);
+		await expect(skipStep(true, 1, "")).toMatchFileSnapshot("__data__/skipStep.txt");
 
 		expect(skipStep(false, 1, "")).toBe("");
 	});
 
 	it("extractLevelOne", async() => {
-		expect(extractLevelOne("body")).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/extractLevelOne.txt"), "utf-8"),
-		);
+		await expect(extractLevelOne("body", true)).toMatchFileSnapshot("__data__/extractLevelOne.txt");
 	});
 
 	it("extractLevelTwo", async() => {
-		expect(extractLevelTwo("params", "userId")).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/extractLevelTwo.txt"), "utf-8"),
-		);
+		await expect(extractLevelTwo("params", "userId", false)).toMatchFileSnapshot("__data__/extractLevelTwo.txt");
 	});
 
 	it("extractPart", async() => {
-		expect(
+		await expect(
 			extractPart({
 				body: zod.string(),
 				params: { userId: zod.string() },
 			}),
-		).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/extractPart.txt"), "utf-8"),
-		);
+		).toMatchFileSnapshot("__data__/extractPart.txt");
 	});
 });

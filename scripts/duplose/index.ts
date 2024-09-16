@@ -13,7 +13,7 @@ import type { BuildedPreflightStep } from "@scripts/step/builded/preflight";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import type { ContractResponseError } from "@scripts/error/contractResponseError";
 import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
-import { type ZodAcceleratorParser, type ZodAcceleratorError, ZodAccelerator } from "@duplojs/zod-accelerator";
+import { type ZodAcceleratorParser, ZodAccelerator } from "@duplojs/zod-accelerator";
 import { getTypedEntries } from "@utils/getTypedEntries";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 import type { IsAny } from "@utils/isAny";
@@ -43,7 +43,7 @@ export interface DuploseContextExtensions {
 export type ExtractErrorFunction = (
 	type: keyof ExtractObject,
 	key: string,
-	error: ZodError | ZodAcceleratorError
+	error: ZodError
 ) => Response;
 
 export interface DisabledExtractKey {

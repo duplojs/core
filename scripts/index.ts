@@ -35,11 +35,12 @@ export * from "@scripts/description";
 export * from "@scripts/error/buildNoRegisteredDuplose";
 export * from "@scripts/error/contractResponseError";
 export * from "@scripts/error/lastStepMustBeHandlerError";
-export * from "@scripts/error/resultIsNotAResponse";
+export * from "@scripts/error/resultIsNotAResponseError";
 
 export * from "@utils/addThis";
 export * from "@utils/advancedEval";
 export * from "@utils/entryUseMapper";
+export * from "@utils/findZodTypeInZodSchema";
 export * from "@utils/fixPath";
 export * from "@utils/flatExtract";
 export * from "@utils/getLastOfUnion";

@@ -102,7 +102,7 @@ describe("checker builder", () => {
 				response:
 					| Response<200, "odd", ZodUndefined>
 					| Response<422, "notOdd", ZodUndefined>;
-				newInput: unknown;
+				newInput: number;
 			},
 			"strict"
 		>;
@@ -121,7 +121,7 @@ describe("checker builder", () => {
 				response:
 					| Response<200, "odd", ZodUndefined>
 					| Response<422, "notOdd", ZodUndefined>;
-				newInput: unknown;
+				newInput: number;
 			},
 			"strict"
 		>;

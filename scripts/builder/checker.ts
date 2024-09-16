@@ -76,11 +76,12 @@ export function createPresetChecker<
 	I extends string,
 	K extends string,
 	R extends ContractResponse,
-	T extends unknown,
+	GCG extends GetCheckerGeneric<C>,
+	T extends unknown = GCG["input"],
 >(
 	checker: C,
 	params: PresetCheckerParams<
-		GetCheckerGeneric<C>,
+		GCG,
 		I,
 		K,
 		ContractToResponse<R>,

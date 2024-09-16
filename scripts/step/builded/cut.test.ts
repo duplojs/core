@@ -1,8 +1,6 @@
-import { readFile } from "fs/promises";
 import { CutStep } from "../cut";
 import { BuildedCutStep } from "./cut";
 import { Response } from "@scripts/response";
-import { resolve } from "path";
 import { zod } from "@scripts/zod";
 import { duploTest } from "@test/utils/duploTest";
 
@@ -18,7 +16,5 @@ it("BuildedCutStep", async() => {
 
 	expect(buildedCutStep.drop).toStrictEqual(["test"]);
 
-	expect(buildedCutStep.toString(2)).toBe(
-		await readFile(resolve(import.meta.dirname, "__data__/cut.txt"), "utf-8"),
-	);
+	await expect(buildedCutStep.toString(2)).toMatchFileSnapshot("__data__/cut.txt");
 });

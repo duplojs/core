@@ -4,8 +4,6 @@ import { Router } from "./router";
 import { Route } from "./duplose/route";
 import { HandlerStep } from "./step/handler";
 import type { AnyFunction } from "@utils/types";
-import { readFile } from "fs/promises";
-import { resolve } from "path";
 import { DuploTest } from "@test/utils/duploTest";
 
 describe("Router", async() => {
@@ -58,11 +56,7 @@ describe("Router", async() => {
 			},
 		);
 
-		expect(spy).lastCalledWith({
-			args: ["path"],
-			bind: spy.mock.lastCall?.[0].bind,
-			content: await readFile(resolve(import.meta.dirname, "__data__/router.txt"), "utf-8"),
-		});
+		await expect(spy.mock.lastCall?.[0].content).toMatchFileSnapshot("__data__/router.txt");
 	});
 
 	it("test finder", () => {

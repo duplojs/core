@@ -1,4 +1,4 @@
-export class ResultIsNotAResponse extends Error {
+export class ResultIsNotAResponseError extends Error {
 	public constructor(
 		public expectedResult: unknown,
 	) {

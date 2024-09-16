@@ -1,9 +1,6 @@
 import { Process } from "@scripts/duplose/process";
 import { type ProcessStepParams } from "../process";
-import { Duplo } from "@scripts/duplo";
 import { makeFloor } from "@scripts/floor";
-import { readFile, writeFile } from "fs/promises";
-import { resolve } from "path";
 import { BuildedPreflightStep } from "./preflight";
 import { PreflightStep } from "../preflight";
 import { duploTest } from "@test/utils/duploTest";
@@ -74,9 +71,7 @@ describe("BuildedPreflightStep", () => {
 
 		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
 
-		expect(buildedProcessStep.toString(1)).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/preflight1.txt"), "utf-8"),
-		);
+		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/preflight1.txt");
 	});
 
 	it("toString options: object, input, skip", async() => {
@@ -92,8 +87,6 @@ describe("BuildedPreflightStep", () => {
 
 		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
 
-		expect(buildedProcessStep.toString(1)).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/preflight2.txt"), "utf-8"),
-		);
+		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/preflight2.txt");
 	});
 });

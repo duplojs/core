@@ -12,12 +12,12 @@ import { HandlerStep } from "@scripts/step/handler";
 import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
 import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
-import { ResultIsNotAResponse } from "@scripts/error/resultIsNotAResponse";
+import { ResultIsNotAResponseError } from "@scripts/error/resultIsNotAResponseError";
 import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
 	hooks: BuildedHooksRouteLifeCycle;
-	ResultIsNotAResponse: typeof ResultIsNotAResponse;
+	ResultIsNotAResponseError: typeof ResultIsNotAResponseError;
 }
 
 export interface RouteBuildedFunction {
@@ -189,7 +189,7 @@ export class Route<
 			steps: buildedStep,
 			extensions: simpleClone(this.extensions),
 			ContractResponseError,
-			ResultIsNotAResponse,
+			ResultIsNotAResponseError,
 			duplose: this,
 			duplo: this.instance,
 		};

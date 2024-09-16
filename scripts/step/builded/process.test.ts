@@ -1,10 +1,7 @@
 import { Process } from "@scripts/duplose/process";
 import { ProcessStep, type ProcessStepParams } from "../process";
 import { BuildedProcessStep } from "./process";
-import { Duplo } from "@scripts/duplo";
 import { makeFloor } from "@scripts/floor";
-import { readFile } from "fs/promises";
-import { resolve } from "path";
 import { duploTest } from "@test/utils/duploTest";
 
 describe("BuildedProcessStep", () => {
@@ -73,9 +70,7 @@ describe("BuildedProcessStep", () => {
 
 		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
 
-		expect(buildedProcessStep.toString(1)).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/process1.txt"), "utf-8"),
-		);
+		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/process1.txt");
 	});
 
 	it("toString options: object, input, skip", async() => {
@@ -92,8 +87,6 @@ describe("BuildedProcessStep", () => {
 
 		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
 
-		expect(buildedProcessStep.toString(1)).toBe(
-			await readFile(resolve(import.meta.dirname, "__data__/process2.txt"), "utf-8"),
-		);
+		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/process2.txt");
 	});
 });

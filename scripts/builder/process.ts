@@ -101,7 +101,7 @@ export interface ProcessBuilder<
 		GCG extends GetCheckerGeneric<GCPG["checker"]> = GetCheckerGeneric<GCPG["checker"]>,
 	>(
 		presetChecker: C,
-		input: (pickup: Floor<FloorData>["pickup"]) => unknown extends GCPG["newInput"] ? GCG["input"] : GCPG["newInput"],
+		input: (pickup: Floor<FloorData>["pickup"]) => GCPG["newInput"],
 		...desc: Description[]
 	): Omit<
 		ProcessBuilder<

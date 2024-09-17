@@ -2,8 +2,7 @@ import { simpleClone } from "@utils/simpleClone";
 import { BuildedStep } from ".";
 import type { CutStep, Cut } from "../cut";
 import { checkResult, condition, insertBlock, mapped, maybeAwait, StringBuilder } from "@utils/stringBuilder";
-import type { ZodType, ZodUnion } from "zod";
-import { zod } from "@scripts/zod";
+import { zod, type zodSpace } from "@scripts/zod";
 import { type Duplo } from "@scripts/duplo";
 import ZodAccelerator, { type ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 
@@ -12,7 +11,7 @@ export class BuildedCutStep extends BuildedStep<CutStep> {
 
 	public drop: string[];
 
-	public responseZodSchema?: ZodUnion<any> | ZodAcceleratorParser<ZodUnion<any>>;
+	public responseZodSchema?: zodSpace.ZodUnion<any> | ZodAcceleratorParser<zodSpace.ZodUnion<any>>;
 
 	public constructor(
 		instance: Duplo,
@@ -29,7 +28,7 @@ export class BuildedCutStep extends BuildedStep<CutStep> {
 						code: zod.literal(contractResponse.code),
 						info: zod.literal(contractResponse.information),
 						body: contractResponse.body,
-					}) satisfies ZodType,
+					}) satisfies zodSpace.ZodType,
 				) as any,
 			);
 

@@ -47,22 +47,30 @@ export class Request implements RequestInitializationData {
 
 	public body: unknown = undefined;
 
-	public constructor(initializationData: RequestInitializationData) {
-		this.method = initializationData.method;
-		this.headers = initializationData.headers;
-		this.url = initializationData.url;
-		this.host = initializationData.host;
-		this.origin = initializationData.origin;
-		this.path = initializationData.path;
-		this.params = initializationData.params;
-		this.query = initializationData.query;
-		this.matchedPath = initializationData.matchedPath;
+	public constructor({
+		method,
+		headers,
+		url,
+		host,
+		origin,
+		path,
+		params,
+		query,
+		matchedPath,
+		...rest
+	}: RequestInitializationData) {
+		this.method = method;
+		this.headers = headers;
+		this.url = url;
+		this.host = host;
+		this.origin = origin;
+		this.path = path;
+		this.params = params;
+		this.query = query;
+		this.matchedPath = matchedPath;
 
-		getTypedEntries(initializationData).forEach(
+		getTypedEntries(rest as RequestInitializationData).forEach(
 			([key, value]) => {
-				if (key in this) {
-					return;
-				}
 				this[key] = value as never;
 			},
 		);

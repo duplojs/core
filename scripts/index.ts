@@ -5,6 +5,7 @@ export * from "@scripts/checker";
 export * from "@scripts/floor";
 export * from "@scripts/router";
 export * from "@scripts/zod";
+export * from "@scripts/mime";
 
 export * from "@scripts/builder/duplose";
 export * from "@scripts/builder/route";
@@ -40,6 +41,7 @@ export * from "@scripts/error/resultIsNotAResponseError";
 export * from "@utils/addThis";
 export * from "@utils/advancedEval";
 export * from "@utils/entryUseMapper";
+export * from "@utils/file";
 export * from "@utils/findZodTypeInZodSchema";
 export * from "@utils/fixPath";
 export * from "@utils/flatExtract";

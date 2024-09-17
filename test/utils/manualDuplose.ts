@@ -1,10 +1,9 @@
 import { Checker, type CheckerOutput } from "@scripts/checker";
 import { Process } from "@scripts/duplose/process";
-import { zod } from "@scripts/zod";
+import { zod, type zodSpace } from "@scripts/zod";
 import { PresetChecker } from "@scripts/builder/checker";
 import { BadRequestHttpResponse } from "@scripts/response/simplePreset";
 import type { CurrentRequestObject } from "@scripts/request";
-import type { ZodString, ZodType } from "zod";
 
 export const manualChecker = new Checker<
 	{ test1: number },
@@ -17,7 +16,7 @@ export const manualPresetChecker = new PresetChecker<
 	typeof manualChecker,
 	"test1",
 	"presetResult",
-	BadRequestHttpResponse<string | undefined, ZodType>,
+	BadRequestHttpResponse<string | undefined, zodSpace.ZodType>,
 	string
 >(
 	manualChecker,
@@ -36,7 +35,7 @@ export const manualProcess = new Process<
 	string,
 	"test1" | "test2",
 	never,
-	{ params: ZodString },
+	{ params: zodSpace.ZodString },
 	never,
 	{
 		test1: string;

@@ -1,13 +1,13 @@
 import ZodAccelerator from "@duplojs/zod-accelerator";
 import { z } from "zod";
-import { multipartFormData } from "./multipartFormData";
+import { receiveFormData } from "./receiveFormData";
 export * from "./presetCheck";
-export * from "./multipartFormData";
+export * from "./receiveFormData";
 import "./toArray";
 
 const zod = {
 	...z,
-	multipartFormData,
+	receiveFormData,
 };
 
 ZodAccelerator.injectZod(zod);

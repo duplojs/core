@@ -1,26 +1,7 @@
-import {
-	ZodEffects,
-	ZodObject,
-	type ZodType,
-	ZodArray,
-	ZodCatch,
-	ZodDefault,
-	ZodIntersection,
-	ZodLazy,
-	ZodOptional,
-	ZodReadonly,
-	ZodRecord,
-	ZodTuple,
-	ZodUnion,
-	ZodPipeline,
-	ZodNullable,
-	ZodPromise,
-	ZodSet,
-	ZodMap,
-} from "zod";
+import { zod, type zodSpace } from "@scripts/zod";
 
 export function findZodTypeInZodSchema<
-	T extends new(...args: any[]) => ZodType,
+	T extends new(...args: any[]) => zodSpace.ZodType,
 >(
 	zodType: T[],
 	zodSchema: unknown,
@@ -37,35 +18,35 @@ export function findZodTypeInZodSchema<
 		findedZodSchema.push(zodSchema as InstanceType<T>);
 	}
 
-	if (zodSchema instanceof ZodArray) {
+	if (zodSchema instanceof zod.ZodArray) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.type,
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodCatch) {
+	} else if (zodSchema instanceof zod.ZodCatch) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.innerType,
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodDefault) {
+	} else if (zodSchema instanceof zod.ZodDefault) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.innerType,
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodEffects) {
+	} else if (zodSchema instanceof zod.ZodEffects) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.schema,
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodIntersection) {
+	} else if (zodSchema instanceof zod.ZodIntersection) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.left,
@@ -79,14 +60,14 @@ export function findZodTypeInZodSchema<
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodLazy) {
+	} else if (zodSchema instanceof zod.ZodLazy) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.getter(),
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodMap) {
+	} else if (zodSchema instanceof zod.ZodMap) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.keyType,
@@ -100,15 +81,15 @@ export function findZodTypeInZodSchema<
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodNullable) {
+	} else if (zodSchema instanceof zod.ZodNullable) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.innerType,
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodObject) {
-		Object.values(zodSchema._def.shape() as ZodType)
+	} else if (zodSchema instanceof zod.ZodObject) {
+		Object.values(zodSchema._def.shape() as zodSpace.ZodType)
 			.forEach(
 				(value) => void findZodTypeInZodSchema(
 					zodType,
@@ -117,14 +98,14 @@ export function findZodTypeInZodSchema<
 					lazyMap,
 				),
 			);
-	} else if (zodSchema instanceof ZodOptional) {
+	} else if (zodSchema instanceof zod.ZodOptional) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.innerType,
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodPipeline) {
+	} else if (zodSchema instanceof zod.ZodPipeline) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.in,
@@ -138,21 +119,21 @@ export function findZodTypeInZodSchema<
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodPromise) {
+	} else if (zodSchema instanceof zod.ZodPromise) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.type,
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodReadonly) {
+	} else if (zodSchema instanceof zod.ZodReadonly) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.innerType,
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodRecord) {
+	} else if (zodSchema instanceof zod.ZodRecord) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.keyType,
@@ -166,15 +147,15 @@ export function findZodTypeInZodSchema<
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodSet) {
+	} else if (zodSchema instanceof zod.ZodSet) {
 		findZodTypeInZodSchema(
 			zodType,
 			zodSchema._def.valueType,
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodTuple) {
-		(zodSchema._def.items as ZodType[])
+	} else if (zodSchema instanceof zod.ZodTuple) {
+		(zodSchema._def.items as zodSpace.ZodType[])
 			.forEach(
 				(value) => void findZodTypeInZodSchema(
 					zodType,
@@ -190,8 +171,8 @@ export function findZodTypeInZodSchema<
 			findedZodSchema,
 			lazyMap,
 		);
-	} else if (zodSchema instanceof ZodUnion) {
-		(zodSchema._def.options as ZodType[])
+	} else if (zodSchema instanceof zod.ZodUnion) {
+		(zodSchema._def.options as zodSpace.ZodType[])
 			.forEach(
 				(value) => void findZodTypeInZodSchema(
 					zodType,

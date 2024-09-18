@@ -3,7 +3,7 @@ import type { Description } from "@scripts/description";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
 import type { AnyFunction, ObjectKey } from "@utils/types";
-import { ZodType, type ZodError } from "zod";
+import { zod, type zodSpace } from "@scripts/zod";
 import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
 import type { makeFloor } from "@scripts/floor";
@@ -43,7 +43,7 @@ export interface DuploseContextExtensions {
 export type ExtractErrorFunction = (
 	type: keyof ExtractObject,
 	key: string,
-	error: ZodError
+	error: zodSpace.ZodError
 ) => Response;
 
 export interface DisabledExtractKey {
@@ -60,13 +60,13 @@ export type ExtractKey<
 export type ExtractObject<
 	T extends object = CurrentRequestObject,
 > = {
-	[P in ExtractKey<T>]?: { [x: string]: ZodType } | ZodType;
+	[P in ExtractKey<T>]?: { [x: string]: zodSpace.ZodType } | zodSpace.ZodType;
 };
 
 export interface AcceleratedExtractObject {
 	[x: ObjectKey]:
-		| Record<string, ZodAcceleratorParser<ZodType, unknown>>
-		| ZodAcceleratorParser<ZodType, unknown>;
+		| Record<string, ZodAcceleratorParser<zodSpace.ZodType, unknown>>
+		| ZodAcceleratorParser<zodSpace.ZodType, unknown>;
 }
 
 export type DefineHooksRouteLifeCycle<
@@ -160,10 +160,10 @@ export abstract class Duplose<
 			return getTypedEntries(this.extract)
 				.reduce<AcceleratedExtractObject>(
 					(pv, [key, value]) => {
-						if (value instanceof ZodType) {
+						if (value instanceof zod.ZodType) {
 							pv[key] = ZodAccelerator.build(value);
 						} else {
-							const deepExtract: Record<string, ZodAcceleratorParser<ZodType, unknown>> = {};
+							const deepExtract: Record<string, ZodAcceleratorParser<zodSpace.ZodType, unknown>> = {};
 
 							getTypedEntries(value)
 								.forEach(

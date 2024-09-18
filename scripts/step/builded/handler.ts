@@ -1,15 +1,14 @@
 import { BuildedStep } from ".";
 import { checkResult, condition, insertBlock, maybeAwait, StringBuilder } from "@utils/stringBuilder";
 import type { Handler, HandlerStep } from "../handler";
-import type { ZodType, ZodUnion } from "zod";
-import { zod } from "@scripts/zod";
+import { zod, type zodSpace } from "@scripts/zod";
 import { type Duplo } from "@scripts/duplo";
 import ZodAccelerator, { type ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 
 export class BuildedHandlerStep extends BuildedStep<HandlerStep> {
 	public handlerFunction: Handler;
 
-	public responseZodSchema?: ZodUnion<any> | ZodAcceleratorParser<ZodUnion<any>>;
+	public responseZodSchema?: zodSpace.ZodUnion<any> | ZodAcceleratorParser<zodSpace.ZodUnion<any>>;
 
 	public constructor(
 		instance: Duplo,
@@ -26,7 +25,7 @@ export class BuildedHandlerStep extends BuildedStep<HandlerStep> {
 						code: zod.literal(contractResponse.code),
 						info: zod.literal(contractResponse.information),
 						body: contractResponse.body,
-					}) satisfies ZodType,
+					}) satisfies zodSpace.ZodType,
 				) as any,
 			);
 

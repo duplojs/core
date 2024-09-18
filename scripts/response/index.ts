@@ -1,5 +1,5 @@
 import { getTypedEntries } from "@utils/getTypedEntries";
-import type { ZodType } from "zod";
+import type { zodSpace } from "@scripts/zod";
 
 const unique = Symbol("unique");
 
@@ -8,7 +8,7 @@ export class Response<
 	Information extends string | undefined = string | undefined,
 	Body extends unknown = unknown,
 > {
-	public readonly [unique] = undefined;
+	public readonly [unique] = unique;
 
 	public code: Code;
 
@@ -63,7 +63,7 @@ export class Response<
 	}
 }
 
-export type ContractResponse = Response<number, string | undefined, ZodType>;
+export type ContractResponse = Response<number, string | undefined, zodSpace.ZodType>;
 
 export type ContractToResponse<
 	T extends ContractResponse,
@@ -71,7 +71,7 @@ export type ContractToResponse<
 	T extends Response<
 		infer code,
 		infer information,
-		infer zodSchema extends ZodType
+		infer zodSchema extends zodSpace.ZodType
 	>
 		? Response<code, information, zodSchema["_output"]>
 		: never;

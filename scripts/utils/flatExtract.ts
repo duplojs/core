@@ -1,5 +1,5 @@
 import type { ExtractObject } from "@scripts/duplose";
-import type { infer as zodInfer, ZodType } from "zod";
+import type { zodSpace } from "@scripts/zod";
 import type { ObjectKey } from "./types";
 
 export interface KeyToType<
@@ -13,11 +13,11 @@ export interface KeyToType<
 export type FlatExtract<
 	T extends ExtractObject,
 	O extends KeyToType = {
-		[P in keyof T]: T[P] extends ZodType
-			? KeyToType<P, zodInfer<T[P]>>
+		[P in keyof T]: T[P] extends zodSpace.ZodType
+			? KeyToType<P, zodSpace.infer<T[P]>>
 			: {
-				[S in keyof T[P]]: T[P][S] extends ZodType
-					? KeyToType<S, zodInfer<T[P][S]>>
+				[S in keyof T[P]]: T[P][S] extends zodSpace.ZodType
+					? KeyToType<S, zodSpace.infer<T[P][S]>>
 					: never
 			}[keyof T[P]]
 	}[keyof T],

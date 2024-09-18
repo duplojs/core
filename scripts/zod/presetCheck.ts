@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { GetPresetCheckerGeneric, PresetChecker } from "@scripts/builder/checker";
 import type { Checker, CheckerOutput, GetCheckerGeneric } from "@scripts/checker";
-import { type RefinementCtx, ZodEffects, type infer as ZodInfer, ZodType } from "zod";
-import { zod } from ".";
+import { type RefinementCtx, ZodEffects, type infer as ZodInfer, ZodType, type input, type output, z as zod, type ZodTypeAny } from "zod";
 import { MissingHandlerCheckerError } from "@scripts/error/missingHandlerCheckerError";
 import { makeFloor } from "@scripts/floor";
 import { findZodTypeInZodSchema } from "@utils/findZodTypeInZodSchema";
@@ -37,15 +36,15 @@ declare module "zod" {
 	}
 
 	interface ZodEffects<
-		T extends zod.ZodTypeAny,
-		Output = zod.output<T>,
-		Input = zod.input<T>,
+		T extends ZodTypeAny,
+		Output = output<T>,
+		Input = input<T>,
 	> {
 		_presetCheck?: boolean;
 	}
 }
 
-ZodType.prototype.presetCheck = function(presetChecker, ...args) {
+ZodType.prototype.presetCheck = function(presetChecker, ..._args) {
 	if (!presetChecker.checker.handler) {
 		throw new MissingHandlerCheckerError(presetChecker.checker);
 	}

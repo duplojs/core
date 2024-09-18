@@ -31,6 +31,10 @@ export default [
 	},
 	{
 		...duploLint,
+		rules: {
+			...duploLint.rules,
+			"max-classes-per-file": "off",
+		},
 		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],
 	},

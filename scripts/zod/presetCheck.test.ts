@@ -2,7 +2,7 @@ import { createChecker, createPresetChecker } from "@scripts/builder/checker";
 import { Response } from "@scripts/response";
 import { zod, zodSchemaHasPresetChecker } from ".";
 import type { ExpectType } from "@test/utils/expectType";
-import { number, ZodError, type ZodEffects, type ZodNumber } from "zod";
+import { type ZodEffects, type ZodNumber } from "zod";
 import { manualPresetChecker } from "@test/utils/manualDuplose";
 import { MissingHandlerCheckerError } from "@scripts/error/missingHandlerCheckerError";
 

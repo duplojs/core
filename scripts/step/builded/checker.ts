@@ -3,8 +3,7 @@ import { BuildedStep } from ".";
 import type { CheckerStep, CheckerStepParams } from "../checker";
 import { simpleClone } from "@utils/simpleClone";
 import type { CheckerHandler } from "@scripts/checker";
-import type { ZodType, ZodUnion } from "zod";
-import { zod } from "@scripts/zod";
+import { zod, type zodSpace } from "@scripts/zod";
 import { type Duplo } from "@scripts/duplo";
 import ZodAccelerator, { type ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 
@@ -13,7 +12,7 @@ export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 
 	public params: CheckerStepParams;
 
-	public responseZodSchema?: ZodUnion<any> | ZodAcceleratorParser<ZodUnion<any>>;
+	public responseZodSchema?: zodSpace.ZodUnion<any> | ZodAcceleratorParser<zodSpace.ZodUnion<any>>;
 
 	public constructor(
 		instance: Duplo,
@@ -47,7 +46,7 @@ export class BuildedCheckerStep extends BuildedStep<CheckerStep> {
 						code: zod.literal(contractResponse.code),
 						info: zod.literal(contractResponse.information),
 						body: contractResponse.body,
-					}) satisfies ZodType,
+					}) satisfies zodSpace.ZodType,
 				) as any,
 			);
 

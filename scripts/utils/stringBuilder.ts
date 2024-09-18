@@ -1,7 +1,6 @@
 import type { ExtractObject } from "@scripts/duplose";
 import { getTypedEntries } from "./getTypedEntries";
-import { ZodType } from "zod";
-import { zodSchemaHasPresetChecker } from "@scripts/zod";
+import { zod, zodSchemaHasPresetChecker } from "@scripts/zod";
 
 export class StringBuilder {
 	public static result = "result";
@@ -126,7 +125,7 @@ export function extractPart(extract?: ExtractObject) {
 			insertBlock("extract-before"),
 			mapped(
 				getTypedEntries(extract),
-				([key, value]) => value instanceof ZodType
+				([key, value]) => value instanceof zod.ZodType
 					? extractLevelOne(key, zodSchemaHasPresetChecker(value))
 					: mapped(
 						getTypedEntries(value),

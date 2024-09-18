@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 import { Response } from ".";
 
 export class NoContentHttpResponse<

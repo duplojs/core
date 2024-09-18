@@ -1,0 +1,56 @@
+
+		
+/* step-skip-(1)-before */
+/* end_block */
+
+
+		if(!this.steps[1].params.skip(floor.pickup)){
+			
+			
+/* step-checker-(1)-before */
+/* end_block */
+
+
+			result = this.steps[1].checkerFunction(
+				this.steps[1].params.input(floor.pickup),
+				(info, data) => ({info, data}),
+				this.steps[1].params.options,
+			);
+
+			
+/* step-checker-(1)-before-treat-result */
+/* end_block */
+
+
+			if(!this.steps[1].params.result.includes(result.info)){
+				result = this.steps[1].params.catch(
+					result.info, 
+					result.data, 
+					floor.pickup
+				);
+
+				
+				let temp = this.steps[1].responseZodSchema.safeParse(result);
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, result);
+				}
+			
+
+				break Execution;
+			}
+
+			
+/* step-checker-(1)-before-indexing */
+/* end_block */
+
+
+			
+
+			
+/* step-checker-(1)-after */
+/* end_block */
+
+			
+		}
+		

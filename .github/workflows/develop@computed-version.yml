@@ -25,7 +25,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_OWNER: ${{ github.repository_owner }}
-          GITHUB_REPO: echo "${{ github.repository }}" | cut -d'/' -f2
+          GITHUB_REPO: core
           GITHUB_BRANCHE: develop
           REGEXP_PATCH: '^fix'
           REGEXP_MINOR: '^feat'
@@ -41,3 +41,5 @@ jobs:
         with:
           message: |
             Target version : `${{ steps.semver.outputs.COMPUTED_VERSION }}`.
+          mode: upsert
+          comment_tag: version

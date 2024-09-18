@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
 	test: {
@@ -9,6 +10,8 @@ export default defineConfig({
 			provider: "istanbul",
 			reporter: ["text", "json", "html", "json-summary"],
 			reportsDirectory: "coverage",
+			exclude: ["__data__", "**/*.test.ts", "dist", "test"],
 		},
 	},
+	plugins: [tsconfigPaths()],
 });

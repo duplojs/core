@@ -7,5 +7,5 @@
     "declarationDir": "types",
   },
   "include": ["scripts/**/*.ts"],
-  "exclude": ["scripts/**/*.test.ts", "scripts/code/**/*.ts"]
+  "exclude": ["scripts/**/*.test.ts"]
 }

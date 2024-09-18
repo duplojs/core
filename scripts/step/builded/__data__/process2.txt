@@ -1,0 +1,43 @@
+
+		
+/* step-skip-(1)-before */
+/* end_block */
+
+
+		if(!this.steps[1].params.skip(floor.pickup)){
+			
+			
+/* step-process-(1)-before */
+/* end_block */
+
+
+			result = this.steps[1].processFunction(
+				request,
+				this.steps[1].params.options,
+				this.steps[1].input(floor.pickup)
+			);
+
+			
+/* step-process-(1)-before-check-result */
+/* end_block */
+
+
+			if(result instanceof this.Response){
+
+break Execution;
+}
+
+			
+/* step-process-(1)-before-drop */
+/* end_block */
+
+
+			
+
+			
+/* step-process-(1)-after */
+/* end_block */
+
+			
+		}
+		

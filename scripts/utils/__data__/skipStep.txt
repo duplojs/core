@@ -1,0 +1,10 @@
+
+		
+/* step-skip-(1)-before */
+/* end_block */
+
+
+		if(!this.steps[1].params.skip(floor.pickup)){
+			
+		}
+		

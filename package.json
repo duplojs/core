@@ -4,21 +4,21 @@
   "author": "mathcovax",
   "license": "ISC",
   "type": "module",
-
+  "repository": "https://github.com/duplojs/core",
   "scripts": {
     "build:scripts": "rollup --config",
     "build:types": "tsc -p tsconfig.types.json",
     "build": "npm run build:types && npm run build:scripts",
-
-    "test:tu": "vitest",
-    "test:tu:watch": "vitest --watch",
-    "test:types": "tsc",
-	"test:lint": "eslint",
-	"test:lint:fix": "eslint --fix",
-	
+    "test:tu": "vitest --coverage",
+    "test:tu:watch": "vitest --coverage --watch",
+    "test:tu:update": "vitest --coverage --update",
+    "test:types": "npm run test:types:scripts && npm run test:types:override",
+    "test:types:scripts": "tsc",
+    "test:types:override": "sh test/overridesTypes/testOverrideTypes.sh",
+    "test:lint": "eslint",
+    "test:lint:fix": "eslint --fix",
     "prepare": "husky"
   },
-
   "types": "./types/index.d.ts",
   "exports": {
     "default": {
@@ -29,26 +29,29 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "README.md"
   ],
-
   "dependencies": {
-    "mime": ">=4.0.4 <5.0.0",
+    "@duplojs/zod-accelerator": ">=2.4.0 <3.0.0",
+    "mime": "^4.0.4",
     "zod": ">=3.23.8 <4.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
-    "@duplojs/eslint": "0.1.2",
+    "@duplojs/eslint": "0.2.2",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "22.1.0",
     "@vitest/coverage-istanbul": "2.0.5",
     "eslint": "9.9.0",
     "husky": "9.1.4",
     "rollup": "4.19.2",
     "rollup-plugin-esbuild": "6.1.1",
+    "tslib": "^2.6.3",
     "typescript": "5.5.4",
+    "vite-tsconfig-paths": "^5.0.1",
     "vitest": "2.0.5"
   },
-
   "keywords": []
 }

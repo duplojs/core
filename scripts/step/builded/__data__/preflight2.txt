@@ -1,0 +1,34 @@
+
+			
+/* preflight-process-(1)-before */
+/* end_block */
+
+
+			result = this.preflightSteps[1].processFunction(
+				request,
+				this.preflightSteps[1].params.options,
+				this.preflightSteps[1].input(floor.pickup)
+			);
+
+			
+/* preflight-process-(1)-before-check-result */
+/* end_block */
+
+
+			if(result instanceof this.Response){
+
+break Execution;
+}
+
+			
+/* preflight-process-(1)-before-drop */
+/* end_block */
+
+
+			
+
+			
+/* preflight-process-(1)-after */
+/* end_block */
+
+		

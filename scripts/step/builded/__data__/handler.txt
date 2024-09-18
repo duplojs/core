@@ -1,0 +1,29 @@
+
+		
+/* step-handler-(4)-before */
+/* end_block */
+
+
+		result = this.steps[4].handlerFunction(floor, request);
+
+		
+/* step-handler-(4)-before-check-result */
+/* end_block */
+
+
+		if(result instanceof this.Response){
+
+				let temp = this.steps[4].responseZodSchema.safeParse(result);
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, result);
+				}
+			
+break Execution;
+}
+
+		
+/* step-handler-(4)-after */
+/* end_block */
+
+		

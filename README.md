@@ -1,1 +1,1 @@
-# @duplojs/eslint
+# @duplojs/core

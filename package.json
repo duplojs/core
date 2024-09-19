@@ -7,7 +7,7 @@
   "repository": "https://github.com/duplojs/core",
   "scripts": {
     "build:scripts": "rollup --config",
-    "build:types": "tsc-alias -p tsconfig.types.json",
+    "build:types": "tsc -p tsconfig.types.json && tsc-alias -p tsconfig.types.json",
     "build": "npm run build:types && npm run build:scripts",
     "test:tu": "vitest --coverage",
     "test:tu:watch": "vitest --coverage --watch",

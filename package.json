@@ -7,7 +7,7 @@
   "repository": "https://github.com/duplojs/core",
   "scripts": {
     "build:scripts": "rollup --config",
-    "build:types": "tsc -p tsconfig.types.json",
+    "build:types": "tsc-alias -p tsconfig.types.json",
     "build": "npm run build:types && npm run build:scripts",
     "test:tu": "vitest --coverage",
     "test:tu:watch": "vitest --coverage --watch",
@@ -32,6 +32,9 @@
     "types",
     "README.md"
   ],
+  "workspaces": [
+    "test/integration"
+  ],
   "dependencies": {
     "@duplojs/zod-accelerator": ">=2.4.0 <3.0.0",
     "mime": "^4.0.4",
@@ -48,6 +51,7 @@
     "husky": "9.1.4",
     "rollup": "4.19.2",
     "rollup-plugin-esbuild": "6.1.1",
+    "tsc-alias": "^1.8.10",
     "tslib": "^2.6.3",
     "typescript": "5.5.4",
     "vite-tsconfig-paths": "^5.0.1",

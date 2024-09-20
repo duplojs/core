@@ -1,5 +1,5 @@
 import type { ExtractObject } from "@scripts/duplose";
-import type { zodSpace } from "@scripts/zod";
+import type { zodSpace } from "@scripts/parser";
 import type { ObjectKey } from "./types";
 
 export interface KeyToType<

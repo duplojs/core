@@ -1,0 +1,17 @@
+import { defineConfig } from "vitest/config";
+import tsconfigPaths from 'vite-tsconfig-paths'
+
+export default defineConfig({
+	test: {
+		watch: false,
+		globals: true,
+		include: ["src/**/*.test.ts"],
+		coverage: {
+			provider: "istanbul",
+			reporter: ["text", "json", "html", "json-summary"],
+			reportsDirectory: "coverage",
+			exclude: ["__data__", "**/*.test.ts", "dist", "test", "src/providers"],
+		},
+	},
+	plugins: [tsconfigPaths()],
+});

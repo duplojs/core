@@ -1,0 +1,16 @@
+{
+  "name": "test-integration",
+  "version": "0.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test:types": "tsc",
+	"test:tu": "vitest --coverage",
+    "test:tu:watch": "vitest --watch --coverage"
+  },
+  "author": "mathcovax",
+  "license": "ISC",
+  "dependencies": {
+    "@duplojs/core": "file:../.."
+  }
+}

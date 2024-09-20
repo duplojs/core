@@ -1,5 +1,5 @@
 import type { CurrentRequestObject, HttpMethod } from "@scripts/request";
-import { Response } from "@scripts/response";
+import { type PresetGeneriqueResponse, Response } from "@scripts/response";
 import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext, type AcceleratedExtractObject } from ".";
 import type { Step } from "@scripts/step";
 import type { Description } from "@scripts/description";
@@ -14,14 +14,15 @@ import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { ResultIsNotAResponseError } from "@scripts/error/resultIsNotAResponseError";
 import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
+import { hookRouteError } from "@scripts/hook/default";
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
-	hooks: BuildedHooksRouteLifeCycle;
+	hooks: BuildedHooksRouteLifeCycle<any>;
 	ResultIsNotAResponseError: typeof ResultIsNotAResponseError;
 }
 
 export interface RouteBuildedFunction {
-	(request: CurrentRequestObject): Promise<Response>;
+	(request: CurrentRequestObject): Promise<PresetGeneriqueResponse>;
 	context: RouteBuildedFunctionContext;
 }
 
@@ -82,6 +83,8 @@ export class Route<
 
 		const hooks = this.getAllHooks();
 		hooks.import(this.instance.hooksRouteLifeCycle);
+
+		hooks.onError.addSubscriber(hookRouteError);
 
 		const buildedPreflight = this.preflightSteps.map(
 			(step) => step.build(this.instance!),
@@ -162,7 +165,7 @@ export class Route<
 		${insertBlock("check-result-before")}
 
 		if(!(${StringBuilder.result} instanceof this.Response)){
-			throw new this.ResultIsNotAResponse(${StringBuilder.result})
+			throw new this.ResultIsNotAResponseError(${StringBuilder.result})
 		}
 
 		${insertBlock("check-result-after")}

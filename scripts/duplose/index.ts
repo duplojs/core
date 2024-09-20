@@ -1,9 +1,9 @@
-import type { Response } from "@scripts/response";
+import type { PresetGeneriqueResponse, Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
 import type { AnyFunction, ObjectKey } from "@utils/types";
-import { zod, type zodSpace } from "@scripts/zod";
+import { zod, type zodSpace } from "@scripts/parser";
 import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
 import type { makeFloor } from "@scripts/floor";
@@ -44,7 +44,7 @@ export type ExtractErrorFunction = (
 	type: keyof ExtractObject,
 	key: string,
 	error: zodSpace.ZodError
-) => Response;
+) => PresetGeneriqueResponse;
 
 export interface DisabledExtractKey {
 	method: true;
@@ -116,6 +116,8 @@ export abstract class Duplose<
 
 	public descriptions: Description[] = [];
 
+	public origin?: unknown;
+
 	public constructor(descriptions: Description[] = []) {
 		this.descriptions.push(...descriptions);
 	}
@@ -140,7 +142,7 @@ export abstract class Duplose<
 	}
 
 	public getAllHooks() {
-		const hooks = new HooksRouteLifeCycle();
+		const hooks = new HooksRouteLifeCycle<Request>();
 
 		hooks.import(this.hooks);
 

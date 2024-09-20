@@ -1,0 +1,17 @@
+{	
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+	"resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+		"@domains/*": ["src/domains/*"],
+		"@checkers/*": ["src/checkers/*"],
+		"@security/*": ["src/security/*"],
+		"@providers/*": ["src/providers/*"],
+		"@types": ["src/types.d.ts"],
+		"@src/*": ["src/*"],
+		"@test/*": ["test/*"],
+	}, 
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+}

@@ -2,9 +2,9 @@ import { Response } from ".";
 
 export class OkHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof OkHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(OkHttpResponse.code, info, body);
 	}
 
@@ -13,9 +13,9 @@ export class OkHttpResponse<
 
 export class CreatedHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof CreatedHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(CreatedHttpResponse.code, info, body);
 	}
 
@@ -24,9 +24,9 @@ export class CreatedHttpResponse<
 
 export class AcceptedHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof AcceptedHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(AcceptedHttpResponse.code, info, body);
 	}
 
@@ -35,9 +35,9 @@ export class AcceptedHttpResponse<
 
 export class ResetContentHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof ResetContentHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(ResetContentHttpResponse.code, info, body);
 	}
 
@@ -46,9 +46,9 @@ export class ResetContentHttpResponse<
 
 export class PartialContentHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof PartialContentHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(PartialContentHttpResponse.code, info, body);
 	}
 
@@ -57,9 +57,9 @@ export class PartialContentHttpResponse<
 
 export class BadRequestHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof BadRequestHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(BadRequestHttpResponse.code, info, body);
 	}
 
@@ -68,9 +68,9 @@ export class BadRequestHttpResponse<
 
 export class UnauthorizedHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof UnauthorizedHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(UnauthorizedHttpResponse.code, info, body);
 	}
 
@@ -79,9 +79,9 @@ export class UnauthorizedHttpResponse<
 
 export class ForbiddenHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof ForbiddenHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(ForbiddenHttpResponse.code, info, body);
 	}
 
@@ -90,9 +90,9 @@ export class ForbiddenHttpResponse<
 
 export class NotFoundHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof NotFoundHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(NotFoundHttpResponse.code, info, body);
 	}
 
@@ -101,9 +101,9 @@ export class NotFoundHttpResponse<
 
 export class MethodNotAllowedHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof MethodNotAllowedHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(MethodNotAllowedHttpResponse.code, info, body);
 	}
 
@@ -112,9 +112,9 @@ export class MethodNotAllowedHttpResponse<
 
 export class NotAcceptableHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof NotAcceptableHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(NotAcceptableHttpResponse.code, info, body);
 	}
 
@@ -123,9 +123,9 @@ export class NotAcceptableHttpResponse<
 
 export class ProxyAuthenticationRequiredHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof ProxyAuthenticationRequiredHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(ProxyAuthenticationRequiredHttpResponse.code, info, body);
 	}
 
@@ -134,9 +134,9 @@ export class ProxyAuthenticationRequiredHttpResponse<
 
 export class RequestTimeoutHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof RequestTimeoutHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(RequestTimeoutHttpResponse.code, info, body);
 	}
 
@@ -145,9 +145,9 @@ export class RequestTimeoutHttpResponse<
 
 export class ConflictHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof ConflictHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(ConflictHttpResponse.code, info, body);
 	}
 
@@ -156,9 +156,9 @@ export class ConflictHttpResponse<
 
 export class GoneHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof GoneHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(GoneHttpResponse.code, info, body);
 	}
 
@@ -167,9 +167,9 @@ export class GoneHttpResponse<
 
 export class LengthRequiredHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof LengthRequiredHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(LengthRequiredHttpResponse.code, info, body);
 	}
 
@@ -178,9 +178,9 @@ export class LengthRequiredHttpResponse<
 
 export class PreconditionFailedHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof PreconditionFailedHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(PreconditionFailedHttpResponse.code, info, body);
 	}
 
@@ -189,9 +189,9 @@ export class PreconditionFailedHttpResponse<
 
 export class PayloadTooLargeHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof PayloadTooLargeHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(PayloadTooLargeHttpResponse.code, info, body);
 	}
 
@@ -200,9 +200,9 @@ export class PayloadTooLargeHttpResponse<
 
 export class UriTooLongHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof UriTooLongHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(UriTooLongHttpResponse.code, info, body);
 	}
 
@@ -211,9 +211,9 @@ export class UriTooLongHttpResponse<
 
 export class UnsupportedMediaTypeHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof UnsupportedMediaTypeHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(UnsupportedMediaTypeHttpResponse.code, info, body);
 	}
 
@@ -222,9 +222,9 @@ export class UnsupportedMediaTypeHttpResponse<
 
 export class RangeNotSatisfiableHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof RangeNotSatisfiableHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(RangeNotSatisfiableHttpResponse.code, info, body);
 	}
 
@@ -233,9 +233,9 @@ export class RangeNotSatisfiableHttpResponse<
 
 export class ExpectationFailedHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof ExpectationFailedHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(ExpectationFailedHttpResponse.code, info, body);
 	}
 
@@ -244,9 +244,9 @@ export class ExpectationFailedHttpResponse<
 
 export class ImATeapotHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof ImATeapotHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(ImATeapotHttpResponse.code, info, body);
 	}
 
@@ -255,9 +255,9 @@ export class ImATeapotHttpResponse<
 
 export class UnprocessableEntityHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof UnprocessableEntityHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(UnprocessableEntityHttpResponse.code, info, body);
 	}
 
@@ -266,9 +266,9 @@ export class UnprocessableEntityHttpResponse<
 
 export class UpgradeRequiredHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof UpgradeRequiredHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(UpgradeRequiredHttpResponse.code, info, body);
 	}
 
@@ -277,9 +277,9 @@ export class UpgradeRequiredHttpResponse<
 
 export class PreconditionRequiredHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof PreconditionRequiredHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(PreconditionRequiredHttpResponse.code, info, body);
 	}
 
@@ -288,9 +288,9 @@ export class PreconditionRequiredHttpResponse<
 
 export class TooManyRequestsHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof TooManyRequestsHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(TooManyRequestsHttpResponse.code, info, body);
 	}
 
@@ -299,9 +299,9 @@ export class TooManyRequestsHttpResponse<
 
 export class RequestHeaderFieldsTooLargeHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof RequestHeaderFieldsTooLargeHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(RequestHeaderFieldsTooLargeHttpResponse.code, info, body);
 	}
 
@@ -310,9 +310,9 @@ export class RequestHeaderFieldsTooLargeHttpResponse<
 
 export class UnavailableForLegalReasonsHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof UnavailableForLegalReasonsHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(UnavailableForLegalReasonsHttpResponse.code, info, body);
 	}
 
@@ -321,9 +321,9 @@ export class UnavailableForLegalReasonsHttpResponse<
 
 export class InternalServerErrorHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof InternalServerErrorHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(InternalServerErrorHttpResponse.code, info, body);
 	}
 
@@ -332,9 +332,9 @@ export class InternalServerErrorHttpResponse<
 
 export class NotImplementedHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof NotImplementedHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(NotImplementedHttpResponse.code, info, body);
 	}
 
@@ -343,9 +343,9 @@ export class NotImplementedHttpResponse<
 
 export class BadGatewayHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof BadGatewayHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(BadGatewayHttpResponse.code, info, body);
 	}
 
@@ -354,9 +354,9 @@ export class BadGatewayHttpResponse<
 
 export class ServiceUnavailableHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof ServiceUnavailableHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(ServiceUnavailableHttpResponse.code, info, body);
 	}
 
@@ -365,9 +365,9 @@ export class ServiceUnavailableHttpResponse<
 
 export class GatewayTimeoutHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof GatewayTimeoutHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(GatewayTimeoutHttpResponse.code, info, body);
 	}
 
@@ -376,9 +376,9 @@ export class GatewayTimeoutHttpResponse<
 
 export class HttpVersionNotSupportedHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof HttpVersionNotSupportedHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(HttpVersionNotSupportedHttpResponse.code, info, body);
 	}
 
@@ -387,9 +387,9 @@ export class HttpVersionNotSupportedHttpResponse<
 
 export class VariantAlsoNegotiatesHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof VariantAlsoNegotiatesHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(VariantAlsoNegotiatesHttpResponse.code, info, body);
 	}
 
@@ -398,9 +398,9 @@ export class VariantAlsoNegotiatesHttpResponse<
 
 export class NotExtendedHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof NotExtendedHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(NotExtendedHttpResponse.code, info, body);
 	}
 
@@ -409,9 +409,9 @@ export class NotExtendedHttpResponse<
 
 export class NetworkAuthenticationRequiredHttpResponse<
 	Information extends string | undefined = undefined,
-	Body extends unknown = unknown,
+	Body extends unknown = undefined,
 > extends Response<typeof NetworkAuthenticationRequiredHttpResponse.code, Information, Body> {
-	public constructor(info: Information, body: Body) {
+	public constructor(info: Information, body: Body = undefined as Body) {
 		super(NetworkAuthenticationRequiredHttpResponse.code, info, body);
 	}
 

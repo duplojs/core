@@ -1,0 +1,157 @@
+{
+	"users": [
+	  {
+		"id": 1,
+		"username": "john_doe",
+		"email": "john@example.com",
+		"password": "hashed_password_123",
+		"role": "USER",
+		"createdAt": "2023-09-15T10:00:00Z"
+	  },
+	  {
+		"id": 2,
+		"username": "jane_doe",
+		"email": "jane@example.com",
+		"password": "hashed_password_456",
+		"role": "USER",
+		"createdAt": "2023-09-16T12:00:00Z"
+	  },
+	  {
+		"id": 3,
+		"username": "mike_smith",
+		"email": "mike@example.com",
+		"password": "hashed_password_789",
+		"role": "USER",
+		"createdAt": "2023-09-17T15:30:00Z"
+	  },
+	  {
+		"id": 4,
+		"username": "sarah_connor",
+		"email": "sarah@example.com",
+		"password": "hashed_password_321",
+		"role": "USER",
+		"createdAt": "2023-09-18T10:00:00Z"
+	  },
+	  {
+		"id": 5,
+		"username": "tom_brady",
+		"email": "tom@example.com",
+		"password": "hashed_password_654",
+		"role": "USER",
+		"createdAt": "2023-09-18T11:00:00Z"
+	  },
+	  {
+		"id": 6,
+		"username": "emma_watson",
+		"email": "emma@example.com",
+		"password": "hashed_password_987",
+		"role": "USER",
+		"createdAt": "2023-09-18T12:00:00Z"
+	  },
+	  {
+		"id": 7,
+		"username": "steve_jobs",
+		"email": "steve@example.com",
+		"password": "hashed_password_111",
+		"role": "USER",
+		"createdAt": "2023-09-18T13:00:00Z"
+	  },
+	  {
+		"id": 8,
+		"username": "michael_jordan",
+		"email": "michael@example.com",
+		"password": "hashed_password_222",
+		"role": "USER",
+		"createdAt": "2023-09-18T14:00:00Z"
+	  },
+	  {
+		"id": 9,
+		"username": "elon_musk",
+		"email": "elon@example.com",
+		"password": "hashed_password_333",
+		"role": "ADMIN",
+		"createdAt": "2023-09-18T15:00:00Z"
+	  },
+	  {
+		"id": 10,
+		"username": "bill_gates",
+		"email": "bill@example.com",
+		"password": "hashed_password_444",
+		"role": "USER",
+		"createdAt": "2023-09-18T16:00:00Z"
+	  }
+	],
+	"posts": [
+	  {
+		"id": 1,
+		"user_id": 1,
+		"title": "My first post",
+		"content": "This is the content of my first post.",
+		"createdAt": "2023-09-18T10:30:00Z"
+	  },
+	  {
+		"id": 2,
+		"user_id": 2,
+		"title": "Hello World!",
+		"content": "Excited to join this platform.",
+		"createdAt": "2023-09-18T11:00:00Z"
+	  },
+	  {
+		"id": 3,
+		"user_id": 3,
+		"title": "My travel adventures",
+		"content": "Just returned from a great trip!",
+		"createdAt": "2023-09-18T11:30:00Z"
+	  },
+	  {
+		"id": 4,
+		"user_id": 4,
+		"title": "Fitness Tips",
+		"content": "Sharing some great fitness routines.",
+		"createdAt": "2023-09-18T12:00:00Z"
+	  },
+	  {
+		"id": 5,
+		"user_id": 5,
+		"title": "Tech Trends",
+		"content": "Let's talk about the latest tech trends.",
+		"createdAt": "2023-09-18T12:30:00Z"
+	  },
+	  {
+		"id": 6,
+		"user_id": 6,
+		"title": "Book Review",
+		"content": "Just finished reading a fantastic book.",
+		"createdAt": "2023-09-18T13:00:00Z"
+	  },
+	  {
+		"id": 7,
+		"user_id": 7,
+		"title": "Startup Ideas",
+		"content": "Here are some new startup ideas I'm excited about.",
+		"createdAt": "2023-09-18T13:30:00Z"
+	  },
+	  {
+		"id": 8,
+		"user_id": 8,
+		"title": "Sports Achievements",
+		"content": "Celebrating recent sports victories!",
+		"createdAt": "2023-09-18T14:00:00Z"
+	  },
+	  {
+		"id": 9,
+		"user_id": 9,
+		"title": "Innovation",
+		"content": "Exploring new ways to innovate.",
+		"createdAt": "2023-09-18T14:30:00Z"
+	  },
+	  {
+		"id": 10,
+		"user_id": 10,
+		"title": "Philanthropy Projects",
+		"content": "Updates on the latest philanthropy efforts.",
+		"createdAt": "2023-09-18T15:00:00Z"
+	  }
+	]
+  }
+  

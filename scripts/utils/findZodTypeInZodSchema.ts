@@ -1,4 +1,4 @@
-import { zod, type zodSpace } from "@scripts/zod";
+import { zod, type zodSpace } from "@scripts/parser";
 
 export function findZodTypeInZodSchema<
 	T extends new(...args: any[]) => zodSpace.ZodType,

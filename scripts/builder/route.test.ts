@@ -49,9 +49,9 @@ describe("useRouteBuilder", () => {
 				() => new Response(400, "invalide_body", undefined),
 				description,
 			)
-			.cut(({ pickup }) => ({ test1: 1 }), ["test1"])
+			.cut(({ pickup, dropper }) => dropper({ test1: 1 }), ["test1"])
 			.handler(
-				({ pickup }) => {
+				(pickup) => {
 					const userId = pickup("userId");
 
 					type check1 = ExpectType<typeof userId, number, "strict">;
@@ -132,7 +132,7 @@ describe("useRouteBuilder", () => {
 				},
 			)
 			.handler(
-				({ pickup }) => {
+				(pickup) => {
 					const presetResult = pickup("presetResult");
 
 					type check1 = ExpectType<typeof presetResult, number, "strict">;
@@ -190,7 +190,7 @@ describe("useRouteBuilder", () => {
 				description2,
 			)
 			.handler(
-				({ pickup }, request) => {
+				(pickup, request) => {
 					const test2 = pickup("test2");
 
 					type check1 = ExpectType<typeof test2, number | undefined, "strict">;
@@ -217,7 +217,7 @@ describe("useRouteBuilder", () => {
 				test: zod.string(),
 			})
 			.cut(
-				({ pickup }, request) => {
+				({ pickup, dropper }, request) => {
 					const userId = pickup("userId");
 
 					type check1 = ExpectType<typeof userId, number, "strict">;
@@ -230,16 +230,19 @@ describe("useRouteBuilder", () => {
 						return new NotFoundHttpResponse("test.notfound", undefined);
 					}
 
-					return { toto: 56 };
+					return dropper({
+						toto: 56,
+						ru: "rr",
+					});
 				},
 				["toto"],
 				new NotFoundHttpResponse("test.notfound", zod.undefined()),
 				description,
 			)
-			.cut(() => ({ ttt: "eee" }))
-			.cut(() => ({}), [])
+			.cut(({ dropper }) => dropper({ ttt: "eee" }))
+			.cut(({ dropper }) => dropper({}), [])
 			.handler(
-				({ pickup }, request) => {
+				(pickup, request) => {
 					const toto = pickup("toto");
 
 					type check1 = ExpectType<typeof toto, number, "strict">;

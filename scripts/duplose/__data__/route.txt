@@ -214,7 +214,7 @@ break Execution;
 /* end_block */
 
 
-		result = this.steps[1].handlerFunction(floor, request);
+		result = this.steps[1].handlerFunction(floor.pickup, request);
 
 		
 /* step-handler-(1)-before-check-result */
@@ -264,7 +264,7 @@ break Execution;
 
 
 		if(!(result instanceof this.Response)){
-			throw new this.ResultIsNotAResponse(result)
+			throw new this.ResultIsNotAResponseError(result)
 		}
 
 		

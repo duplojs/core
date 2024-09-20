@@ -2,6 +2,7 @@ import { advancedEval } from "@utils/advancedEval";
 import type { AnyFunction } from "@utils/types";
 import type { HooksRouteLifeCycle } from "./routeLifeCycle";
 import type { HooksInstanceifeCycle } from "./instanceLifeCycle";
+import type { CurrentRequestObject } from "@scripts/request";
 
 export class Hook<
 	subscriber extends AnyFunction = AnyFunction,
@@ -92,7 +93,7 @@ export class Hook<
 	}
 }
 
-export type Hooks = HooksRouteLifeCycle | HooksInstanceifeCycle;
+export type Hooks = HooksRouteLifeCycle<any> | HooksInstanceifeCycle;
 
 export type BuildHooks<T extends Hooks> = {
 	[P in keyof T]: T[P] extends Hook

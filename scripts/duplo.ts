@@ -4,7 +4,7 @@ import { Route } from "./duplose/route";
 import { NotFoundHttpResponse, UnprocessableEntityHttpResponse } from "./response/simplePreset";
 import type { AnyFunction } from "@utils/types";
 import type { CurrentRequestObject } from "./request";
-import type { Response } from "./response";
+import type { PresetGeneriqueResponse } from "./response";
 import { useRouteBuilder } from "./builder/route";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import { type BuildedHooksInstanceLifeCycle, HooksInstanceifeCycle } from "./hook/instanceLifeCycle";
@@ -27,9 +27,9 @@ export interface DuploConfig {
 	plugins?: DuploPlugins[];
 }
 
-export type NotfoundHandler = (request: CurrentRequestObject) => Response;
+export type NotfoundHandler = (request: CurrentRequestObject) => PresetGeneriqueResponse;
 
-export type DuploHooks = BuildedHooksInstanceLifeCycle & BuildedHooksRouteLifeCycle;
+export type DuploHooks = BuildedHooksInstanceLifeCycle & BuildedHooksRouteLifeCycle<CurrentRequestObject>;
 
 export class Duplo {
 	public duploses: Duplose[] = [];
@@ -71,10 +71,14 @@ export class Duplo {
 		return this;
 	}
 
-	public register(duplose: Duplose) {
-		duplose.instance = this;
-		this.duploses.push(duplose);
-		this.hooksInstanceLifeCycle.onRegistered.launchSubscriber(duplose);
+	public register(...duplose: Duplose[]) {
+		duplose.forEach(
+			(duplose) => {
+				duplose.instance = this;
+				this.duploses.push(duplose);
+				this.hooksInstanceLifeCycle.onRegistered.launchSubscriber(duplose);
+			},
+		);
 
 		return this;
 	}

@@ -15,9 +15,9 @@ describe("Process", async() => {
 		params: { userId: zod.coerce.number() },
 	});
 	const step = new CutStep(
-		() => {
+		({ dropper }) => {
 			checkpointList.addPoint("cut");
-			return { toto: "true" };
+			return dropper({ toto: "true" });
 		},
 		["toto"],
 		[new Response(100, "toto", zod.undefined())],

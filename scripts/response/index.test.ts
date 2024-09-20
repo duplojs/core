@@ -1,5 +1,7 @@
 import type { ExpectType } from "@test/utils/expectType";
-import { Response } from ".";
+import { makeResponseContract, Response } from ".";
+import { BadRequestHttpResponse } from "./simplePreset";
+import { zod, type zodSpace } from "@scripts/parser";
 
 describe("response", () => {
 	it("construct response", () => {
@@ -36,5 +38,44 @@ describe("response", () => {
 		expect(response.headers).toStrictEqual({});
 
 		response.deleteHeader("content-type");
+	});
+
+	it("makeResponseContract", () => {
+		const contract1 = makeResponseContract(BadRequestHttpResponse);
+
+		type check1 = ExpectType<
+			typeof contract1,
+			Response<400, string | undefined, zodSpace.ZodUndefined>[],
+			"strict"
+		>;
+
+		expect(contract1[0].code).toBe(400);
+		expect(contract1[0].information).toBe(undefined);
+		expect(contract1[0].body).instanceof(zod.ZodUndefined);
+
+		const contract2 = makeResponseContract(BadRequestHttpResponse, ["superInfo1", "superInfo2"]);
+
+		type check2 = ExpectType<
+			typeof contract2,
+			(
+				| Response<400, "superInfo1", zodSpace.ZodUndefined>
+				| Response<400, "superInfo2", zodSpace.ZodUndefined>
+			)[],
+			"strict"
+		>;
+
+		expect(contract2[0].information).toBe("superInfo1");
+		expect(contract2[1].information).toBe("superInfo2");
+
+		const contract3 = makeResponseContract(BadRequestHttpResponse, "toto", zod.string());
+
+		type check3 = ExpectType<
+			typeof contract3,
+			Response<400, "toto", zodSpace.ZodString>[],
+			"strict"
+		>;
+
+		expect(contract3[0].information).toBe("toto");
+		expect(contract3[0].body).instanceof(zod.ZodString);
 	});
 });

@@ -1,6 +1,6 @@
 import type { ExtractObject } from "@scripts/duplose";
 import { getTypedEntries } from "./getTypedEntries";
-import { zod, zodSchemaHasPresetChecker } from "@scripts/zod";
+import { zod, zodSchemaHasPresetChecker } from "@scripts/parser";
 
 export class StringBuilder {
 	public static result = "result";

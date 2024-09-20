@@ -5,7 +5,7 @@ import { getTypedEntries } from "@utils/getTypedEntries";
 import { Response } from "@scripts/response";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Hook } from "@scripts/hook";
-import { zod } from "@scripts/zod";
+import { zod } from "@scripts/parser";
 import { ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 import { insertBlock } from "@utils/stringBuilder";
 import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKeyError";

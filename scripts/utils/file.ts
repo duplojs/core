@@ -1,4 +1,4 @@
-import { mimeStandard } from "@scripts/mime";
+import { mimeStandard } from "@scripts/mimeType";
 import { basename, extname } from "path";
 
 export interface FileInformations {

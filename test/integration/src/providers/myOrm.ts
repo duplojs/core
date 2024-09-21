@@ -45,4 +45,15 @@ export class MyOrm {
 			) ?? null,
 		);
 	}
+
+	public static createOne<
+		T extends keyof typeof myDataBase,
+	>(
+		from: T,
+		newEntity: typeof myDataBase[T][number],
+	): Promise<boolean> {
+		myDataBase[from].push(newEntity as never);
+
+		return Promise.resolve(true);
+	}
 }

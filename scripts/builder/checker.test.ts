@@ -68,7 +68,7 @@ describe("checker builder", () => {
 		>;
 	});
 
-	it("preset checker", () => {
+	describe("preset checker", () => {
 		const isOdd = createChecker("isOdd")
 			.handler((input: number, output, options) => {
 				if (input % 2 === 1) {
@@ -91,61 +91,88 @@ describe("checker builder", () => {
 			],
 		);
 
-		expect(preset).instanceOf(PresetChecker);
+		it("createPresetChecker", () => {
+			expect(preset).instanceOf(PresetChecker);
 
-		type check1 = ExpectType<
-			GetPresetCheckerGeneric<typeof preset>,
-			{
-				checker: typeof isOdd;
-				info: "odd";
-				key: "number";
-				response:
-					| Response<200, "odd", ZodUndefined>
-					| Response<422, "notOdd", ZodUndefined>;
-				newInput: number;
-			},
-			"strict"
-		>;
+			type check1 = ExpectType<
+				GetPresetCheckerGeneric<typeof preset>,
+				{
+					checker: typeof isOdd;
+					info: "odd";
+					key: "number";
+					response:
+						| Response<200, "odd", ZodUndefined>
+						| Response<422, "notOdd", ZodUndefined>;
+					newInput: number;
+				},
+				"strict"
+			>;
+		});
 
-		const newPreset = preset.rewriteIndexing("test");
+		it("rewrite Indexing", () => {
+			const newPreset = preset.rewriteIndexing("test");
 
-		expect(newPreset).instanceOf(PresetChecker);
-		expect(newPreset.params.indexing).toBe("test");
+			expect(newPreset).instanceOf(PresetChecker);
+			expect(newPreset.params.indexing).toBe("test");
 
-		type check2 = ExpectType<
-			GetPresetCheckerGeneric<typeof newPreset>,
-			{
-				checker: typeof isOdd;
-				info: "odd";
-				key: "test";
-				response:
-					| Response<200, "odd", ZodUndefined>
-					| Response<422, "notOdd", ZodUndefined>;
-				newInput: number;
-			},
-			"strict"
-		>;
+			type check2 = ExpectType<
+				GetPresetCheckerGeneric<typeof newPreset>,
+				{
+					checker: typeof isOdd;
+					info: "odd";
+					key: "test";
+					response:
+						| Response<200, "odd", ZodUndefined>
+						| Response<422, "notOdd", ZodUndefined>;
+					newInput: number;
+				},
+				"strict"
+			>;
+		});
 
-		const presetWithTransformInput = createPresetChecker(
-			isOdd,
-			{
-				result: "notOdd",
-				catch: () => new OkHttpResponse("odd", undefined),
-				transformInput: (input: symbol) => Number(input),
-			},
-			new OkHttpResponse("odd", zod.undefined()),
-		);
+		it("transform input", () => {
+			const presetWithTransformInput = createPresetChecker(
+				isOdd,
+				{
+					result: "notOdd",
+					catch: () => new OkHttpResponse("odd", undefined),
+					transformInput: (input: symbol) => Number(input),
+				},
+				new OkHttpResponse("odd", zod.undefined()),
+			);
 
-		type check3 = ExpectType<
-			GetPresetCheckerGeneric<typeof presetWithTransformInput>,
-			{
-				checker: typeof isOdd;
-				info: "notOdd";
-				key: string;
-				response: Response<200, "odd", ZodUndefined>;
-				newInput: symbol;
-			},
-			"strict"
-		>;
+			type check3 = ExpectType<
+				GetPresetCheckerGeneric<typeof presetWithTransformInput>,
+				{
+					checker: typeof isOdd;
+					info: "notOdd";
+					key: string;
+					response: Response<200, "odd", ZodUndefined>;
+					newInput: symbol;
+				},
+				"strict"
+			>;
+		});
+
+		it("transform input", () => {
+			const newPreset = preset.transformInput((input: string) => Number(input));
+
+			expect(newPreset).instanceOf(PresetChecker);
+			expect(newPreset.params.transformInput?.("1")).toBe(1);
+
+			type check1 = ExpectType<
+				GetPresetCheckerGeneric<typeof newPreset>,
+				{
+					checker: typeof isOdd;
+					info: "odd";
+					key: "number";
+					response:
+						| Response<200, "odd", ZodUndefined>
+						| Response<422, "notOdd", ZodUndefined>;
+					newInput: string;
+				},
+				"strict"
+			>;
+		});
 	});
 });

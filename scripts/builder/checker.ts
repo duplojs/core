@@ -69,6 +69,27 @@ export class PresetChecker<
 			this.responses,
 		);
 	}
+
+	public transformInput<
+		T extends unknown,
+	>(
+		transformInput: (input: T) => GetCheckerGeneric<_Checker>["input"],
+	) {
+		return new PresetChecker<
+			_Checker,
+			_Info,
+			_Key,
+			_Response,
+			T
+		>(
+			this.checker,
+			{
+				...this.params,
+				transformInput,
+			},
+			this.responses,
+		);
+	}
 }
 
 export function createPresetChecker<

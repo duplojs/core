@@ -184,7 +184,7 @@ export abstract class Duplose<
 		}
 	}
 
-	protected editingFunctions: EditingDuploseFunction[] = [];
+	public editingFunctions: EditingDuploseFunction[] = [];
 
 	protected applyEditingFunctions(content: string) {
 		let editedContent = content;

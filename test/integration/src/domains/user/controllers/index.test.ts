@@ -1,5 +1,5 @@
 import { duplo } from "@src/main";
-import { getSelf } from "./self";
+import { getSelf } from ".";
 import { makeFakeRequest } from "@test/request";
 import { OkHttpResponse, useBuilder } from "@duplojs/core";
 

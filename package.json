@@ -10,8 +10,6 @@
     "test:tu": "vitest --coverage",
     "test:tu:watch": "vitest --coverage --watch",
     "test:tu:update": "vitest --coverage --update",
-    "integration:test:tu": "npm -w test/integration run test:tu",
-    "integration:test:tu:watch": "npm -w test/integration run test:tu:watch",
     "test:types": "npm run test:types:scripts && npm run test:types:override && npm run integration:test:types",
     "test:types:scripts": "tsc",
     "test:types:override": "sh test/overridesTypes/testOverrideTypes.sh",

@@ -14,7 +14,7 @@ import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { ResultIsNotAResponseError } from "@scripts/error/resultIsNotAResponseError";
 import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
-import { hookRouteError } from "@scripts/hook/default";
+import { hookRouteContractResponseError, hookRouteError, hookRouteRangeError } from "@scripts/hook/default";
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
 	hooks: BuildedHooksRouteLifeCycle<any>;
@@ -84,6 +84,8 @@ export class Route<
 		const hooks = this.getAllHooks();
 		hooks.import(this.instance.hooksRouteLifeCycle);
 
+		hooks.onError.addSubscriber(hookRouteContractResponseError);
+		hooks.onError.addSubscriber(hookRouteRangeError);
 		hooks.onError.addSubscriber(hookRouteError);
 
 		const buildedPreflight = this.preflightSteps.map(

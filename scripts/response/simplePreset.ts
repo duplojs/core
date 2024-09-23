@@ -396,6 +396,17 @@ export class VariantAlsoNegotiatesHttpResponse<
 	public static readonly code = 506;
 }
 
+export class LoopDetectedHttpResponse<
+	Information extends string | undefined = undefined,
+	Body extends unknown = undefined,
+> extends Response<typeof LoopDetectedHttpResponse.code, Information, Body> {
+	public constructor(info: Information, body: Body = undefined as Body) {
+		super(LoopDetectedHttpResponse.code, info, body);
+	}
+
+	public static readonly code = 508;
+}
+
 export class NotExtendedHttpResponse<
 	Information extends string | undefined = undefined,
 	Body extends unknown = undefined,

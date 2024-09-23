@@ -4,9 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test:types": "tsc",
-	"test:tu": "vitest --coverage",
-    "test:tu:watch": "vitest --watch --coverage"
+    "test:types": "tsc"
   },
   "author": "mathcovax",
   "license": "ISC",

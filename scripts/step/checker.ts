@@ -1,5 +1,5 @@
 import { StepWithResponse } from ".";
-import type { ContractResponse, PresetGeneriqueResponse } from "@scripts/response";
+import type { ContractResponse, PresetGenericResponse } from "@scripts/response";
 import type { Description } from "@scripts/description";
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Floor } from "@scripts/floor";
@@ -10,7 +10,7 @@ export interface CheckerStepParams<
 	CheckerGeneric extends GetCheckerGeneric = GetCheckerGeneric,
 	Info extends string = string,
 	Key extends string = string,
-	CatchResponse extends PresetGeneriqueResponse = PresetGeneriqueResponse,
+	CatchResponse extends PresetGenericResponse = PresetGenericResponse,
 	FloorData extends object = object,
 	Skip extends ((floor: any) => boolean) | undefined = ((floor: any) => boolean) | undefined,
 > {

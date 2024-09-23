@@ -1,4 +1,4 @@
-import type { PresetGeneriqueResponse, Response } from "@scripts/response";
+import type { PresetGenericResponse, Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
@@ -44,7 +44,7 @@ export type ExtractErrorFunction = (
 	type: keyof ExtractObject,
 	key: string,
 	error: ZodSpace.ZodError
-) => PresetGeneriqueResponse;
+) => PresetGenericResponse;
 
 export interface DisabledExtractKey {
 	method: true;

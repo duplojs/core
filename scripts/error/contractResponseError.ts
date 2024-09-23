@@ -1,10 +1,10 @@
 import type { ZodSpace } from "@scripts/parser";
-import type { PresetGeneriqueResponse } from "@scripts/response";
+import type { PresetGenericResponse } from "@scripts/response";
 
 export class ContractResponseError extends Error {
 	public constructor(
 		public zodError: ZodSpace.ZodError,
-		public response: PresetGeneriqueResponse,
+		public response: PresetGenericResponse,
 	) {
 		super("Data returned isn't matching to zod schema.");
 	}

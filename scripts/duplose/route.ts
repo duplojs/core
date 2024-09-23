@@ -1,5 +1,5 @@
 import type { CurrentRequestObject, HttpMethod } from "@scripts/request";
-import { type PresetGeneriqueResponse, Response } from "@scripts/response";
+import { type PresetGenericResponse, Response } from "@scripts/response";
 import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext, type AcceleratedExtractObject } from ".";
 import type { Step } from "@scripts/step";
 import type { Description } from "@scripts/description";
@@ -22,7 +22,7 @@ export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionConte
 }
 
 export interface RouteBuildedFunction {
-	(request: CurrentRequestObject): Promise<PresetGeneriqueResponse>;
+	(request: CurrentRequestObject): Promise<PresetGenericResponse>;
 	context: RouteBuildedFunctionContext;
 }
 

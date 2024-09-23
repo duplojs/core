@@ -2,6 +2,7 @@ import { inputUserExist, iWantUserExist, userExist } from "@checkers/user";
 import { ConflictHttpResponse, CreatedHttpResponse, ForbiddenHttpResponse, makeResponseContract, OkHttpResponse, useBuilder, zod } from "@duplojs/core";
 import { MyOrm } from "@providers/myOrm";
 import { registeredUser } from "../schemas/registeredUser";
+import type { ExpectType } from "@test/expectType";
 
 export const registerUser = useBuilder()
 	.createRoute("POST", "/users")
@@ -53,9 +54,23 @@ export const loginUser = useBuilder()
 	.cut(
 		({ pickup, dropper }) => {
 			const { user, body } = pickup(["user", "body"]);
+
 			if (user.password !== body.password) {
 				return new ForbiddenHttpResponse("wrongPassword");
 			}
+
+			type check = ExpectType<
+				typeof user,
+				{
+					id: number;
+					username: string;
+					email: string;
+					password: string;
+					role: string;
+					createdAt: string;
+				},
+				"strict"
+			>;
 
 			return dropper({});
 		},

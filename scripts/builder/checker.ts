@@ -1,6 +1,6 @@
 import { Checker, type CheckerHandler, type GetCheckerGeneric } from "@scripts/checker";
 import type { CheckerStepParams } from "@scripts/step/checker";
-import type { ContractResponse, ContractToResponse, PresetGeneriqueResponse } from "@scripts/response";
+import type { ContractResponse, ContractToResponse, PresetGenericResponse } from "@scripts/response";
 
 export function createChecker<
 	GenericOptions extends object | undefined = undefined,
@@ -30,7 +30,7 @@ export interface PresetCheckerParams<
 	GenericCheckerGeneric extends GetCheckerGeneric = GetCheckerGeneric,
 	GenericInfo extends string = string,
 	GenericKey extends string = string,
-	GenericResponse extends PresetGeneriqueResponse = PresetGeneriqueResponse,
+	GenericResponse extends PresetGenericResponse = PresetGenericResponse,
 	GenericNewInput extends unknown = GenericCheckerGeneric["input"],
 > extends
 	Pick<

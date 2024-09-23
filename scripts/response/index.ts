@@ -5,7 +5,7 @@ import type { SimplifyType } from "@utils/simplifyType";
 
 const unique = Symbol("unique");
 
-export type PresetGeneriqueResponse = Response<number, string | undefined, unknown>;
+export type PresetGenericResponse = Response<number, string | undefined, unknown>;
 
 export class Response<
 	Code extends number,
@@ -34,7 +34,7 @@ export class Response<
 		this.body = body;
 	}
 
-	public setHeaders(headers: PresetGeneriqueResponse["headers"]) {
+	public setHeaders(headers: PresetGenericResponse["headers"]) {
 		getTypedEntries(headers)
 			.forEach(
 				([...arg]) => void this.setHeader(...arg),
@@ -42,7 +42,7 @@ export class Response<
 		return this;
 	}
 
-	public setHeader(key: string, value?: PresetGeneriqueResponse["headers"][string]) {
+	public setHeader(key: string, value?: PresetGenericResponse["headers"][string]) {
 		if (value !== undefined) {
 			this.headers[key] = value;
 		} else {
@@ -81,7 +81,7 @@ export type ContractToResponse<
 		: never;
 
 export interface ResponseToMakeContracts {
-	new(...args: any[]): PresetGeneriqueResponse;
+	new(...args: any[]): PresetGenericResponse;
 	code: number;
 }
 

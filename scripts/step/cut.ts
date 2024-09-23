@@ -1,13 +1,13 @@
 import { StepWithResponse } from ".";
 import type { Description } from "@scripts/description";
 import { BuildedCutStep } from "./builded/cut";
-import type { ContractResponse, PresetGeneriqueResponse } from "@scripts/response";
+import type { ContractResponse, PresetGenericResponse } from "@scripts/response";
 import { type Duplo } from "@scripts/duplo";
 import type { DroppedValue, Floor } from "@scripts/floor";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { PromiseOrNot } from "@utils/types";
 
-export type CutReturnValue = DroppedValue | PresetGeneriqueResponse;
+export type CutReturnValue = DroppedValue | PresetGenericResponse;
 
 export type Cut<
 	FloorData extends object = object,

@@ -1,5 +1,5 @@
 import { decodeToken } from "@checkers/token";
-import { inputUserExist, iWantUserExist } from "@checkers/userExist";
+import { inputUserExist, iWantUserExist } from "@checkers/user";
 import { useBuilder, zod, UnauthorizedHttpResponse, makeResponseContract } from "@duplojs/core";
 import type { ExpectType } from "@test/expectType";
 
@@ -39,12 +39,12 @@ export const mustBeConnected = useBuilder()
 		makeResponseContract(UnauthorizedHttpResponse, "invalideAuthorization"),
 	)
 	.presetCheck(
-		iWantUserExist,
+		iWantUserExist.rewriteIndexing("currentUser"),
 		(pickup) => inputUserExist.id(pickup("tokenData").id),
 	)
 	.cut(
 		({ pickup, dropper }) => {
-			const { tokenData, options, user } = pickup(["tokenData", "options", "user"]);
+			const { tokenData, options, currentUser } = pickup(["tokenData", "options", "currentUser"]);
 
 			type check = ExpectType<
 				typeof tokenData,
@@ -58,7 +58,7 @@ export const mustBeConnected = useBuilder()
 			type check1 = ExpectType<typeof options, MustBeConnectedOptions, "strict">;
 
 			type check2 = ExpectType<
-				typeof user,
+				typeof currentUser,
 				{
 					id: number;
 					username: string;
@@ -70,11 +70,11 @@ export const mustBeConnected = useBuilder()
 				"strict"
 			>;
 
-			if (user.role === "ADMIN") {
+			if (currentUser.role === "ADMIN") {
 				return dropper({});
 			}
 
-			if (user.role !== options.role) {
+			if (currentUser.role !== options.role) {
 				return new UnauthorizedHttpResponse("wrongRole");
 			}
 
@@ -83,7 +83,7 @@ export const mustBeConnected = useBuilder()
 		[],
 		makeResponseContract(UnauthorizedHttpResponse, "wrongRole"),
 	)
-	.exportation(["tokenData", "user"]);
+	.exportation(["tokenData", "currentUser"]);
 
 export function mustBeConnectedBuilder(options: MustBeConnectedOptions) {
 	return useBuilder()
@@ -91,7 +91,7 @@ export function mustBeConnectedBuilder(options: MustBeConnectedOptions) {
 			mustBeConnected,
 			{
 				options,
-				pickup: ["user"],
+				pickup: ["currentUser"],
 			},
 		);
 }

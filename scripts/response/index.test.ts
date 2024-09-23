@@ -1,7 +1,7 @@
 import type { ExpectType } from "@test/utils/expectType";
 import { makeResponseContract, Response } from ".";
 import { BadRequestHttpResponse } from "./simplePreset";
-import { zod, type zodSpace } from "@scripts/parser";
+import { zod, type ZodSpace } from "@scripts/parser";
 
 describe("response", () => {
 	it("construct response", () => {
@@ -45,7 +45,7 @@ describe("response", () => {
 
 		type check1 = ExpectType<
 			typeof contract1,
-			Response<400, string | undefined, zodSpace.ZodUndefined>[],
+			Response<400, string | undefined, ZodSpace.ZodUndefined>[],
 			"strict"
 		>;
 
@@ -58,8 +58,8 @@ describe("response", () => {
 		type check2 = ExpectType<
 			typeof contract2,
 			(
-				| Response<400, "superInfo1", zodSpace.ZodUndefined>
-				| Response<400, "superInfo2", zodSpace.ZodUndefined>
+				| Response<400, "superInfo1", ZodSpace.ZodUndefined>
+				| Response<400, "superInfo2", ZodSpace.ZodUndefined>
 			)[],
 			"strict"
 		>;
@@ -71,7 +71,7 @@ describe("response", () => {
 
 		type check3 = ExpectType<
 			typeof contract3,
-			Response<400, "toto", zodSpace.ZodString>[],
+			Response<400, "toto", ZodSpace.ZodString>[],
 			"strict"
 		>;
 

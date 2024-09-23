@@ -36,3 +36,5 @@ export const iWantUserExist = createPresetChecker(
 	},
 	makeResponseContract(NotFoundHttpResponse, "notfoundUser"),
 );
+
+export const iWantUserExistById = iWantUserExist.transformInput(inputUserExist.id);

@@ -5,9 +5,15 @@
 
 
 	{
-		let temp = this.extract["body"].safeParse(request["body"])
+		let temp = await this.extract["body"].safeParseAsync(request["body"])
 
 		if(!temp.success){
+			result = temp.error.issues.at(-1)?.params?.response;
+
+			if(result instanceof this.Response) {
+				break Execution;
+			}
+
 			result = this.extractError(
 				"body",
 				undefined,
@@ -16,10 +22,7 @@
 			break Execution;
 		}
 
-		floor.drop(
-			"body",
-			temp.data,
-		);
+		floor.drop("user", temp.data)
 	}
 
 	

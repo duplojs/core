@@ -1,46 +1,45 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { GetPresetCheckerGeneric, PresetChecker } from "@scripts/builder/checker";
 import type { Checker, CheckerOutput, GetCheckerGeneric } from "@scripts/checker";
-import { type RefinementCtx, ZodEffects, type infer as ZodInfer, ZodType, type input, type output, z as zod, type ZodTypeAny } from "zod";
+import { type ZodEffectsDef, ZodEffects, type infer as ZodInfer, ZodType, type input, z as zod, type ZodTypeAny, ZodFirstPartyTypeKind } from "zod";
 import { MissingHandlerCheckerError } from "@scripts/error/missingHandlerCheckerError";
 import { makeFloor } from "@scripts/floor";
 import { findZodTypeInZodSchema } from "@utils/findZodTypeInZodSchema";
-import type { ContractResponse } from "@scripts/response";
 
 export type PresetCheckerContract<
 	Input extends unknown,
 > = PresetChecker<
-	Checker<object | undefined, unknown, CheckerOutput>,
-	string,
-	string,
-	ContractResponse,
+	Checker,
+	any,
+	any,
+	any,
 	Input
 >;
 
 declare module "zod" {
 	interface ZodType {
 		presetCheck<
-			T extends PresetCheckerContract<ZodInfer<this>>,
-			GPCG extends GetPresetCheckerGeneric<T>,
-			GCG extends GetCheckerGeneric<GPCG["checker"]>,
-			InputError extends (
-				GPCG["newInput"] extends ZodInfer<this>
-					? []
-					: ["Input zod schema does not match with checker input.", never]
-			),
-		>(presetChecker: T, ...args: InputError): ZodEffects<
+			GenericPresetChecker extends PresetCheckerContract<ZodInfer<this>>,
+		>(presetChecker: GenericPresetChecker): ZodPresetChecker<
 			this,
-			Extract<GCG["output"], { info: GPCG["info"] }>["data"],
-			this["_input"]
+			GenericPresetChecker
 		>;
 	}
+}
 
-	interface ZodEffects<
-		T extends ZodTypeAny,
-		Output = output<T>,
-		Input = input<T>,
-	> {
-		_presetCheck?: boolean;
+export class ZodPresetChecker<
+	GenericZodType extends ZodTypeAny = ZodTypeAny,
+	GenericPresetChecker extends PresetChecker = PresetChecker,
+	_GenericOutput extends unknown = GetPresetCheckerGeneric<GenericPresetChecker>["outputData"],
+	_GenericInput extends unknown = input<GenericZodType>,
+> extends ZodEffects<GenericZodType, _GenericOutput, _GenericInput> {
+	public presetChecker: GenericPresetChecker;
+
+	public constructor(
+		{ presetChecker, ...def }: ZodEffectsDef<GenericZodType> & { presetChecker: GenericPresetChecker },
+	) {
+		super(def);
+		this.presetChecker = presetChecker;
 	}
 }
 
@@ -66,61 +65,55 @@ ZodType.prototype.presetCheck = function(presetChecker, ..._args) {
 
 	const pickup = makeFloor().pickup;
 
-	function traitResult(result: CheckerOutput, ctx: RefinementCtx) {
-		if (!presetCheckerResult.includes(result.info)) {
-			ctx.addIssue({
-				code: "custom",
-				message: "",
-				params: {
-					response: presetCheckerCatch(
-						result.info,
-						result.data,
-						pickup,
-					),
-				},
-			});
-
-			return zod.NEVER;
-		}
-
-		return result.data;
-	}
-
-	const effect = zod.effect(
-		this,
+	return new ZodPresetChecker(
 		{
-			type: "transform",
-			transform: (value, ctx) => {
-				const result = checkerHandler(
-					presetCheckerTransformInput(value),
-					(info, data) => ({
-						info,
-						data,
-					}),
-					options,
-				);
+			presetChecker: presetChecker,
+			schema: this,
+			typeName: ZodFirstPartyTypeKind.ZodEffects,
+			effect: {
+				type: "transform",
+				transform: (value, ctx) => new Promise<CheckerOutput>(
+					(resolve) => void resolve(
+						checkerHandler(
+							presetCheckerTransformInput(value),
+							(info, data) => ({
+								info,
+								data,
+							}),
+							options,
+						),
+					),
+				).then(
+					(result) => {
+						if (!presetCheckerResult.includes(result.info)) {
+							ctx.addIssue({
+								code: "custom",
+								message: "",
+								params: {
+									response: presetCheckerCatch(
+										result.info,
+										result.data,
+										pickup,
+									),
+								},
+							});
 
-				if (result instanceof Promise) {
-					return result.then((value) => traitResult(value, ctx));
-				} else {
-					return traitResult(result, ctx);
-				}
+							return zod.NEVER;
+						}
+
+						return result.data;
+					},
+				),
 			},
 		},
 	);
-
-	effect._presetCheck = true;
-
-	return effect;
 };
 
 export function zodSchemaHasPresetChecker(zodSchema: ZodType): boolean {
-	const zodSchemaEffects = findZodTypeInZodSchema(
-		[ZodEffects],
+	const [zodPresetChecker] = findZodTypeInZodSchema(
+		[ZodPresetChecker],
 		zodSchema,
 	);
 
-	return !!zodSchemaEffects.find(
-		(value) => !!value._presetCheck,
-	);
+	return !!zodPresetChecker;
 }

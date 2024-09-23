@@ -5,7 +5,7 @@
 
 
 	{
-		let temp = this.extract["body"].safeParse(request["body"])
+		let temp = await this.extract["body"].safeParseAsync(request["body"])
 
 		if(!temp.success){
 			result = this.extractError(

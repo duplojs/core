@@ -35,6 +35,10 @@
 				if(!temp.success){
 					throw new this.ContractResponseError(temp.error, result);
 				}
+
+				result.code = temp.data.code;
+				result.information = temp.data.information;
+				result.body = temp.data.body;
 			
 
 				break Execution;

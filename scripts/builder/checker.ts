@@ -3,19 +3,22 @@ import type { CheckerStepParams } from "@scripts/step/checker";
 import type { ContractResponse, ContractToResponse, PresetGeneriqueResponse } from "@scripts/response";
 
 export function createChecker<
-	T extends object | undefined = undefined,
->(name: string, options: T = undefined as T) {
+	GenericOptions extends object | undefined = undefined,
+>(
+	name: string,
+	options: GenericOptions = undefined as GenericOptions,
+) {
 	const checker = new Checker(name);
 	checker.setOptions(options);
 
 	return {
 		handler<
-			H extends CheckerHandler<T>,
+			H extends CheckerHandler<GenericOptions>,
 		>(handler: H) {
 			checker.setHandler(handler);
 
 			return checker as Checker<
-				T,
+				GenericOptions,
 				Parameters<H>[0],
 				Awaited<ReturnType<H>>
 			>;
@@ -24,42 +27,55 @@ export function createChecker<
 }
 
 export interface PresetCheckerParams<
-	CheckerGeneric extends GetCheckerGeneric = GetCheckerGeneric,
-	Info extends string = string,
-	Key extends string = string,
-	CatchResponse extends PresetGeneriqueResponse = PresetGeneriqueResponse,
-	NewInput extends unknown = CheckerGeneric["input"],
+	GenericCheckerGeneric extends GetCheckerGeneric = GetCheckerGeneric,
+	GenericInfo extends string = string,
+	GenericKey extends string = string,
+	GenericResponse extends PresetGeneriqueResponse = PresetGeneriqueResponse,
+	GenericNewInput extends unknown = GenericCheckerGeneric["input"],
 > extends
 	Pick<
-		CheckerStepParams<CheckerGeneric, Info, Key, CatchResponse>,
+		CheckerStepParams<
+			GenericCheckerGeneric,
+			GenericInfo,
+			GenericKey,
+			GenericResponse
+		>,
 		"result" | "catch" | "indexing"
 	> {
-	transformInput?(input: NewInput): CheckerGeneric["input"];
-	options?: Partial<CheckerGeneric["options"]>;
+	transformInput?(input: GenericNewInput): GenericCheckerGeneric["input"];
+	options?: Partial<GenericCheckerGeneric["options"]>;
 }
 
 export class PresetChecker<
-	_Checker extends Checker = Checker,
-	_Info extends string = string,
-	_Key extends string = string,
-	_Response extends ContractResponse = ContractResponse,
-	_NewInput extends unknown = unknown,
+	GenericChecker extends Checker = Checker,
+	GenericInfo extends string = string,
+	GenericKey extends string = string,
+	GenericContractResponse extends ContractResponse = ContractResponse,
+	GenericNewInput extends unknown = unknown,
+	_GenericCheckerGeneric extends GetCheckerGeneric<GenericChecker> = GetCheckerGeneric<GenericChecker>,
+	_GenericOutputData extends unknown = Extract<_GenericCheckerGeneric["output"], { info: GenericInfo }>["data"],
 > {
 	public constructor(
-		public checker: Checker,
-		public params: PresetCheckerParams,
-		public responses: ContractResponse[],
+		public checker: GenericChecker,
+		public params: PresetCheckerParams<
+			GetCheckerGeneric<GenericChecker>,
+			GenericInfo,
+			GenericKey,
+			ContractToResponse<GenericContractResponse>,
+			GenericNewInput
+		>,
+		public responses: GenericContractResponse[],
 	) {}
 
 	public rewriteIndexing<
-		T extends string,
-	>(indexing: T) {
+		GenericKey extends string,
+	>(indexing: GenericKey) {
 		return new PresetChecker<
-			_Checker,
-			_Info,
-			T,
-			_Response,
-			_NewInput
+			GenericChecker,
+			GenericInfo,
+			GenericKey,
+			GenericContractResponse,
+			GenericNewInput
 		>(
 			this.checker,
 			{
@@ -71,16 +87,16 @@ export class PresetChecker<
 	}
 
 	public transformInput<
-		T extends unknown,
+		GenericNewInput extends unknown,
 	>(
-		transformInput: (input: T) => GetCheckerGeneric<_Checker>["input"],
+		transformInput: (input: GenericNewInput) => _GenericCheckerGeneric["input"],
 	) {
 		return new PresetChecker<
-			_Checker,
-			_Info,
-			_Key,
-			_Response,
-			T
+			GenericChecker,
+			GenericInfo,
+			GenericKey,
+			GenericContractResponse,
+			GenericNewInput
 		>(
 			this.checker,
 			{
@@ -93,25 +109,30 @@ export class PresetChecker<
 }
 
 export function createPresetChecker<
-	C extends Checker,
-	I extends string,
-	K extends string,
-	R extends ContractResponse,
-	GCG extends GetCheckerGeneric<C>,
-	T extends unknown = GCG["input"],
+	GenericChecker extends Checker,
+	GenericInfo extends string,
+	GenericKey extends string,
+	GenericContractResponse extends ContractResponse,
+	GenericNewInput extends unknown,
 >(
-	checker: C,
+	checker: GenericChecker,
 	params: PresetCheckerParams<
-		GCG,
-		I,
-		K,
-		ContractToResponse<R>,
-		T
+		GetCheckerGeneric<GenericChecker>,
+		GenericInfo,
+		GenericKey,
+		ContractToResponse<GenericContractResponse>,
+		GenericNewInput
 	>,
-	responses: R | R[],
+	responses: GenericContractResponse | GenericContractResponse[],
 
 ) {
-	return new PresetChecker<C, I, K, R, T>(
+	return new PresetChecker<
+		GenericChecker,
+		GenericInfo,
+		GenericKey,
+		GenericContractResponse,
+		GenericNewInput
+	>(
 		checker,
 		params,
 		responses instanceof Array ? responses : [responses],
@@ -119,21 +140,25 @@ export function createPresetChecker<
 }
 
 export type GetPresetCheckerGeneric<
-	T extends PresetChecker,
+	GenericPresetChecker extends PresetChecker,
 > =
-	T extends PresetChecker<
-		infer Checker,
-		infer Info,
-		infer Key,
-		infer Response,
-		infer NewInput
+	GenericPresetChecker extends PresetChecker<
+		infer InferedChecker,
+		infer InferedInfo,
+		infer InferedKey,
+		infer InferedContractResponse,
+		infer InferedNewInput,
+		infer InferedCheckerGeneric,
+		infer InferedOutputData
 	>
 		? {
-			checker: Checker;
-			info: Info;
-			key: Key;
-			response: Response;
-			newInput: NewInput;
+			checker: InferedChecker;
+			info: InferedInfo;
+			key: InferedKey;
+			response: InferedContractResponse;
+			newInput: InferedNewInput;
+			checkerGeneric: InferedCheckerGeneric;
+			outputData: InferedOutputData;
 		}
 		: never;
 

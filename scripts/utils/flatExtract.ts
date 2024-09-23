@@ -1,23 +1,39 @@
 import type { ExtractObject } from "@scripts/duplose";
-import type { zodSpace } from "@scripts/parser";
+import type { ZodSpace, ZodPresetChecker } from "@scripts/parser";
 import type { ObjectKey } from "./types";
+import type { GetPresetCheckerGeneric } from "@scripts/builder/checker";
 
-export interface KeyToType<
-	K extends ObjectKey = ObjectKey,
-	V extends unknown = unknown,
+export interface KeyAndValue<
+	GenericObjectKey extends ObjectKey = ObjectKey,
+	GenericValue extends unknown = unknown,
 > {
-	key: K;
-	value: V;
+	key: GenericObjectKey;
+	value: GenericValue;
 }
+
+export type ZodTypeToKeyAndValue<
+	GenericObjectKey extends ObjectKey,
+	GenericZodType extends ZodSpace.ZodType,
+> = GenericZodType extends ZodPresetChecker<any, infer inferedPresetChecker>
+	? (
+		string extends GetPresetCheckerGeneric<inferedPresetChecker>["key"]
+			? never
+			: KeyAndValue<
+				GetPresetCheckerGeneric<inferedPresetChecker>["key"],
+				ZodSpace.infer<GenericZodType>
+			>
+
+	)
+	: KeyAndValue<GenericObjectKey, ZodSpace.infer<GenericZodType>>;
 
 export type FlatExtract<
 	T extends ExtractObject,
-	O extends KeyToType = {
-		[P in keyof T]: T[P] extends zodSpace.ZodType
-			? KeyToType<P, zodSpace.infer<T[P]>>
+	O extends KeyAndValue = {
+		[P in keyof T]: T[P] extends ZodSpace.ZodType
+			? ZodTypeToKeyAndValue<P, T[P]>
 			: {
-				[S in keyof T[P]]: T[P][S] extends zodSpace.ZodType
-					? KeyToType<S, zodSpace.infer<T[P][S]>>
+				[S in keyof T[P]]: T[P][S] extends ZodSpace.ZodType
+					? ZodTypeToKeyAndValue<S, T[P][S]>
 					: never
 			}[keyof T[P]]
 	}[keyof T],

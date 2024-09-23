@@ -1,10 +1,11 @@
-import { createChecker, createPresetChecker } from "@scripts/builder/checker";
+import { createChecker, createPresetChecker, PresetChecker } from "@scripts/builder/checker";
 import { Response } from "@scripts/response";
-import { zod, zodSchemaHasPresetChecker } from ".";
+import { zod, zodSchemaHasPresetChecker, type ZodPresetChecker } from ".";
 import type { ExpectType } from "@test/utils/expectType";
-import { type ZodEffects, type ZodNumber } from "zod";
-import { manualPresetChecker } from "@test/utils/manualDuplose";
+import { type ZodNumber } from "zod";
 import { MissingHandlerCheckerError } from "@scripts/error/missingHandlerCheckerError";
+import { zodSchemaIsAsync } from "@duplojs/zod-accelerator";
+import { Checker } from "@scripts/checker";
 
 describe("presetCheck", () => {
 	const isOddChecker = createChecker("isOdd")
@@ -51,12 +52,15 @@ describe("presetCheck", () => {
 	it("zodSchemaHasPresetChecker", () => {
 		const zodSchema = zod.number().presetCheck(wantEven);
 
+		expect(zodSchemaIsAsync(zodSchema)).toBe(true);
+
 		expect(zodSchemaHasPresetChecker(zodSchema)).toBe(true);
 
 		type check = ExpectType<
 			typeof zodSchema,
-			ZodEffects<
+			ZodPresetChecker<
 				ZodNumber,
+				typeof wantEven,
 				"even",
 				number
 			>,
@@ -64,11 +68,11 @@ describe("presetCheck", () => {
 		>;
 	});
 
-	it("perset check sync", () => {
+	it("perset check sync", async() => {
 		const zodSchema = zod.number().presetCheck(wantEven);
 
 		expect(
-			zodSchema.safeParse(1).error?.issues[0],
+			(await zodSchema.safeParseAsync(1)).error?.issues[0],
 		).toStrictEqual({
 			path: [],
 			code: "custom",
@@ -78,11 +82,14 @@ describe("presetCheck", () => {
 			},
 		});
 
-		expect(zodSchema.parse(2)).toBe("even");
+		expect(await zodSchema.parseAsync(2)).toBe("even");
 	});
 
 	it("perset check async", async() => {
 		const zodSchema = zod.string().presetCheck(wantEvenAsync);
+
+		expect(zodSchemaIsAsync(zod.string().transform(() => Promise.resolve()))).toBe(true);
+		expect(zodSchemaIsAsync(zodSchema)).toBe(true);
 
 		expect(
 			(await zodSchema.safeParseAsync("1")).error?.issues[0],
@@ -100,7 +107,16 @@ describe("presetCheck", () => {
 
 	it("missing handler", () => {
 		expect(
-			() => zod.string().presetCheck(manualPresetChecker),
+			() => zod.string().presetCheck(
+				new PresetChecker(
+					new Checker("test"),
+					{
+						result: "test",
+						catch: () => void undefined as never,
+					},
+					[],
+				),
+			),
 		).toThrowError(MissingHandlerCheckerError);
 	});
 });

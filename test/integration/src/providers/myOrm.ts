@@ -50,10 +50,31 @@ export class MyOrm {
 		T extends keyof typeof myDataBase,
 	>(
 		from: T,
-		newEntity: typeof myDataBase[T][number],
+		data: typeof myDataBase[T][number],
 	): Promise<boolean> {
-		myDataBase[from].push(newEntity as never);
+		myDataBase[from].push(data as never);
 
 		return Promise.resolve(true);
+	}
+
+	public static async updateOne<
+		T extends keyof typeof myDataBase,
+	>(
+		from: T,
+		by: Partial<typeof myDataBase[T][number]>,
+		data: Partial<typeof myDataBase[T][number]>,
+	): Promise<boolean> {
+		const entity = await this.findOne(from, by);
+
+		if (!entity) {
+			return false;
+		}
+
+		getTypedEntries(data)
+			.forEach(([key, value]) => {
+				entity[key] = value as never;
+			});
+
+		return true;
 	}
 }

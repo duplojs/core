@@ -36,6 +36,7 @@ export default [
 			...duploLint.rules,
 			"max-classes-per-file": "off",
 			"no-useless-assignment": "off",
+			"@typescript-eslint/no-namespace": "off",
 		},
 		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],

@@ -35,7 +35,11 @@ export * from "@scripts/description";
 
 export * from "@scripts/error/buildNoRegisteredDuplose";
 export * from "@scripts/error/contractResponseError";
+export * from "@scripts/error/contractResponseHasZodEffectError";
+export * from "@scripts/error/duplicateExtentionKeyError";
+export * from "@scripts/error/injectBlockNotfoundError";
 export * from "@scripts/error/lastStepMustBeHandlerError";
+export * from "@scripts/error/missingHandlerCheckerError";
 export * from "@scripts/error/resultIsNotAResponseError";
 
 export * from "@utils/addThis";

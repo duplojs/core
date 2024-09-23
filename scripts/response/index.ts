@@ -1,5 +1,5 @@
 import { getTypedEntries } from "@utils/getTypedEntries";
-import { zod, type zodSpace } from "@scripts/parser";
+import { zod, type ZodSpace } from "@scripts/parser";
 import type { UniqueGeneric } from "@utils/uniqueGeneric";
 import type { SimplifyType } from "@utils/simplifyType";
 
@@ -67,7 +67,7 @@ export class Response<
 	}
 }
 
-export type ContractResponse = Response<number, string | undefined, zodSpace.ZodType>;
+export type ContractResponse = Response<number, string | undefined, ZodSpace.ZodType>;
 
 export type ContractToResponse<
 	T extends ContractResponse,
@@ -75,7 +75,7 @@ export type ContractToResponse<
 	T extends Response<
 		infer code,
 		infer information,
-		infer zodSchema extends zodSpace.ZodType
+		infer zodSchema extends ZodSpace.ZodType
 	>
 		? Response<code, information, zodSchema["_output"]>
 		: never;
@@ -88,19 +88,19 @@ export interface ResponseToMakeContracts {
 export type MakeResponseContract<
 	T extends ResponseToMakeContracts,
 	I extends string,
-	B extends UniqueGeneric<zodSpace.ZodType>,
+	B extends UniqueGeneric<ZodSpace.ZodType>,
 > = {
 	[P in I]: Response<
 		T["code"],
 		string extends P ? string | undefined : P,
-		UniqueGeneric<zodSpace.ZodType> extends B ? zodSpace.ZodUndefined : B
+		UniqueGeneric<ZodSpace.ZodType> extends B ? ZodSpace.ZodUndefined : B
 	>
 }[I][];
 
 export function makeResponseContract<
 	T extends ResponseToMakeContracts,
 	I extends string,
-	B extends zodSpace.ZodType,
+	B extends ZodSpace.ZodType,
 >(
 	response: T,
 	info?: I | I[],

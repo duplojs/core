@@ -1,4 +1,4 @@
-import { inputUserExist, userExist } from "@checkers/userExist";
+import { inputUserExist, userExist } from "@checkers/user";
 import { ConflictHttpResponse, CreatedHttpResponse, makeResponseContract, useBuilder, zod } from "@duplojs/core";
 import { MyOrm } from "@providers/myOrm";
 import { registeredUser } from "../schemas/registeredUser";

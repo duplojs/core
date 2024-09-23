@@ -1,7 +1,7 @@
-import { zod, type zodSpace } from "@scripts/parser";
+import { zod, type ZodSpace } from "@scripts/parser";
 
 export function findZodTypeInZodSchema<
-	T extends new(...args: any[]) => zodSpace.ZodType,
+	T extends new(...args: any[]) => ZodSpace.ZodType,
 >(
 	zodType: T[],
 	zodSchema: unknown,
@@ -89,7 +89,7 @@ export function findZodTypeInZodSchema<
 			lazyMap,
 		);
 	} else if (zodSchema instanceof zod.ZodObject) {
-		Object.values(zodSchema._def.shape() as zodSpace.ZodType)
+		Object.values(zodSchema._def.shape() as ZodSpace.ZodType)
 			.forEach(
 				(value) => void findZodTypeInZodSchema(
 					zodType,
@@ -155,7 +155,7 @@ export function findZodTypeInZodSchema<
 			lazyMap,
 		);
 	} else if (zodSchema instanceof zod.ZodTuple) {
-		(zodSchema._def.items as zodSpace.ZodType[])
+		(zodSchema._def.items as ZodSpace.ZodType[])
 			.forEach(
 				(value) => void findZodTypeInZodSchema(
 					zodType,
@@ -172,7 +172,7 @@ export function findZodTypeInZodSchema<
 			lazyMap,
 		);
 	} else if (zodSchema instanceof zod.ZodUnion) {
-		(zodSchema._def.options as zodSpace.ZodType[])
+		(zodSchema._def.options as ZodSpace.ZodType[])
 			.forEach(
 				(value) => void findZodTypeInZodSchema(
 					zodType,

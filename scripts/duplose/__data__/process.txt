@@ -63,7 +63,6 @@ break Execution;
 		let temp = this.extract["params"]["userId"].safeParse(request["params"]?.["userId"])
 
 		if(!temp.success){
-			
 			result = this.extractError(
 				"params",
 				"userId",
@@ -113,6 +112,10 @@ break Execution;
 				if(!temp.success){
 					throw new this.ContractResponseError(temp.error, result);
 				}
+
+				result.code = temp.data.code;
+				result.information = temp.data.information;
+				result.body = temp.data.body;
 			
 break Execution;
 }

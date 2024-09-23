@@ -1,8 +1,10 @@
 import type { Duplo } from "@scripts/duplo";
 import type { Step, StepWithResponse } from "..";
-import { zod, type zodSpace } from "@scripts/parser";
+import { zod, type ZodSpace } from "@scripts/parser";
 import ZodAccelerator, { type ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 import { condition, StringBuilder } from "@utils/stringBuilder";
+import { findZodTypeInZodSchema } from "@utils/findZodTypeInZodSchema";
+import { ContractResponseHasZodEffectError } from "@scripts/error/contractResponseHasZodEffectError";
 
 export abstract class BuildedStep<T extends Step = Step> {
 	public constructor(
@@ -16,7 +18,7 @@ export abstract class BuildedStep<T extends Step = Step> {
 export abstract class BuildedStepWithResponses<
 	T extends StepWithResponse = StepWithResponse,
 > extends BuildedStep<T> {
-	public responseZodSchema?: zodSpace.ZodUnion<any> | ZodAcceleratorParser<zodSpace.ZodUnion<any>>;
+	public responseZodSchema?: ZodSpace.ZodUnion<any> | ZodAcceleratorParser<ZodSpace.ZodUnion<any>>;
 
 	public constructor(
 		instance: Duplo,
@@ -33,9 +35,13 @@ export abstract class BuildedStepWithResponses<
 							? zod.literal(contractResponse.information)
 							: zod.string().optional(),
 						body: contractResponse.body,
-					}) satisfies zodSpace.ZodType,
+					}) satisfies ZodSpace.ZodType,
 				) as any,
 			);
+
+			if (findZodTypeInZodSchema([zod.ZodEffects], this.responseZodSchema).length > 0) {
+				throw new ContractResponseHasZodEffectError();
+			}
 
 			if (!instance.config.disabledZodAccelerator) {
 				this.responseZodSchema = ZodAccelerator.build(this.responseZodSchema);
@@ -52,6 +58,10 @@ export abstract class BuildedStepWithResponses<
 				if(!temp.success){
 					throw new this.ContractResponseError(temp.error, ${StringBuilder.result});
 				}
+
+				${StringBuilder.result}.code = temp.data.code;
+				${StringBuilder.result}.information = temp.data.information;
+				${StringBuilder.result}.body = temp.data.body;
 			`,
 		);
 	}

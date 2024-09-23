@@ -9,9 +9,15 @@
 
 
 	{
-		let temp = this.extract["body"].safeParse(request["body"])
+		let temp = await this.extract["body"].safeParseAsync(request["body"])
 
 		if(!temp.success){
+			result = temp.error.issues.at(-1)?.params?.response;
+
+			if(result instanceof this.Response) {
+				break Execution;
+			}
+
 			result = this.extractError(
 				"body",
 				undefined,
@@ -20,10 +26,7 @@
 			break Execution;
 		}
 
-		floor.drop(
-			"body",
-			temp.data,
-		);
+		floor.drop("presetResult", temp.data)
 	}
 
 	
@@ -38,9 +41,15 @@
 
 
 	{
-		let temp = this.extract["params"]["userId"].safeParse(request["params"]?.["userId"])
+		let temp = await this.extract["params"]["userId"].safeParseAsync(request["params"]?.["userId"])
 
 		if(!temp.success){
+			result = temp.error.issues.at(-1)?.params?.response;
+
+			if(result instanceof this.Response) {
+				break Execution;
+			}
+
 			result = this.extractError(
 				"params",
 				"userId",
@@ -49,10 +58,7 @@
 			break Execution;
 		}
 
-		floor.drop(
-			"userId",
-			temp.data,
-		);
+		floor.drop("presetResult", temp.data)
 	}
 
 	

@@ -7,10 +7,10 @@ export const getSelf = mustBeConnectedBuilder({ role: "USER" })
 	.createRoute("GET", "/user")
 	.handler(
 		(pickup) => {
-			const { user } = pickup(["user"]);
+			const { currentUser } = pickup(["currentUser"]);
 
 			type check = ExpectType<
-				typeof user,
+				typeof currentUser,
 				{
 					id: number;
 					username: string;
@@ -22,7 +22,7 @@ export const getSelf = mustBeConnectedBuilder({ role: "USER" })
 				"strict"
 			>;
 
-			return new OkHttpResponse("user", user);
+			return new OkHttpResponse("user", currentUser);
 		},
 		makeResponseContract(OkHttpResponse, "user", userSchema),
 	);

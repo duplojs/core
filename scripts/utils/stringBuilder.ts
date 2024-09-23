@@ -1,6 +1,8 @@
 import type { ExtractObject } from "@scripts/duplose";
 import { getTypedEntries } from "./getTypedEntries";
-import { zod, zodSchemaHasPresetChecker } from "@scripts/parser";
+import { zod, ZodPresetChecker } from "@scripts/parser";
+import { zodSchemaIsAsync } from "@duplojs/zod-accelerator";
+import { PresetChecker } from "@scripts/builder/checker";
 
 export class StringBuilder {
 	public static result = "result";
@@ -48,32 +50,21 @@ export function skipStep(bool: boolean, index: number, block: string) {
 		? /* js */`
 		${insertBlock(`step-skip-(${index})-before`)}
 
-		if(!this.steps[${index}].params.skip(floor.pickup)){
+		if(!this.steps[${index}].params.skip(${StringBuilder.floor}.pickup)){
 			${block}
 		}
 		`
 		: block;
 }
 
-export function extractPresetCheckerCheckResult() {
-	return /* js */`
-	${StringBuilder.result} = temp.error.issues.at(-1)?.params?.response;
-
-	if(${StringBuilder.result} instanceof this.Response) {
-		break ${StringBuilder.label};
-	}
-	`;
-}
-
-export function extractLevelOne(one: string, zodSchemaContainPresetChecker: boolean) {
+export function extractLevelOne(one: string, async: boolean) {
 	return /* js */`
 	${insertBlock(`extract-(${one})-before`)}
 
 	{
-		let temp = this.extract["${one}"].safeParse(${StringBuilder.request}["${one}"])
+		let temp = ${async ? "await " : ""}this.extract["${one}"].${async ? "safeParseAsync" : "safeParse"}(${StringBuilder.request}["${one}"])
 
 		if(!temp.success){
-			${zodSchemaContainPresetChecker ? extractPresetCheckerCheckResult() : ""}
 			${StringBuilder.result} = this.extractError(
 				"${one}",
 				undefined,
@@ -82,7 +73,7 @@ export function extractLevelOne(one: string, zodSchemaContainPresetChecker: bool
 			break ${StringBuilder.label};
 		}
 
-		floor.drop(
+		${StringBuilder.floor}.drop(
 			"${one}",
 			temp.data,
 		);
@@ -92,15 +83,14 @@ export function extractLevelOne(one: string, zodSchemaContainPresetChecker: bool
 	`;
 }
 
-export function extractLevelTwo(one: string, two: string, zodSchemaContainPresetChecker: boolean) {
+export function extractLevelTwo(one: string, two: string, async: boolean) {
 	return /* js */`
 	${insertBlock(`extract-(${one})-(${two})-before`)}
 
 	{
-		let temp = this.extract["${one}"]["${two}"].safeParse(${StringBuilder.request}["${one}"]?.["${two}"])
+		let temp = ${async ? "await " : ""}this.extract["${one}"]["${two}"].${async ? "safeParseAsync" : "safeParse"}(${StringBuilder.request}["${one}"]?.["${two}"])
 
 		if(!temp.success){
-			${zodSchemaContainPresetChecker ? extractPresetCheckerCheckResult() : ""}
 			${StringBuilder.result} = this.extractError(
 				"${one}",
 				"${two}",
@@ -109,10 +99,68 @@ export function extractLevelTwo(one: string, two: string, zodSchemaContainPreset
 			break ${StringBuilder.label};
 		}
 
-		floor.drop(
+		${StringBuilder.floor}.drop(
 			"${two}",
 			temp.data,
 		);
+	}
+
+	${insertBlock(`extract-(${one})-(${two})-after`)}
+	`;
+}
+
+export function extractLevelOnePresetCheck(one: string, presetCheckerIndexing?: string) {
+	return /* js */`
+	${insertBlock(`extract-(${one})-before`)}
+
+	{
+		let temp = await this.extract["${one}"].safeParseAsync(${StringBuilder.request}["${one}"])
+
+		if(!temp.success){
+			${StringBuilder.result} = temp.error.issues.at(-1)?.params?.response;
+
+			if(${StringBuilder.result} instanceof this.Response) {
+				break ${StringBuilder.label};
+			}
+
+			${StringBuilder.result} = this.extractError(
+				"${one}",
+				undefined,
+				temp.error,
+			);
+			break ${StringBuilder.label};
+		}
+
+		${presetCheckerIndexing ? `${StringBuilder.floor}.drop("${presetCheckerIndexing}", temp.data)` : ""}
+	}
+
+	${insertBlock(`extract-(${one})-after`)}
+	`;
+}
+
+export function extractLevelTwoPresetCheck(one: string, two: string, presetCheckerIndexing?: string) {
+	return /* js */`
+	${insertBlock(`extract-(${one})-(${two})-before`)}
+
+	{
+		let temp = await this.extract["${one}"]["${two}"].safeParseAsync(${StringBuilder.request}["${one}"]?.["${two}"])
+
+		if(!temp.success){
+			${StringBuilder.result} = temp.error.issues.at(-1)?.params?.response;
+
+			if(${StringBuilder.result} instanceof this.Response) {
+				break ${StringBuilder.label};
+			}
+
+			${StringBuilder.result} = this.extractError(
+				"${one}",
+				"${two}",
+				temp.error,
+			);
+			break ${StringBuilder.label};
+		}
+
+		${presetCheckerIndexing ? `${StringBuilder.floor}.drop("${presetCheckerIndexing}", temp.data)` : ""}
 	}
 
 	${insertBlock(`extract-(${one})-(${two})-after`)}
@@ -125,12 +173,27 @@ export function extractPart(extract?: ExtractObject) {
 			insertBlock("extract-before"),
 			mapped(
 				getTypedEntries(extract),
-				([key, value]) => value instanceof zod.ZodType
-					? extractLevelOne(key, zodSchemaHasPresetChecker(value))
-					: mapped(
-						getTypedEntries(value),
-						([subKey, subValue]) => extractLevelTwo(key, subKey, zodSchemaHasPresetChecker(subValue)),
-					),
+				([key, value]) => {
+					if (value instanceof zod.ZodType) {
+						return value instanceof ZodPresetChecker
+							? extractLevelOnePresetCheck(
+								key,
+								(<ZodPresetChecker>value).presetChecker.params.indexing,
+							)
+							: extractLevelOne(key, zodSchemaIsAsync(value));
+					} else {
+						return mapped(
+							getTypedEntries(value),
+							([subKey, subValue]) => subValue instanceof ZodPresetChecker
+								? extractLevelTwoPresetCheck(
+									key,
+									subKey,
+									(<ZodPresetChecker>subValue).presetChecker.params.indexing,
+								)
+								: extractLevelTwo(key, subKey, zodSchemaIsAsync(subValue)),
+						);
+					}
+				},
 			),
 			insertBlock("extract-after"),
 		)

@@ -104,6 +104,8 @@ describe("checker builder", () => {
 						| Response<200, "odd", ZodUndefined>
 						| Response<422, "notOdd", ZodUndefined>;
 					newInput: number;
+					outputData: number;
+					checkerGeneric: GetCheckerGeneric<typeof isOdd>;
 				},
 				"strict"
 			>;
@@ -125,6 +127,8 @@ describe("checker builder", () => {
 						| Response<200, "odd", ZodUndefined>
 						| Response<422, "notOdd", ZodUndefined>;
 					newInput: number;
+					outputData: number;
+					checkerGeneric: GetCheckerGeneric<typeof isOdd>;
 				},
 				"strict"
 			>;
@@ -149,6 +153,8 @@ describe("checker builder", () => {
 					key: string;
 					response: Response<200, "odd", ZodUndefined>;
 					newInput: symbol;
+					outputData: number;
+					checkerGeneric: GetCheckerGeneric<typeof isOdd>;
 				},
 				"strict"
 			>;
@@ -170,6 +176,8 @@ describe("checker builder", () => {
 						| Response<200, "odd", ZodUndefined>
 						| Response<422, "notOdd", ZodUndefined>;
 					newInput: string;
+					outputData: number;
+					checkerGeneric: GetCheckerGeneric<typeof isOdd>;
 				},
 				"strict"
 			>;

@@ -69,7 +69,7 @@ describe("mustBeConnected", () => {
 				id: 9,
 				role: "ADMIN",
 			},
-			user: {
+			currentUser: {
 				createdAt: "2023-09-18T15:00:00Z",
 				email: "elon@example.com",
 				id: 9,

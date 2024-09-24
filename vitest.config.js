@@ -7,6 +7,7 @@ export default defineConfig({
 		globals: true,
 		include: [
 			"scripts/**/*.test.ts", 
+			"test/spec/**/*.test.ts", 
 			"test/integration/src/**/*.test.ts"
 		],
 		coverage: {

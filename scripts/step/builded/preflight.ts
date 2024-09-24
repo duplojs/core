@@ -11,7 +11,7 @@ export class BuildedPreflightStep extends BuildedProcessStep {
 
 		const input = condition(
 			!!this.params.input,
-			() => /* js */`this.preflightSteps[${index}].input(floor.pickup)`,
+			() => /* js */`this.preflightSteps[${index}].params.input(${StringBuilder.floor}.pickup)`,
 		);
 
 		const drop = mapped(

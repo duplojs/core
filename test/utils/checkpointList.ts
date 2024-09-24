@@ -1,7 +1,7 @@
 export class CheckpointList {
-	private pointList: string[] = [];
+	private pointList: unknown[] = [];
 
-	public addPoint(name: string) {
+	public addPoint(name: unknown) {
 		if (this.pointList.includes(name)) {
 			throw new Error("Duplication point name");
 		}

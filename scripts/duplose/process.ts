@@ -142,10 +142,14 @@ export class Process<
 
 			${insertBlock("steps-after")}
 		}
+
+		${insertBlock("process-if-return-before")}
 		if(${StringBuilder.result} instanceof this.Response){
+			${insertBlock("process-result-return-before")}
 			return result;
 		}
 		else {
+			${insertBlock("process-drop-return-before")}
 			return {
 				${drop}
 			};

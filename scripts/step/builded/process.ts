@@ -48,7 +48,7 @@ export class BuildedProcessStep extends BuildedStep<ProcessStep> {
 
 		const input = condition(
 			!!this.params.input,
-			() => /* js */`this.steps[${index}].input(floor.pickup)`,
+			() => /* js */`this.steps[${index}].params.input(${StringBuilder.floor}.pickup)`,
 		);
 
 		const drop = mapped(

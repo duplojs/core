@@ -27,7 +27,7 @@ export const getSelf = mustBeConnectedBuilder({ role: "USER" })
 		makeResponseContract(OkHttpResponse, "user", userSchema),
 	);
 
-export const postPicture = mustBeConnectedBuilder({ role: "USER" })
+export const uploadPicture = mustBeConnectedBuilder({ role: "USER" })
 	.createRoute("PUT", "/user/picture")
 	.extract({
 		body: zod.receiveFormData({

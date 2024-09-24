@@ -2,7 +2,6 @@ import type { ExtractObject } from "@scripts/duplose";
 import { getTypedEntries } from "./getTypedEntries";
 import { zod, ZodPresetChecker } from "@scripts/parser";
 import { zodSchemaIsAsync } from "@duplojs/zod-accelerator";
-import { PresetChecker } from "@scripts/builder/checker";
 
 export class StringBuilder {
 	public static result = "result";

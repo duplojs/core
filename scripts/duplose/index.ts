@@ -108,7 +108,7 @@ export abstract class Duplose<
 
 	public steps: Step[] = [];
 
-	public modifiers: AnyFunction[] = [];
+	public editingFunctions: EditingDuploseFunction[] = [];
 
 	public extensions: DuploseContextExtensions = {
 		injectedFunction: [],
@@ -157,7 +157,7 @@ export abstract class Duplose<
 		return hooks;
 	}
 
-	public acceleratedExtract() {
+	protected acceleratedExtract() {
 		if (this.extract) {
 			return getTypedEntries(this.extract)
 				.reduce<AcceleratedExtractObject>(
@@ -183,8 +183,6 @@ export abstract class Duplose<
 				);
 		}
 	}
-
-	public editingFunctions: EditingDuploseFunction[] = [];
 
 	protected applyEditingFunctions(content: string) {
 		let editedContent = content;
@@ -268,6 +266,31 @@ export abstract class Duplose<
 				);
 			},
 		};
+	}
+
+	public hasDuplose(duplose: Duplose, deep = Infinity) {
+		if (deep === 0) {
+			return false;
+		} else if (duplose === this) {
+			return true;
+		}
+
+		for (const preflight of this.preflightSteps) {
+			if (preflight.parent.hasDuplose(duplose, deep - 1)) {
+				return true;
+			}
+		}
+
+		for (const step of this.steps) {
+			if (
+				step.parent instanceof Duplose
+				&& step.parent.hasDuplose(duplose, deep - 1)
+			) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public abstract build(): BuildedFunction;

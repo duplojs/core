@@ -1,30 +1,30 @@
-import { createChecker, useBuilder } from "@scripts/index";
+import { createChecker, createPresetChecker, useBuilder, Response } from "@scripts/index";
 
-export const processWichDropValue = useBuilder()
-	.createProcess("processWichDropValue")
-	.cut(
-		async({ dropper }) => {
-			const value = await dropper({ dropValue: "test" });
-
-			return value;
-		},
-		["dropValue"],
-	)
-	.exportation(["dropValue"]);
-
-export const processWithOptionAndInput = useBuilder()
+export const fixtureProcessWichDropValue = useBuilder()
 	.createProcess(
-		"processWithOptionAndInput",
+		"processWichDropValue",
 		{
 			options: {
-				value: "",
+				option1: "test",
+				option2: 12,
 			},
 			input: 22,
 		},
 	)
-	.exportation();
+	.cut(
+		async({ pickup, dropper }) => {
+			const value = await dropper({
+				dropOptions: pickup("options"),
+				dropInput: pickup("input"),
+			});
 
-export const checkerWithoutOptions = createChecker("checkerWithoutOptions")
+			return value;
+		},
+		["dropInput", "dropOptions"],
+	)
+	.exportation(["dropOptions", "dropInput"]);
+
+export const fixtureCheckerWithoutOptions = createChecker("checkerWithoutOptions")
 	.handler(
 		async(input: number, output) => {
 			await Promise.resolve();
@@ -36,10 +36,11 @@ export const checkerWithoutOptions = createChecker("checkerWithoutOptions")
 		},
 	);
 
-export const checkerWithOptions = createChecker(
+export const fixtureCheckerWithOptions = createChecker(
 	"checkerWithoutOptions",
 	{
 		option1: "test",
+		option2: 11,
 	},
 )
 	.handler(
@@ -52,3 +53,14 @@ export const checkerWithOptions = createChecker(
 			return output("no", <const>false);
 		},
 	);
+
+export const fixturePresetChecker = createPresetChecker(
+	fixtureCheckerWithOptions,
+	{
+		result: "yes",
+		catch: () => new Response(400, undefined, undefined),
+		options: {
+			option1: "settedOption",
+		},
+	},
+);

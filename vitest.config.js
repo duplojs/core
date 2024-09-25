@@ -19,7 +19,8 @@ export default defineConfig({
 				"dist", 
 				"test/utils", 
 				"test/integration/src/providers",
-				"test/overridesTypes"
+				"test/overridesTypes",
+				"test/spec/process",
 			],
 		},
 	},

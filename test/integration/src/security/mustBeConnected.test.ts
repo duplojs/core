@@ -12,6 +12,7 @@ describe("mustBeConnected", () => {
 		const result = await builedProcess(
 			makeFakeRequest(),
 			{ role: "USER" },
+			undefined,
 		) as UnauthorizedHttpResponse;
 
 		expect(result).instanceOf(UnauthorizedHttpResponse);
@@ -22,6 +23,7 @@ describe("mustBeConnected", () => {
 		const result = await builedProcess(
 			makeFakeRequest({ headers: { authorization: "invalideAuthorization" } }),
 			{ role: "USER" },
+			undefined,
 		) as UnauthorizedHttpResponse;
 
 		expect(result).instanceOf(UnauthorizedHttpResponse);
@@ -32,6 +34,7 @@ describe("mustBeConnected", () => {
 		const result = await builedProcess(
 			makeFakeRequest({ headers: { authorization: "valide-USER-20" } }),
 			{ role: "USER" },
+			undefined,
 		) as NotFoundHttpResponse;
 
 		expect(result).instanceOf(NotFoundHttpResponse);
@@ -42,6 +45,7 @@ describe("mustBeConnected", () => {
 		const result = await builedProcess(
 			makeFakeRequest({ headers: { authorization: "valide-USER-20" } }),
 			{ role: "USER" },
+			undefined,
 		) as NotFoundHttpResponse;
 
 		expect(result).instanceOf(NotFoundHttpResponse);
@@ -52,6 +56,7 @@ describe("mustBeConnected", () => {
 		const result = await builedProcess(
 			makeFakeRequest({ headers: { authorization: "valide-USER-1" } }),
 			{ role: "ADMIN" },
+			undefined,
 		) as UnauthorizedHttpResponse;
 
 		expect(result).instanceOf(UnauthorizedHttpResponse);
@@ -62,6 +67,7 @@ describe("mustBeConnected", () => {
 		const result = await builedProcess(
 			makeFakeRequest({ headers: { authorization: "valide-ADMIN-9" } }),
 			{ role: "ADMIN" },
+			undefined,
 		);
 
 		expect(result).toStrictEqual({

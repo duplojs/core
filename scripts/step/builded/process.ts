@@ -28,6 +28,8 @@ export class BuildedProcessStep extends BuildedStep<ProcessStep> {
 				...step.parent.options,
 				...this.params.options,
 			};
+		} else {
+			this.params.options = step.parent.options;
 		}
 
 		if (!this.params.input) {

@@ -18,8 +18,8 @@ export interface ProcessBuildedFunction<
 > {
 	(
 		request: CurrentRequestObject,
-		options?: O,
-		input?: I
+		options: O,
+		input: I
 	): PromiseOrNot<unknown>;
 	context: DuploseBuildedFunctionContext<Process>;
 }

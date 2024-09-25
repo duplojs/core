@@ -1,215 +1,197 @@
-import { createChecker, useBuilder, zod, Response } from "@scripts/index";
-import type { ExpectType } from "@test/utils/expectType";
-import { checkerWithOptions, checkerWithoutOptions } from "@test/utils/fixture";
+import { duploTest } from "@test/utils/duploTest";
+import { useBuilder, Response, UnprocessableEntityHttpResponse } from "@scripts/index";
+import { makeFakeRequest } from "@test/utils/request";
+import { processWithCut } from "./process/withCut";
+import { processWithChecker } from "./process/withChecker";
+import { processWithExtract } from "./process/withExtract";
+import { processWithCheckerWithNoOptions } from "./process/withCheckerHasNoOptions";
+import { processWithPresetChecker } from "./process/withPresetChecker";
+import { processWithSkipChecker } from "./process/withSkipChecker";
+import { processWithOptionsAndInput } from "./process/withOptionsAndInput";
+import { processWithProcess } from "./process/withProcess";
+import { processWithSkipProcess } from "./process/withSkipProcess";
 
 describe("process", () => {
-	const process = useBuilder()
-		.createProcess("process")
-		.cut(
-			({ dropper }) => dropper({ value: "test" }),
-			["value"],
-		)
-		.cut(
-			({ pickup, dropper }) => {
-				const { value, options, input } = pickup(["value", "options", "input"]);
+	duploTest.register(...useBuilder.getAllCreatedDuplose());
 
-			type check1 = ExpectType<
-				typeof value,
-				string,
-				"strict"
-			>;
+	it("with cut", async() => {
+		const buildedProcess = processWithCut.build();
 
-			type check2 = ExpectType<
-				typeof options,
-				undefined,
-				"strict"
-			>;
+		const result = await buildedProcess(makeFakeRequest(), undefined, undefined);
 
-			type check3 = ExpectType<
-				typeof input,
-				undefined,
-				"strict"
-			>;
+		expect(result).toStrictEqual({
+			value: "test",
+		});
+	});
 
-			return dropper({});
-			},
-		)
-		.exportation(["value"]);
+	it("with extract", async() => {
+		const buildedProcess = processWithExtract.build();
 
-	const processWithOptionAndInput = useBuilder()
-		.createProcess(
-			"processWithOptionAndInput",
-			{
-				options: { test: 12 },
-				input: "test",
-			},
-		)
-		.cut(
-			({ pickup, dropper }) => {
-				const { options, input } = pickup(["options", "input"]);
+		const result1 = await buildedProcess(makeFakeRequest(), undefined, undefined);
 
-			type check2 = ExpectType<
-				typeof options,
-				{ test: number },
-				"strict"
-			>;
+		expect(result1).instanceOf(
+			UnprocessableEntityHttpResponse,
+		);
 
-			type check3 = ExpectType<
-				typeof input,
-				string,
-				"strict"
-			>;
-
-			return dropper({});
-			},
-		)
-		.exportation();
-
-	const processWithExtract = useBuilder()
-		.createProcess("processWithExtract")
-		.extract({
+		const result2 = await buildedProcess(makeFakeRequest({
 			params: {
-				userId: zod.string(),
+				userId: "test",
 			},
-			body: zod.object({
-				prop1: zod.string(),
-				prop2: zod.object({
-					prop3: zod.string(),
-					prop4: zod.object({
-						prop5: zod.string(),
-					}),
-				}).passthrough(),
-			}).passthrough(),
-		})
-		.cut(
-			({ pickup, dropper }) => {
-				const { userId, body } = pickup(["userId", "body"]);
-
-				type check2 = ExpectType<
-					typeof userId,
-					string,
-					"strict"
-				>;
-
-				type check3 = ExpectType<
-					typeof body,
-					{
-						prop1: string;
-						prop2: {
-							prop3: string;
-							prop4: {
-								prop5: string;
-							};
-						};
+			body: {
+				prop1: "test",
+				prop2: {
+					prop3: "test",
+					prop4: {
+						prop5: "test",
 					},
-					"strict"
-				>;
-
-				return dropper({});
-			},
-		)
-		.exportation();
-
-	const processWithCheckerWithNoOptions = useBuilder()
-		.createProcess("processWithCheckerWithNoOptions")
-		.extract({
-			body: zod.number(),
-		})
-		.check(
-			checkerWithoutOptions,
-			{
-				input: (pickup) => {
-					const body = pickup("body");
-					type check2 = ExpectType<
-						typeof body,
-						number,
-						"strict"
-					>;
-					return body;
-				},
-				result: "yes",
-				catch: () => new Response(400, "first", undefined),
-				indexing: "valueCheck",
-			},
-		)
-		.cut(
-			({ pickup, dropper }) => {
-				const { valueCheck } = pickup(["valueCheck"]);
-
-				type check2 = ExpectType<
-					typeof valueCheck,
-					true,
-					"strict"
-				>;
-
-				return dropper({ });
-			},
-		)
-		.check(
-			checkerWithoutOptions,
-			{
-				input: (pickup) => pickup("body"),
-				result: ["yes"],
-				catch: () => new Response(400, "seconds", undefined),
-			},
-		)
-		.cut(
-			({ pickup, dropper }) => {
-				const { valueCheck } = pickup(["valueCheck"]);
-
-				type check2 = ExpectType<
-					typeof valueCheck,
-					true,
-					"strict"
-				>;
-
-				return dropper({ });
-			},
-		)
-		.exportation();
-
-	const processWithChecker = useBuilder()
-		.createProcess("processWithChecker")
-		.extract({
-			body: zod.number(),
-		})
-		.check(
-			checkerWithOptions,
-			{
-				input: (pickup) => pickup("body"),
-				result: "yes",
-				catch: () => new Response(400, "first", undefined),
-				indexing: "valueCheck1",
-				options: {
-					option1: "toto",
 				},
 			},
-		)
-		.check(
-			checkerWithOptions,
-			{
-				input: (pickup) => pickup("body"),
-				result: "yes",
-				catch: () => new Response(400, "first", undefined),
-				indexing: "valueCheck2",
-				options: (pickup) => {
-					const body = pickup("body");
+		}), undefined, undefined);
 
-					type check2 = ExpectType<
-						typeof body,
-						number,
-						"strict"
-					>;
-
-					return {
-						option1: body.toString(),
-					};
+		expect(result2).toStrictEqual({
+			userId: "test",
+			body: {
+				prop1: "test",
+				prop2: {
+					prop3: "test",
+					prop4: {
+						prop5: "test",
+					},
 				},
 			},
-		)
-		.exportation(["valueCheck1", "valueCheck2"]);
+		});
+	});
 
-	it("test", () => {
+	it("with checker", async() => {
+		const buildedProcess = processWithChecker.build();
 
+		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
+
+		expect(result1).instanceOf(Response);
+
+		const result2 = await buildedProcess(makeFakeRequest({ body: 1 }), undefined, undefined);
+
+		expect(result2).toStrictEqual({
+			valueCheck1: {
+				option1: "toto",
+				option2: 11,
+			},
+			valueCheck2: {
+				option1: "1",
+				option2: 11,
+			},
+		});
+	});
+
+	it("with checker has no options", async() => {
+		const buildedProcess = processWithCheckerWithNoOptions.build();
+
+		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
+
+		expect(result1).instanceOf(Response);
+
+		const result2 = await buildedProcess(makeFakeRequest({ body: 1 }), undefined, undefined);
+
+		expect(result2).toStrictEqual({
+			valueCheck: true,
+		});
+	});
+
+	it("with preset checker", async() => {
+		const buildedProcess = processWithPresetChecker.build();
+
+		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
+
+		expect(result1).instanceOf(Response);
+
+		const result2 = await buildedProcess(makeFakeRequest({ body: 1 }), undefined, undefined);
+
+		expect(result2).toStrictEqual({
+			valueCheck: {
+				option1: "settedOption",
+				option2: 11,
+			},
+		});
+	});
+
+	it("with skip checker", async() => {
+		const buildedProcess = processWithSkipChecker.build();
+
+		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
+
+		expect(result1).toStrictEqual({
+			valueCheck: true,
+		});
+
+		const result2 = await buildedProcess(makeFakeRequest({ body: 1 }), undefined, undefined);
+
+		expect(result2).toStrictEqual({
+			valueCheck: undefined,
+		});
+	});
+
+	it("with options and input", async() => {
+		const buildedProcess = processWithOptionsAndInput.build();
+
+		const result = await buildedProcess(
+			makeFakeRequest(),
+			{
+				option1: 1,
+				option2: "",
+			},
+			"test",
+		);
+
+		expect(result).toStrictEqual({
+			input: "test",
+			options: {
+				option1: 1,
+				option2: "",
+			},
+		});
+	});
+
+	it("with Process", async() => {
+		const buildedProcess = processWithProcess.build();
+
+		const result = await buildedProcess(
+			makeFakeRequest(),
+			undefined,
+			undefined,
+		);
+
+		expect(result).toStrictEqual({
+			dropInput1: 66,
+			dropInput2: 22,
+			dropOptions1: {
+				option1: "myOption",
+				option2: 12,
+			},
+			dropOptions2: {
+				option1: "myOption",
+				option2: 33,
+			},
+		});
+	});
+
+	it("with skip process", async() => {
+		const buildedProcess = processWithSkipProcess.build();
+
+		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
+
+		expect(result1).toStrictEqual({
+			dropInput: 22,
+			dropOptions: {
+				option1: "test",
+				option2: 12,
+			},
+		});
+
+		const result2 = await buildedProcess(makeFakeRequest({ body: 1 }), undefined, undefined);
+
+		expect(result2).toStrictEqual({
+			dropInput: undefined,
+			dropOptions: undefined,
+		});
 	});
 });

@@ -1,10 +1,10 @@
-import { OkHttpResponse, useBuilder } from "@scripts/index";
+import { createChecker, createPresetChecker, OkHttpResponse, useBuilder, Response } from "@scripts/index";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { duploTest } from "@test/utils/duploTest";
 import type { ExpectType } from "@test/utils/expectType";
 import { makeFakeRequest } from "@test/utils/request";
 
-it("passe value", async() => {
+it("all execute", async() => {
 	const checkPoint = new CheckpointList();
 
 	const insertValuepreflight = useBuilder()
@@ -33,6 +33,40 @@ it("passe value", async() => {
 		)
 		.exportation(["value"]);
 
+	const checker1 = createChecker("checker1")
+		.handler(
+			(input: string, output) => {
+				checkPoint.addPoint(`checker1 ${input}`);
+
+				return output("test", null);
+			},
+		);
+
+	const presetChecker1 = createPresetChecker(
+		checker1,
+		{
+			result: "test",
+			catch: () => new Response(400, undefined, undefined),
+		},
+	);
+
+	const checker2 = createChecker("checker2")
+		.handler(
+			(input: string, output) => {
+				checkPoint.addPoint(`checker2 ${input}`);
+
+				return output("test", null);
+			},
+		);
+
+	const presetChecker2 = createPresetChecker(
+		checker2,
+		{
+			result: "test",
+			catch: () => new Response(400, undefined, undefined),
+		},
+	);
+
 	const process1 = useBuilder()
 		.createProcess("process1", { input: null as null | string })
 		.cut(
@@ -44,6 +78,38 @@ it("passe value", async() => {
 				return dropper({ value: <const>"mySuperValue2" });
 			},
 			["value"],
+		)
+		.check(
+			checker1,
+			{
+				input: (pickup) => {
+					const { value } = pickup(["value"]);
+
+					type check = ExpectType<
+						typeof value,
+						"mySuperValue2",
+						"strict"
+					>;
+
+					return "mySuperValuePassToChecker1";
+				},
+				result: "test",
+				catch: () => new Response(400, undefined, undefined),
+			},
+		)
+		.presetCheck(
+			presetChecker1,
+			(pickup) => {
+				const { value } = pickup(["value"]);
+
+				type check = ExpectType<
+					typeof value,
+					"mySuperValue2",
+					"strict"
+				>;
+
+				return "mySuperValuePassToPresetChecker1";
+			},
 		)
 		.exportation(["value"]);
 
@@ -100,6 +166,38 @@ it("passe value", async() => {
 			},
 			["value"],
 		)
+		.check(
+			checker2,
+			{
+				input: (pickup) => {
+					const { value } = pickup(["value"]);
+
+					type check = ExpectType<
+						typeof value,
+						"mySuperValue3",
+						"strict"
+					>;
+
+					return "mySuperValuePassToChecker2";
+				},
+				result: "test",
+				catch: () => new Response(400, undefined, undefined),
+			},
+		)
+		.presetCheck(
+			presetChecker2,
+			(pickup) => {
+				const { value } = pickup(["value"]);
+
+				type check = ExpectType<
+					typeof value,
+					"mySuperValue3",
+					"strict"
+				>;
+
+				return "mySuperValuePassToPresetChecker2";
+			},
+		)
 		.handler(
 			(pickup) => {
 				const { value } = pickup(["value"]);
@@ -120,12 +218,19 @@ it("passe value", async() => {
 	const buildedRoute = route.build();
 	const response = await buildedRoute(makeFakeRequest());
 
+	expect(response).instanceOf(OkHttpResponse);
+	expect(response.information).toBe("OK");
+
 	expect(checkPoint.getPointList()).toStrictEqual([
 		"start",
 		"insertValuepreflight",
 		"preflight1 mySuperValue",
 		"process1 mySuperValue1",
+		"checker1 mySuperValuePassToChecker1",
+		"checker1 mySuperValuePassToPresetChecker1",
 		"route mySuperValue2",
+		"checker2 mySuperValuePassToChecker2",
+		"checker2 mySuperValuePassToPresetChecker2",
 		"route mySuperValue3",
 		"end",
 	]);

@@ -123,7 +123,7 @@ export function createPresetChecker<
 		ContractToResponse<GenericContractResponse>,
 		GenericNewInput
 	>,
-	responses: GenericContractResponse | GenericContractResponse[],
+	responses: GenericContractResponse | GenericContractResponse[] = [],
 
 ) {
 	return new PresetChecker<

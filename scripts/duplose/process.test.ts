@@ -75,7 +75,7 @@ describe("Process", async() => {
 
 		const processFunction = process.build();
 
-		expect(processFunction(new Request({ params: { userId: "2" } } as any))).toStrictEqual({
+		expect(processFunction(new Request({ params: { userId: "2" } } as any), undefined, undefined)).toStrictEqual({
 			toto: "true",
 			userId: 2,
 		});

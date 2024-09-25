@@ -1,4 +1,4 @@
-import { createChecker, createPresetChecker, useBuilder, Response } from "@scripts/index";
+import { createChecker, createPresetChecker, useBuilder, Response, BadRequestHttpResponse } from "@scripts/index";
 
 export const fixtureProcessWichDropValue = useBuilder()
 	.createProcess(
@@ -58,7 +58,7 @@ export const fixturePresetChecker = createPresetChecker(
 	fixtureCheckerWithOptions,
 	{
 		result: "yes",
-		catch: () => new Response(400, undefined, undefined),
+		catch: () => new BadRequestHttpResponse(undefined, undefined),
 		options: {
 			option1: "settedOption",
 		},

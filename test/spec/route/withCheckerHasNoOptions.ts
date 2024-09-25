@@ -1,9 +1,9 @@
-import { useBuilder, zod, Response } from "@scripts/index";
+import { useBuilder, zod, Response, OkHttpResponse, BadRequestHttpResponse } from "@scripts/index";
 import type { ExpectType } from "@test/utils/expectType";
 import { fixtureCheckerWithoutOptions } from "@test/utils/fixture";
 
-export const processWithCheckerWithNoOptions = useBuilder()
-	.createProcess("processWithCheckerWithNoOptions")
+export const routeWithCheckerWithNoOptions = useBuilder()
+	.createRoute("GET", "/")
 	.extract({
 		body: zod.number(),
 	})
@@ -20,7 +20,7 @@ export const processWithCheckerWithNoOptions = useBuilder()
 				return body;
 			},
 			result: "yes",
-			catch: () => new Response(400, "first", undefined),
+			catch: () => new BadRequestHttpResponse("first", undefined),
 			indexing: "valueCheck",
 		},
 	)
@@ -45,17 +45,16 @@ export const processWithCheckerWithNoOptions = useBuilder()
 			catch: () => new Response(400, "seconds", undefined),
 		},
 	)
-	.cut(
-		({ pickup, dropper }) => {
+	.handler(
+		(pickup) => {
 			const { valueCheck } = pickup(["valueCheck"]);
 
 			type check2 = ExpectType<
-					typeof valueCheck,
+				typeof valueCheck,
 				true,
 				"strict"
 			>;
 
-			return dropper({ });
+			return new OkHttpResponse(undefined, { valueCheck });
 		},
-	)
-	.exportation(["valueCheck"]);
+	);

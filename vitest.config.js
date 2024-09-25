@@ -20,7 +20,7 @@ export default defineConfig({
 				"test/utils", 
 				"test/integration/src/providers",
 				"test/overridesTypes",
-				"test/spec/process",
+				"test/spec",
 			],
 		},
 	},

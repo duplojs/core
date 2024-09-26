@@ -25,6 +25,7 @@ export default [
 			"func-style": "off",
 			"@typescript-eslint/no-unsafe-member-access": "off",
 			"@typescript-eslint/no-unsafe-argument": "off",
+			"no-useless-assignment": "off",
 		},
 		files: ["**/*.test.ts", "test/**/*.ts"],
 		ignores: ["**/*.d.ts"]
@@ -34,6 +35,8 @@ export default [
 		rules: {
 			...duploLint.rules,
 			"max-classes-per-file": "off",
+			"no-useless-assignment": "off",
+			"@typescript-eslint/no-namespace": "off",
 		},
 		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],

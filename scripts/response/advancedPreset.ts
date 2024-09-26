@@ -1,4 +1,6 @@
+import type { File } from "@utils/file";
 import { Response } from ".";
+import { OkHttpResponse } from "./simplePreset";
 
 export class NoContentHttpResponse<
 	Information extends string | undefined = undefined,
@@ -88,4 +90,25 @@ export class PermanentRedirectHttpResponse<
 	}
 
 	public static readonly code = 308;
+}
+
+export class SendFileHttpResponse<
+	Information extends string | undefined = undefined,
+> extends OkHttpResponse<Information, File> {
+	public constructor(info: Information, public file: File, mineType?: string) {
+		super(info, file);
+
+		this.headers["content-type"] = mineType ?? file.informations.mimeType ?? "text/plain; charset=utf-8";
+	}
+}
+
+export class DownloadFileHttpResponse<
+	Information extends string | undefined = undefined,
+> extends OkHttpResponse<Information, File> {
+	public constructor(info: Information, public file: File, name?: string) {
+		super(info, file);
+
+		this.headers["content-type"] = "application/octet-stream";
+		this.headers["Content-Disposition"] = `attachment; filename=${name || file.informations.name}`;
+	}
 }

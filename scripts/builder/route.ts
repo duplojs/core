@@ -12,10 +12,10 @@ import type { PresetChecker, GetPresetCheckerGeneric } from "./checker";
 import type { ContractResponse, ContractToResponse } from "@scripts/response";
 import type { AddOne } from "@utils/incremente";
 import { CheckerStep, type CheckerStepParams } from "@scripts/step/checker";
-import type { Floor } from "@scripts/floor";
+import type { DroppedValue, Floor } from "@scripts/floor";
 import { ProcessStep, type ProcessStepParams } from "@scripts/step/process";
 import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
-import { CutStep, type Cut } from "@scripts/step/cut";
+import { type Cut, CutStep } from "@scripts/step/cut";
 import { HandlerStep, type Handler } from "@scripts/step/handler";
 import type { AnyFunction } from "@utils/types";
 
@@ -141,11 +141,9 @@ export interface RouteBuilder<
 			Steps | ProcessStep<P, StepsCount>,
 			AddOne<StepsCount>,
 			(
-				T extends keyof GPG["floor"]
-					? undefined extends F
-						? Pick<GPG["floor"], T>
-						: Partial<Pick<GPG["floor"], T>>
-					: object
+				undefined extends F
+					? Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>
+					: Partial<Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>>
 			) & (
 				string extends T
 					? FloorData
@@ -158,14 +156,14 @@ export interface RouteBuilder<
 	cut<
 		R extends ContractResponse,
 		CR extends ContractToResponse<R>,
-		T extends Record<string, unknown> | CR,
+		T extends DroppedValue | CR,
 		O extends Exclude<T, CR>,
 		D extends string,
 	>(
 		cutFunction: Cut<
 			FloorData,
 			Request,
-			CR | T
+			T
 		>,
 		drop?: D[] & NoInfer<keyof O>[],
 		responses?: R | R[],

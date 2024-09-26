@@ -85,4 +85,12 @@ describe("duplo", () => {
 			"end",
 		]);
 	});
+
+	it("hook beforeSend", () => {
+		const response = new Response(200, "test", undefined);
+
+		duplo.hooksRouteLifeCycle.beforeSend.launchSubscriber({} as any, response);
+
+		expect(response.headers.information).toBe("test");
+	});
 });

@@ -10,39 +10,39 @@
 
 
 			
-			
+				
 /* preflight-process-(0)-before */
 /* end_block */
 
 
-			result = this.preflightSteps[0].processFunction(
-				request,
-				this.preflightSteps[0].params.options,
-				
-			);
+				result = this.preflightSteps[0].processFunction(
+					request,
+					this.preflightSteps[0].params.options,
+					
+				);
 
-			
+				
 /* preflight-process-(0)-before-check-result */
 /* end_block */
 
 
-			if(result instanceof this.Response){
+				if(result instanceof this.Response){
 
 break Execution;
 }
 
-			
+				
 /* preflight-process-(0)-before-drop */
 /* end_block */
 
 
-			floor.drop("flute", result["flute"]);
+				floor.drop("flute", result["flute"]);
 
-			
+				
 /* preflight-process-(0)-after */
 /* end_block */
 
-		
+			
 
 			
 /* preflight-after */
@@ -63,7 +63,6 @@ break Execution;
 		let temp = this.extract["params"]["userId"].safeParse(request["params"]?.["userId"])
 
 		if(!temp.success){
-			
 			result = this.extractError(
 				"params",
 				"userId",
@@ -113,6 +112,10 @@ break Execution;
 				if(!temp.success){
 					throw new this.ContractResponseError(temp.error, result);
 				}
+
+				result.code = temp.data.code;
+				result.information = temp.data.information;
+				result.body = temp.data.body;
 			
 break Execution;
 }
@@ -135,10 +138,23 @@ break Execution;
 /* end_block */
 
 		}
+
+		
+/* process-if-return-before */
+/* end_block */
+
 		if(result instanceof this.Response){
+			
+/* process-result-return-before */
+/* end_block */
+
 			return result;
 		}
 		else {
+			
+/* process-drop-return-before */
+/* end_block */
+
 			return {
 				"toto": floor.pickup("toto"),
 "userId": floor.pickup("userId"),

@@ -14,7 +14,7 @@
 			result = this.steps[1].processFunction(
 				request,
 				this.steps[1].params.options,
-				this.steps[1].input(floor.pickup)
+				this.steps[1].params.input(floor.pickup)
 			);
 
 			

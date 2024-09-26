@@ -92,7 +92,7 @@ export class Hook<
 	}
 }
 
-export type Hooks = HooksRouteLifeCycle | HooksInstanceifeCycle;
+export type Hooks = HooksRouteLifeCycle<any> | HooksInstanceifeCycle;
 
 export type BuildHooks<T extends Hooks> = {
 	[P in keyof T]: T[P] extends Hook

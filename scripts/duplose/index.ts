@@ -1,9 +1,9 @@
-import type { Response } from "@scripts/response";
+import type { PresetGenericResponse, Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
 import type { AnyFunction, ObjectKey } from "@utils/types";
-import { zod, type zodSpace } from "@scripts/zod";
+import { zod, type ZodSpace } from "@scripts/parser";
 import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
 import type { makeFloor } from "@scripts/floor";
@@ -43,8 +43,8 @@ export interface DuploseContextExtensions {
 export type ExtractErrorFunction = (
 	type: keyof ExtractObject,
 	key: string,
-	error: zodSpace.ZodError
-) => Response;
+	error: ZodSpace.ZodError
+) => PresetGenericResponse;
 
 export interface DisabledExtractKey {
 	method: true;
@@ -60,13 +60,13 @@ export type ExtractKey<
 export type ExtractObject<
 	T extends object = CurrentRequestObject,
 > = {
-	[P in ExtractKey<T>]?: { [x: string]: zodSpace.ZodType } | zodSpace.ZodType;
+	[P in ExtractKey<T>]?: { [x: string]: ZodSpace.ZodType } | ZodSpace.ZodType;
 };
 
 export interface AcceleratedExtractObject {
 	[x: ObjectKey]:
-		| Record<string, ZodAcceleratorParser<zodSpace.ZodType, unknown>>
-		| ZodAcceleratorParser<zodSpace.ZodType, unknown>;
+		| Record<string, ZodAcceleratorParser<ZodSpace.ZodType, unknown>>
+		| ZodAcceleratorParser<ZodSpace.ZodType, unknown>;
 }
 
 export type DefineHooksRouteLifeCycle<
@@ -108,13 +108,15 @@ export abstract class Duplose<
 
 	public steps: Step[] = [];
 
-	public modifiers: AnyFunction[] = [];
+	public editingFunctions: EditingDuploseFunction[] = [];
 
 	public extensions: DuploseContextExtensions = {
 		injectedFunction: [],
 	};
 
 	public descriptions: Description[] = [];
+
+	public origin?: unknown;
 
 	public constructor(descriptions: Description[] = []) {
 		this.descriptions.push(...descriptions);
@@ -140,7 +142,7 @@ export abstract class Duplose<
 	}
 
 	public getAllHooks() {
-		const hooks = new HooksRouteLifeCycle();
+		const hooks = new HooksRouteLifeCycle<Request>();
 
 		hooks.import(this.hooks);
 
@@ -155,7 +157,7 @@ export abstract class Duplose<
 		return hooks;
 	}
 
-	public acceleratedExtract() {
+	protected acceleratedExtract() {
 		if (this.extract) {
 			return getTypedEntries(this.extract)
 				.reduce<AcceleratedExtractObject>(
@@ -163,7 +165,7 @@ export abstract class Duplose<
 						if (value instanceof zod.ZodType) {
 							pv[key] = ZodAccelerator.build(value);
 						} else {
-							const deepExtract: Record<string, ZodAcceleratorParser<zodSpace.ZodType, unknown>> = {};
+							const deepExtract: Record<string, ZodAcceleratorParser<ZodSpace.ZodType, unknown>> = {};
 
 							getTypedEntries(value)
 								.forEach(
@@ -181,8 +183,6 @@ export abstract class Duplose<
 				);
 		}
 	}
-
-	protected editingFunctions: EditingDuploseFunction[] = [];
 
 	protected applyEditingFunctions(content: string) {
 		let editedContent = content;
@@ -266,6 +266,31 @@ export abstract class Duplose<
 				);
 			},
 		};
+	}
+
+	public hasDuplose(duplose: Duplose, deep = Infinity) {
+		if (deep === 0) {
+			return false;
+		} else if (duplose === this) {
+			return true;
+		}
+
+		for (const preflight of this.preflightSteps) {
+			if (preflight.parent.hasDuplose(duplose, deep - 1)) {
+				return true;
+			}
+		}
+
+		for (const step of this.steps) {
+			if (
+				step.parent instanceof Duplose
+				&& step.parent.hasDuplose(duplose, deep - 1)
+			) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public abstract build(): BuildedFunction;

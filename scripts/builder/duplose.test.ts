@@ -92,7 +92,7 @@ describe("useBuilder", () => {
 				{ pickup: ["test1"] },
 			)
 			.createRoute("GET", "/", description1)
-			.handler(({ pickup }) => {
+			.handler((pickup) => {
 				type check = ExpectType<ReturnType<typeof pickup<"test1">>, string, "strict">;
 
 				return new OkHttpResponse("test", undefined);
@@ -108,7 +108,7 @@ describe("useBuilder", () => {
 					userId: zod.string(),
 				},
 			})
-			.handler(({ pickup }) => {
+			.handler((pickup) => {
 				type check = ExpectType<ReturnType<typeof pickup<"userId">>, string, "strict">;
 
 				return new OkHttpResponse("test", undefined);
@@ -124,11 +124,11 @@ describe("useBuilder", () => {
 				{ pickup: ["test1"] },
 			)
 			.createProcess("test", { options: { test: 1 } }, description1)
-			.cut(({ pickup }) => {
+			.cut(({ pickup, dropper }) => {
 				type check1 = ExpectType<ReturnType<typeof pickup<"test1">>, string, "strict">;
 				type check2 = ExpectType<ReturnType<typeof pickup<"options">>, { test: number }, "strict">;
 
-				return {};
+				return dropper({});
 			})
 			.exportation();
 
@@ -137,10 +137,10 @@ describe("useBuilder", () => {
 
 		useBuilder()
 			.createProcess("test")
-			.cut(({ pickup }) => {
+			.cut(({ pickup, dropper }) => {
 				type check2 = ExpectType<ReturnType<typeof pickup<"options">>, undefined, "strict">;
 
-				return {};
+				return dropper({});
 			})
 			.exportation();
 	});

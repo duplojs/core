@@ -1,4 +1,4 @@
-import { checkResult, condition, insertBlock, mapped, maybeAwait, StringBuilder } from "@utils/stringBuilder";
+import { checkResult, condition, insertBlock, mapped, maybeAwait, skipPreflight, StringBuilder } from "@utils/stringBuilder";
 import { BuildedProcessStep } from "./process";
 
 export class BuildedPreflightStep extends BuildedProcessStep {
@@ -11,7 +11,7 @@ export class BuildedPreflightStep extends BuildedProcessStep {
 
 		const input = condition(
 			!!this.params.input,
-			() => /* js */`this.preflightSteps[${index}].input(floor.pickup)`,
+			() => /* js */`this.preflightSteps[${index}].params.input(${StringBuilder.floor}.pickup)`,
 		);
 
 		const drop = mapped(
@@ -19,24 +19,28 @@ export class BuildedPreflightStep extends BuildedProcessStep {
 			(key) => /* js */`${StringBuilder.floor}.drop("${key}", ${StringBuilder.result}["${key}"]);`,
 		);
 
-		return /* js */`
-			${insertBlock(`preflight-process-(${index})-before`)}
+		return skipPreflight(
+			!!this.params.skip,
+			index,
+			/* js */`
+				${insertBlock(`preflight-process-(${index})-before`)}
 
-			${StringBuilder.result} = ${maybeAwait(async)}this.preflightSteps[${index}].processFunction(
-				${StringBuilder.request},
-				${options},
-				${input}
-			);
+				${StringBuilder.result} = ${maybeAwait(async)}this.preflightSteps[${index}].processFunction(
+					${StringBuilder.request},
+					${options},
+					${input}
+				);
 
-			${insertBlock(`preflight-process-(${index})-before-check-result`)}
+				${insertBlock(`preflight-process-(${index})-before-check-result`)}
 
-			${checkResult()}
+				${checkResult()}
 
-			${insertBlock(`preflight-process-(${index})-before-drop`)}
+				${insertBlock(`preflight-process-(${index})-before-drop`)}
 
-			${drop}
+				${drop}
 
-			${insertBlock(`preflight-process-(${index})-after`)}
-		`;
+				${insertBlock(`preflight-process-(${index})-after`)}
+			`,
+		);
 	}
 }

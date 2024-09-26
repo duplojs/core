@@ -12,7 +12,6 @@
 		let temp = this.extract["body"].safeParse(request["body"])
 
 		if(!temp.success){
-			
 			result = this.extractError(
 				"body",
 				undefined,
@@ -42,7 +41,6 @@
 		let temp = this.extract["params"]["userId"].safeParse(request["params"]?.["userId"])
 
 		if(!temp.success){
-			
 			result = this.extractError(
 				"params",
 				"userId",

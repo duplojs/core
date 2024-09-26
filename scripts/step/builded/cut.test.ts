@@ -1,11 +1,11 @@
-import { CutStep } from "../cut";
+import { type Cut, CutStep } from "../cut";
 import { BuildedCutStep } from "./cut";
 import { Response } from "@scripts/response";
-import { zod } from "@scripts/zod";
+import { zod } from "@scripts/parser";
 import { duploTest } from "@test/utils/duploTest";
 
 it("BuildedCutStep", async() => {
-	const cutFunction = () => ({});
+	const cutFunction: Cut = ({ dropper }) => dropper({});
 
 	const step = new CutStep(cutFunction, ["test"], [new Response(100, "toto", zod.undefined())]);
 	const buildedCutStep = new BuildedCutStep(duploTest, step);

@@ -1,5 +1,6 @@
 import { Response } from ".";
-import { MultipleChoicesHttpResponse, RedirectHttpResponse, NoContentHttpResponse, MovedPermanentlyHttpResponse, FoundHttpResponse, SeeOtherHttpResponse, NotModifiedHttpResponse, TemporaryRedirectHttpResponse, PermanentRedirectHttpResponse } from "./advancedPreset";
+import { MultipleChoicesHttpResponse, RedirectHttpResponse, NoContentHttpResponse, MovedPermanentlyHttpResponse, FoundHttpResponse, SeeOtherHttpResponse, NotModifiedHttpResponse, TemporaryRedirectHttpResponse, PermanentRedirectHttpResponse, SendFileHttpResponse, DownloadFileHttpResponse } from "./advancedPreset";
+import { File } from "@utils/file";
 
 describe("advancedPreset", () => {
 	it("NoContentHttpResponse", () => {
@@ -28,5 +29,22 @@ describe("advancedPreset", () => {
 			expect(response.information).toBe("test");
 			expect(response.headers.Location).toBe("/monSuperUrl");
 		});
+	});
+
+	it("SendFileHttpResponse", () => {
+		const response = new SendFileHttpResponse("test", new File("/test.png"));
+
+		expect(response.headers).toStrictEqual({ "content-type": "image/png" });
+		expect(response.body).instanceof(File);
+	});
+
+	it("DownloadFileHttpResponse", () => {
+		const response = new DownloadFileHttpResponse("test", new File("/test.png"));
+
+		expect(response.headers).toStrictEqual({
+			"content-type": "application/octet-stream",
+			"Content-Disposition": "attachment; filename=test.png",
+		});
+		expect(response.body).instanceof(File);
 	});
 });

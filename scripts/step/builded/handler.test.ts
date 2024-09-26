@@ -1,7 +1,7 @@
 import { BuildedHandlerStep } from "./handler";
 import { HandlerStep } from "../handler";
 import { Response } from "@scripts/response";
-import { zod } from "@scripts/zod";
+import { zod } from "@scripts/parser";
 import { duploTest } from "@test/utils/duploTest";
 
 it("BuildedHandlerStep", async() => {

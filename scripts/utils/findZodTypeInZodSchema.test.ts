@@ -1,4 +1,4 @@
-import { zod } from "@scripts/zod";
+import { zod } from "@scripts/parser";
 import { findZodTypeInZodSchema } from "./findZodTypeInZodSchema";
 import { ZodString } from "zod";
 

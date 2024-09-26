@@ -4,7 +4,7 @@ import { Route } from "./duplose/route";
 import { NotFoundHttpResponse, UnprocessableEntityHttpResponse } from "./response/simplePreset";
 import type { AnyFunction } from "@utils/types";
 import type { CurrentRequestObject } from "./request";
-import type { Response } from "./response";
+import type { PresetGenericResponse } from "./response";
 import { useRouteBuilder } from "./builder/route";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import { type BuildedHooksInstanceLifeCycle, HooksInstanceifeCycle } from "./hook/instanceLifeCycle";
@@ -24,12 +24,13 @@ export interface DuploConfig {
 	environment: Environment;
 	disabledRuntimeEndPointCheck?: boolean;
 	disabledZodAccelerator?: boolean;
+	keyToInformationInHeaders?: string;
 	plugins?: DuploPlugins[];
 }
 
-export type NotfoundHandler = (request: CurrentRequestObject) => Response;
+export type NotfoundHandler = (request: CurrentRequestObject) => PresetGenericResponse;
 
-export type DuploHooks = BuildedHooksInstanceLifeCycle & BuildedHooksRouteLifeCycle;
+export type DuploHooks = BuildedHooksInstanceLifeCycle & BuildedHooksRouteLifeCycle<CurrentRequestObject>;
 
 export class Duplo {
 	public duploses: Duplose[] = [];
@@ -42,6 +43,15 @@ export class Duplo {
 		public config: DuploConfig,
 	) {
 		config.plugins?.forEach((plugin) => void plugin(this));
+
+		const keyToInformationInHeaders = config.keyToInformationInHeaders ?? "information";
+		this.hooksRouteLifeCycle.beforeSend.addSubscriber(
+			(request, response) => {
+				if (response.information) {
+					response.headers[keyToInformationInHeaders] = response.information;
+				}
+			},
+		);
 	}
 
 	public extractError: ExtractErrorFunction = (type, key, error) => new UnprocessableEntityHttpResponse(`TYPE_ERROR.${type}${key ? `.${key}` : ""}`, error);
@@ -71,10 +81,14 @@ export class Duplo {
 		return this;
 	}
 
-	public register(duplose: Duplose) {
-		duplose.instance = this;
-		this.duploses.push(duplose);
-		this.hooksInstanceLifeCycle.onRegistered.launchSubscriber(duplose);
+	public register(...duplose: Duplose[]) {
+		duplose.forEach(
+			(duplose) => {
+				duplose.instance = this;
+				this.duploses.push(duplose);
+				this.hooksInstanceLifeCycle.onRegistered.launchSubscriber(duplose);
+			},
+		);
 
 		return this;
 	}

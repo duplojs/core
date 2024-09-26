@@ -5,12 +5,24 @@ export default defineConfig({
 	test: {
 		watch: false,
 		globals: true,
-		include: ["scripts/**/*.test.ts"],
+		include: [
+			"scripts/**/*.test.ts", 
+			"test/spec/**/*.test.ts", 
+			"test/integration/src/**/*.test.ts"
+		],
 		coverage: {
 			provider: "istanbul",
 			reporter: ["text", "json", "html", "json-summary"],
 			reportsDirectory: "coverage",
-			exclude: ["__data__", "**/*.test.ts", "dist", "test"],
+			exclude: [
+				"**/*.test.ts", 
+				"dist", 
+				"test/utils", 
+				"test/integration/src/providers",
+				"test/integration/src/main.ts",
+				"test/overridesTypes",
+				"test/spec",
+			],
 		},
 	},
 	plugins: [tsconfigPaths()],

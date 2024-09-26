@@ -5,7 +5,7 @@ import { getTypedEntries } from "@utils/getTypedEntries";
 import { Response } from "@scripts/response";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Hook } from "@scripts/hook";
-import { zod } from "@scripts/zod";
+import { zod } from "@scripts/parser";
 import { ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 import { insertBlock } from "@utils/stringBuilder";
 import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKeyError";
@@ -19,6 +19,10 @@ describe("Duplose", () => {
 
 		public get aef() {
 			return this.applyEditingFunctions;
+		}
+
+		public get ae() {
+			return this.acceleratedExtract;
 		}
 
 		public resetEditingFunction() {
@@ -79,7 +83,7 @@ describe("Duplose", () => {
 	});
 
 	it("acceleratedExtract", () => {
-		const acceleratedExtact: any = duplose.acceleratedExtract();
+		const acceleratedExtact: any = duplose.ae();
 
 		expect(acceleratedExtact).not.toBe(undefined);
 		expect(acceleratedExtact.body).instanceOf(ZodAcceleratorParser);
@@ -142,5 +146,12 @@ describe("Duplose", () => {
 
 		expect(duplose.extensions.test)
 			.toBe("toto");
+	});
+
+	it("hasDuplose", () => {
+		expect(duplose.hasDuplose(new Process("process"))).toBe(false);
+		expect(duplose.hasDuplose(new Process("process"), 0)).toBe(false);
+		expect(duplose.hasDuplose(process1)).toBe(true);
+		expect(duplose.hasDuplose(process2)).toBe(true);
 	});
 });

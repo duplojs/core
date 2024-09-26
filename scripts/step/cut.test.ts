@@ -1,8 +1,8 @@
 import { duploTest } from "@test/utils/duploTest";
-import { BuildedCutStep, CutStep } from "..";
+import { BuildedCutStep, type Cut, CutStep } from "..";
 
 it("CutStep", () => {
-	const cutFunction = () => ({});
+	const cutFunction: Cut = ({ dropper }) => dropper({});
 
 	const step = new CutStep(cutFunction, ["test"]);
 

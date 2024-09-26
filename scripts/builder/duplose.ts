@@ -36,11 +36,9 @@ export interface Builder<
 		| PreflightStep<P, PreflightsCount>,
 		AddOne<PreflightsCount>,
 		(
-			T extends keyof GPG["floor"]
-				? undefined extends F
-					? Pick<GPG["floor"], T>
-					: Partial<Pick<GPG["floor"], T>>
-				: object
+			undefined extends F
+				? Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>
+				: Partial<Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>>
 		) & (
 			string extends T
 				? FloorData

@@ -29,9 +29,9 @@ describe("Route", async() => {
 		}).optional(),
 	});
 	const step = new CutStep(
-		() => {
+		({ dropper }) => {
 			checkpointList.addPoint("cut");
-			return { toto: "true" };
+			return dropper({ toto: "true" });
 		},
 		["toto"],
 		[new Response(100, "toto", zod.undefined())],
@@ -64,10 +64,10 @@ describe("Route", async() => {
 		const handlerStep = new HandlerStep(
 			(
 				(
-					{ pickup }: Floor<{
+					pickup: Floor<{
 						toto: string;
 						userId: number;
-					}>,
+					}>["pickup"],
 				) => new OkHttpResponse(pickup("toto"), pickup("userId"))
 			) as AnyFunction,
 		);

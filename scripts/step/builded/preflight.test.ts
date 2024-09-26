@@ -81,6 +81,7 @@ describe("BuildedPreflightStep", () => {
 				toto: 2,
 				test1: "&",
 			},
+			skip: () => true,
 		};
 
 		const step = new PreflightStep(process, params);

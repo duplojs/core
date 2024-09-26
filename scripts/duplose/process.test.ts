@@ -15,9 +15,9 @@ describe("Process", async() => {
 		params: { userId: zod.coerce.number() },
 	});
 	const step = new CutStep(
-		() => {
+		({ dropper }) => {
 			checkpointList.addPoint("cut");
-			return { toto: "true" };
+			return dropper({ toto: "true" });
 		},
 		["toto"],
 		[new Response(100, "toto", zod.undefined())],
@@ -75,7 +75,7 @@ describe("Process", async() => {
 
 		const processFunction = process.build();
 
-		expect(processFunction(new Request({ params: { userId: "2" } } as any))).toStrictEqual({
+		expect(processFunction(new Request({ params: { userId: "2" } } as any), undefined, undefined)).toStrictEqual({
 			toto: "true",
 			userId: 2,
 		});

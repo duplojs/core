@@ -10,13 +10,17 @@ import { simpleClone } from "@utils/simpleClone";
 import { makeFloor } from "@scripts/floor";
 import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
+import type { PromiseOrNot } from "@utils/types";
 
-export interface ProcessBuildedFunction {
+export interface ProcessBuildedFunction<
+	O extends object | undefined = object | undefined,
+	I extends unknown = unknown,
+> {
 	(
 		request: CurrentRequestObject,
-		options?: object,
-		input?: unknown
-	): Promise<unknown>;
+		options: O,
+		input: I
+	): PromiseOrNot<unknown>;
 	context: DuploseBuildedFunctionContext<Process>;
 }
 
@@ -54,7 +58,7 @@ export class Process<
 	_Step extends Step = any,
 	_FloorData extends object = any,
 > extends Duplose<
-		ProcessBuildedFunction,
+		ProcessBuildedFunction<_Options, _Input>,
 		Request,
 		_PreflightStep,
 		_Extract,
@@ -94,7 +98,7 @@ export class Process<
 		this.descriptions.push(...descriptions);
 	}
 
-	public build() {
+	public build(): ProcessBuildedFunction<_Options, _Input> {
 		if (!this.instance) {
 			throw new BuildNoRegisteredDuploseError(this);
 		}
@@ -138,10 +142,14 @@ export class Process<
 
 			${insertBlock("steps-after")}
 		}
+
+		${insertBlock("process-if-return-before")}
 		if(${StringBuilder.result} instanceof this.Response){
+			${insertBlock("process-result-return-before")}
 			return result;
 		}
 		else {
+			${insertBlock("process-drop-return-before")}
 			return {
 				${drop}
 			};

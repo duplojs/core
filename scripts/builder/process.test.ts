@@ -53,7 +53,7 @@ describe("useProcessBuilder", () => {
 				() => new Response(400, "invalide_body", undefined),
 				description,
 			)
-			.cut(({ pickup }) => ({ test1: 1 }), ["test1"])
+			.cut(({ pickup, dropper }) => dropper({ test1: 1 }), ["test1"])
 			.exportation(["body", "userId", "test1"]);
 
 		expect(Object.keys(process.extract ?? {})).toStrictEqual(["params", "body"]);
@@ -187,7 +187,7 @@ describe("useProcessBuilder", () => {
 				},
 			})
 			.cut(
-				({ pickup }, request) => {
+				({ pickup, dropper }, request) => {
 					const userId = pickup("userId");
 					const options = pickup("options");
 					const input = pickup("input");
@@ -202,14 +202,14 @@ describe("useProcessBuilder", () => {
 						return new NotFoundHttpResponse("test.notfound", undefined);
 					}
 
-					return { toto: 56 };
+					return dropper({ toto: 56 });
 				},
 				["toto"],
 				new NotFoundHttpResponse("test.notfound", zod.undefined()),
 				description,
 			)
-			.cut(() => ({ ttt: "eee" }))
-			.cut(() => ({}), [])
+			.cut(({ dropper }) => dropper({ ttt: "eee" }))
+			.cut(({ dropper }) => dropper({}), [])
 			.exportation(["input", "options"]);
 
 		expect(process.steps[0]).instanceOf(CutStep);
@@ -226,7 +226,7 @@ describe("useProcessBuilder", () => {
 				test: zod.string(),
 			})
 			.cut(
-				({ pickup }, request) => {
+				({ pickup, dropper }, request) => {
 					type check1 = ExpectType<typeof request["test"], string, "strict">;
 
 					type check2 = ExpectType<ReturnType<typeof pickup<"test">>, string, "strict">;
@@ -235,7 +235,7 @@ describe("useProcessBuilder", () => {
 
 					type check4 = ExpectType<ReturnType<typeof pickup<"options">>, undefined, "strict">;
 
-					return { toto: 56 };
+					return dropper({ toto: 56 });
 				},
 			)
 			.exportation();

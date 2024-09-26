@@ -1,6 +1,6 @@
 import { mustBeConnectedBuilder } from "@security/mustBeConnected";
 import { makeResponseContract, OkHttpResponse, zod, zoderce } from "@duplojs/core";
-import { iWantUserExistById } from "@checkers/user";
+import { iWantUserExist, iWantUserExistById } from "@checkers/user";
 import { MyOrm } from "@providers/myOrm";
 import { userSchema } from "../schemas";
 import type { ExpectType } from "@test/expectType";
@@ -26,7 +26,6 @@ export const adminEditUser = mustBeConnectedBuilder({ role: "ADMIN" })
 					id: number;
 					username: string;
 					email: string;
-					password: string;
 					role: string;
 					createdAt: string;
 				},

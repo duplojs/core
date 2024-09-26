@@ -1,4 +1,4 @@
-import { Duplo, getTypedEntries, useBuilder, zod } from "@scripts/index";
+import { Duplo, getTypedEntries, OkHttpResponse, useBuilder, zod } from "@scripts/index";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { makeFakeRequest } from "@test/utils/request";
 
@@ -153,5 +153,35 @@ describe("life cycle hooks", () => {
 			"instance onError",
 			"end",
 		]);
+	});
+
+	it("correct return response", async() => {
+		const route = useBuilder()
+			.preflight(preflight)
+			.createRoute("GET", "/")
+			.hook("beforeRouteExecution", (request) => request.params.type === "beforeRouteExecution" ? new OkHttpResponse(undefined, "beforeRouteExecution") : undefined)
+			.hook("parsingBody", (request) => request.params.type === "parsingBody" ? new OkHttpResponse(undefined, "parsingBody") : undefined)
+			.hook("onError", (request) => request.params.type === "onError" ? new OkHttpResponse(undefined, "onError") : undefined)
+			.extract({ body: zod.any() })
+			.execute(process)
+			.handler(() => {
+				throw new Error();
+			});
+
+		duplo.register(route);
+
+		const buildedRoute = route.build();
+
+		const result1 = await buildedRoute(makeFakeRequest({ params: { type: "beforeRouteExecution" } }));
+
+		expect(result1.body).toBe("beforeRouteExecution");
+
+		const result2 = await buildedRoute(makeFakeRequest({ params: { type: "parsingBody" } }));
+
+		expect(result2.body).toBe("parsingBody");
+
+		const result3 = await buildedRoute(makeFakeRequest({ params: { type: "onError" } }));
+
+		expect(result3.body).toBe("onError");
 	});
 });

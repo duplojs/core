@@ -1,14 +1,12 @@
 export interface ExpectType<
-	T extends any,
-	A extends T,
+	T extends unknown,
+	A extends unknown,
 	_R extends (
-		boolean extends (
-			T extends A
-				? true
-				: false
-		)
-			? never
-			: "strict"
+		T extends A
+			? A extends T
+				? "strict"
+				: never
+			: never
 	),
 
 > {

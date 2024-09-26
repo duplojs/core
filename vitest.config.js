@@ -19,6 +19,7 @@ export default defineConfig({
 				"dist", 
 				"test/utils", 
 				"test/integration/src/providers",
+				"test/integration/src/main.ts",
 				"test/overridesTypes",
 				"test/spec",
 			],

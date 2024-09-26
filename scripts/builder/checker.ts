@@ -113,7 +113,7 @@ export function createPresetChecker<
 	GenericInfo extends string,
 	GenericKey extends string,
 	GenericContractResponse extends ContractResponse,
-	GenericNewInput extends unknown,
+	GenericNewInput extends unknown = GetCheckerGeneric<GenericChecker>["input"],
 >(
 	checker: GenericChecker,
 	params: PresetCheckerParams<

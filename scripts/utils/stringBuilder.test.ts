@@ -1,4 +1,4 @@
-import { checkResult, condition, extractLevelOne, extractLevelOnePresetCheck, extractLevelTwo, extractLevelTwoPresetCheck, extractPart, insertBlock, mapped, maybeAwait, skipStep, spread } from "./stringBuilder";
+import { checkResult, condition, extractLevelOne, extractLevelOnePresetCheck, extractLevelTwo, extractLevelTwoPresetCheck, extractPart, insertBlock, mapped, maybeAwait, skipPreflight, skipStep, spread } from "./stringBuilder";
 import { zod } from "..";
 import { manualPresetChecker } from "@test/utils/manualDuplose";
 
@@ -37,6 +37,12 @@ describe("stringBuilder", () => {
 		await expect(skipStep(true, 1, "")).toMatchFileSnapshot("__data__/skipStep.txt");
 
 		expect(skipStep(false, 1, "")).toBe("");
+	});
+
+	it("skipPreflight", async() => {
+		await expect(skipPreflight(true, 1, "")).toMatchFileSnapshot("__data__/skipPreflight.txt");
+
+		expect(skipPreflight(false, 1, "")).toBe("");
 	});
 
 	it("extractLevelOne", async() => {

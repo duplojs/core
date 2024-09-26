@@ -56,6 +56,18 @@ export function skipStep(bool: boolean, index: number, block: string) {
 		: block;
 }
 
+export function skipPreflight(bool: boolean, index: number, block: string) {
+	return bool
+		? /* js */`
+		${insertBlock(`preflight-skip-(${index})-before`)}
+
+		if(!this.preflightSteps[${index}].params.skip(${StringBuilder.floor}.pickup)){
+			${block}
+		}
+		`
+		: block;
+}
+
 export function extractLevelOne(one: string, async: boolean) {
 	return /* js */`
 	${insertBlock(`extract-(${one})-before`)}

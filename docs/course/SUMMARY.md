@@ -10,7 +10,7 @@
 **Typescript :**
 - Présentation
 - Dépendance des types (sources de vérités, contrats)
-- Génériques
+- Introduction au Génériques
 
 **Zod :**
 - Présentation (A quoi ça sert ? Comment ça s'utilise ?)

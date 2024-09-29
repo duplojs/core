@@ -16,6 +16,10 @@
 - Présentation (A quoi ça sert ? Comment ça s'utilise ?)
 - Types principaux
 
+**Design pattern builder :**
+- coutre explication
+- référence a des article qui en parle
+
 ## DuploJS :
 
 - ma premier route

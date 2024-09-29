@@ -1,44 +1,44 @@
-# Duplojs - Sommaire
+# DuploJS - Sommaire
 
 ## Intro
 - Raison d'être
 - Philosophie du framework
-- Le scope (utilité, possibilité)
+- Le scope (utilité, possibilités)
 
 ## Duplo Prérequis :
 
 **Typescript :**
 - Présentation
-- Dépendance des types (sources de vérités, contrats)
-- Introduction au Génériques
+- Dépendance des types (sources de vérité, contrats)
+- Introduction aux Génériques
 
 **Zod :**
-- Présentation (A quoi ça sert ? Comment ça s'utilise ?)
+- Présentation (À quoi ça sert ? Comment ça s'utilise ?)
 - Types principaux
 
 **Design pattern builder :**
-- coutre explication
-- référence a des article qui en parle
+- Courte explication
+- Référence à des articles qui en parlent
 
 ## DuploJS :
 
-- ma premier route
-  - Extraction donnée (extract)
+- Ma première route
+  - Extraction de données (extract)
   - Répondre
 - Extract
-  - Niveau simple et deep
-  - Error handler (local ou global)
+  - Niveau simple et profond
+  - Gestion des erreurs (locale ou globale)
 - Mon premier checker
   - Explication de son rôle d'interface
   - Création d'un checker
   - Implémentation dans une route
   - Preset checker
   - Implémentation d'un preset dans une route et extract
-- Réponse typé
-	- Intérêt de typé ses réponses
-	- Philosophie d'un document api
-	- Implémenter un contrat de réponse
-	- makeResponseContract
+- Réponse typée
+  - Intérêt de typer ses réponses
+  - Philosophie d'un document API
+  - Implémenter un contrat de réponse
+  - makeResponseContract
 - Exercice système d'authentification
 - Initiation à la création d'un plugin (Logger)
 - Fonctionnement des Tests (TU Route)

@@ -1,24 +1,11 @@
-import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import { getTypedEntries } from "@utils/getTypedEntries";
 import type { OverrideInterface } from "@utils/overrideInterface";
-
-export interface HttpMethods {
-	DELETE: true;
-	GET: true;
-	HEAD: true;
-	OPTIONS: true;
-	PATCH: true;
-	POST: true;
-	PUT: true;
-}
-
-export type HttpMethod = GetPropsWithTrueValue<HttpMethods>;
 
 export interface RequestInitializationData {
 	readonly headers: Partial<Record<string, string>>;
 	readonly host: string;
 	readonly matchedPath: string | null;
-	readonly method: HttpMethod;
+	readonly method: string;
 	readonly origin: string;
 	readonly params: Partial<Record<string, string>>;
 	readonly path: string;
@@ -27,7 +14,7 @@ export interface RequestInitializationData {
 }
 
 export class Request implements RequestInitializationData {
-	public method: HttpMethod;
+	public method: string;
 
 	public headers: Partial<Record<string, string>>;
 

@@ -1,4 +1,4 @@
-import type { CurrentRequestObject, HttpMethod } from "@scripts/request";
+import type { CurrentRequestObject } from "@scripts/request";
 import { type PresetGenericResponse, Response } from "@scripts/response";
 import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext, type AcceleratedExtractObject } from ".";
 import type { Step } from "@scripts/step";
@@ -15,6 +15,19 @@ import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { ResultIsNotAResponseError } from "@scripts/error/resultIsNotAResponseError";
 import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 import { hookRouteContractResponseError, hookRouteError, hookRouteRangeError } from "@scripts/hook/default";
+import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
+
+export interface HttpMethods {
+	DELETE: true;
+	GET: true;
+	HEAD: true;
+	OPTIONS: true;
+	PATCH: true;
+	POST: true;
+	PUT: true;
+}
+
+export type HttpMethod = GetPropsWithTrueValue<HttpMethods>;
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
 	hooks: BuildedHooksRouteLifeCycle<any>;

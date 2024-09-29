@@ -92,12 +92,4 @@ export class Duplo {
 
 		return this;
 	}
-
-	protected createNotfoundRoute() {
-		const notfoundHandler = this.notfoundHandler;
-		const route = new Route("GET", ["/*"]);
-		this.register(route);
-		return useRouteBuilder(route)
-			.handler((floor, request) => notfoundHandler(request));
-	}
 }

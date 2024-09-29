@@ -1,13 +1,13 @@
 import type { Description } from "@scripts/description";
 import { Process, type GetProcessGeneric } from "@scripts/duplose/process";
 import type { Floor } from "@scripts/floor";
-import type { CurrentRequestObject, HttpMethod } from "@scripts/request";
+import type { CurrentRequestObject } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import type { ProcessStepParams } from "@scripts/step/process";
 import type { AddOne } from "@utils/incremente";
 import { type AnyRouteBuilder, useRouteBuilder, type RouteBuilder } from "./route";
 import type { Duplose, ExtractObject } from "@scripts/duplose";
-import { Route } from "@scripts/duplose/route";
+import { type HttpMethod, Route } from "@scripts/duplose/route";
 import { useProcessBuilder, type ProcessBuilder, type ProcessBuilderParams, type AnyProcessBuilder, type ProcessBuilderParamsToFloorData } from "./process";
 
 export interface Builder<

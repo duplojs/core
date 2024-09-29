@@ -2,7 +2,7 @@ import { getTypedEntries } from "@utils/getTypedEntries";
 import type { OverrideInterface } from "@utils/overrideInterface";
 
 export interface RequestInitializationData {
-	readonly headers: Partial<Record<string, string>>;
+	readonly headers: Partial<Record<string, string | string[]>>;
 	readonly host: string;
 	readonly matchedPath: string | null;
 	readonly method: string;
@@ -16,7 +16,7 @@ export interface RequestInitializationData {
 export class Request implements RequestInitializationData {
 	public method: string;
 
-	public headers: Partial<Record<string, string>>;
+	public headers: Partial<Record<string, string | string[]>>;
 
 	public url: string;
 

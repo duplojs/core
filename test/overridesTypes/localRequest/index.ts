@@ -34,8 +34,9 @@ useBuilder<Request & { test3: string }>()
 		type check = ExpectType<
 			typeof request,
 			Request & {
-				test1: string;
 				test3: string;
+			} & {
+				test1: string;
 			},
 			"strict"
 		>;
@@ -48,8 +49,10 @@ useBuilder<Request & { test3: string }>()
 			typeof request,
 			Request & {
 				test3: string;
-				test2: string;
+			} & {
 				test1: string;
+			} & {
+				test2: string;
 			},
 			"strict"
 		>;

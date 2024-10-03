@@ -3,11 +3,11 @@
 
 import { hasKey } from "./hasKey";
 
-export class InvalideBytesInStringError extends Error {
+export class InvalidBytesInStringError extends Error {
 	public constructor(
 		public input: string,
 	) {
-		super("Invalide Input");
+		super("Invalid Input");
 	}
 }
 
@@ -36,7 +36,7 @@ export function stringToBytes(bytesInString: BytesInString) {
 		: "b";
 
 	if (!hasKey(unitMapper, unit) || isNaN(floatValue)) {
-		throw new InvalideBytesInStringError(bytesInString);
+		throw new InvalidBytesInStringError(bytesInString);
 	}
 
 	return Math.floor(unitMapper[unit] * floatValue);

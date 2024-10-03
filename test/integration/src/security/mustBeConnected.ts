@@ -33,10 +33,10 @@ export const mustBeConnected = useBuilder()
 				return authorization;
 			},
 			result: "valide.token",
-			catch: () => new UnauthorizedHttpResponse("invalideAuthorization"),
+			catch: () => new UnauthorizedHttpResponse("invalidAuthorization"),
 			indexing: "tokenData",
 		},
-		makeResponseContract(UnauthorizedHttpResponse, "invalideAuthorization"),
+		makeResponseContract(UnauthorizedHttpResponse, "invalidAuthorization"),
 	)
 	.presetCheck(
 		iWantUserExist.rewriteIndexing("currentUser"),

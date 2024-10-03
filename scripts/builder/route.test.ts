@@ -46,7 +46,7 @@ describe("useRouteBuilder", () => {
 						test: zod.string(),
 					}),
 				},
-				() => new Response(400, "invalide_body", undefined),
+				() => new Response(400, "invalid_body", undefined),
 				description,
 			)
 			.cut(({ pickup, dropper }) => dropper({ test1: 1 }), ["test1"])

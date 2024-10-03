@@ -39,16 +39,19 @@ export class Duplo {
 
 	public hooksInstanceLifeCycle = new HooksInstanceifeCycle();
 
+	public keyToInformationInHeaders: string;
+
 	public constructor(
 		public config: DuploConfig,
 	) {
 		config.plugins?.forEach((plugin) => void plugin(this));
 
-		const keyToInformationInHeaders = config.keyToInformationInHeaders ?? "information";
+		this.keyToInformationInHeaders = config.keyToInformationInHeaders ?? "information";
+
 		this.hooksRouteLifeCycle.beforeSend.addSubscriber(
 			(request, response) => {
 				if (response.information) {
-					response.headers[keyToInformationInHeaders] = response.information;
+					response.headers[this.keyToInformationInHeaders] = response.information;
 				}
 			},
 		);

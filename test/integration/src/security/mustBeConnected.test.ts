@@ -19,15 +19,15 @@ describe("mustBeConnected", () => {
 		expect(result.information).toBe("missingAuthorization");
 	});
 
-	it("invalide Authorization", async() => {
+	it("invalid Authorization", async() => {
 		const result = await builedProcess(
-			makeFakeRequest({ headers: { authorization: "invalideAuthorization" } }),
+			makeFakeRequest({ headers: { authorization: "invalidAuthorization" } }),
 			{ role: "USER" },
 			undefined,
 		) as UnauthorizedHttpResponse;
 
 		expect(result).instanceOf(UnauthorizedHttpResponse);
-		expect(result.information).toBe("invalideAuthorization");
+		expect(result.information).toBe("invalidAuthorization");
 	});
 
 	it("notfound user", async() => {

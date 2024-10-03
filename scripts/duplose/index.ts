@@ -16,7 +16,6 @@ import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "@scripts/h
 import { type ZodAcceleratorParser, ZodAccelerator } from "@duplojs/zod-accelerator";
 import { getTypedEntries } from "@utils/getTypedEntries";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
-import type { IsAny } from "@utils/isAny";
 import { StringBuilder } from "@utils/stringBuilder";
 import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKeyError";
 
@@ -36,7 +35,7 @@ export interface DuploseBuildedFunctionContext<
 }
 
 export interface DuploseContextExtensions {
-	injectedFunction: EditInjectFunction<any>[];
+	injectedFunction: EditInjectFunction[];
 	[x: ObjectKey]: unknown;
 }
 
@@ -80,25 +79,23 @@ export type EditingDuploseFunction = (input: string) => string;
 
 export type EditInjectPos = "first" | "last" | "top" | "bottom";
 
-export type EditInjectFunction<
-	Request extends CurrentRequestObject = CurrentRequestObject,
-> = (
-	request: Request,
+export type EditInjectFunction = (
+	request: CurrentRequestObject,
 	context: DuploseBuildedFunctionContext,
 	result: unknown,
 ) => void;
 
 export abstract class Duplose<
-	BuildedFunction extends AnyFunction = any,
-	Request extends CurrentRequestObject = any,
-	_PreflightStep extends PreflightStep = any,
-	_Extract extends ExtractObject = any,
-	_Step extends Step = any,
-	_FloorData extends object = any,
+	GenericBuildedFunction extends AnyFunction = any,
+	_GenericRequest extends CurrentRequestObject = any,
+	_GenericPreflightStep extends PreflightStep = any,
+	_GenericExtract extends ExtractObject = any,
+	_GenericStep extends Step = any,
+	_GenericFloorData extends object = any,
 > {
 	public instance?: Duplo;
 
-	public hooks = new HooksRouteLifeCycle<Request>();
+	public hooks = new HooksRouteLifeCycle<CurrentRequestObject>();
 
 	public preflightSteps: PreflightStep[] = [];
 
@@ -142,7 +139,7 @@ export abstract class Duplose<
 	}
 
 	public getAllHooks() {
-		const hooks = new HooksRouteLifeCycle<Request>();
+		const hooks = new HooksRouteLifeCycle();
 
 		hooks.import(this.hooks);
 
@@ -233,9 +230,7 @@ export abstract class Duplose<
 			},
 			injectFunction: (
 				entryPoint: string,
-				editInjectFunction: IsAny<Request> extends true
-					? EditInjectFunction
-					: EditInjectFunction<Request>,
+				editInjectFunction: EditInjectFunction,
 				pos: EditInjectPos = "last",
 			) => {
 				const index = this.extensions.injectedFunction.length;
@@ -293,5 +288,5 @@ export abstract class Duplose<
 		return false;
 	}
 
-	public abstract build(): BuildedFunction;
+	public abstract build(): GenericBuildedFunction;
 }

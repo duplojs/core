@@ -30,7 +30,7 @@ export interface HttpMethods {
 export type HttpMethod = GetPropsWithTrueValue<HttpMethods>;
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
-	hooks: BuildedHooksRouteLifeCycle<any>;
+	hooks: BuildedHooksRouteLifeCycle<CurrentRequestObject>;
 	ResultIsNotAResponseError: typeof ResultIsNotAResponseError;
 }
 
@@ -58,18 +58,18 @@ export type GetRouteGeneric<
 	: never;
 
 export class Route<
-	Request extends CurrentRequestObject = any,
-	_PreflightStep extends PreflightStep = any,
-	_Extract extends ExtractObject = any,
-	_Step extends Step = any,
-	_FloorData extends object = any,
+	GenericRequest extends CurrentRequestObject = any,
+	_GenericPreflightStep extends PreflightStep = any,
+	_GenericExtract extends ExtractObject = any,
+	_GenericStep extends Step = any,
+	_GenericFloorData extends object = any,
 > extends Duplose<
 		RouteBuildedFunction,
-		Request,
-		_PreflightStep,
-		_Extract,
-		_Step,
-		_FloorData
+		GenericRequest,
+		_GenericPreflightStep,
+		_GenericExtract,
+		_GenericStep,
+		_GenericFloorData
 	> {
 	public method: HttpMethod;
 

@@ -1,7 +1,7 @@
-import type { HttpMethod } from "@scripts/request";
+import type { HttpMethod } from "@scripts/duplose/route";
 import type { ExpectType } from "@test/utils/expectType";
 
-declare module "@scripts/request" {
+declare module "@scripts/duplose/route" {
 	interface HttpMethods {
 		TRACE: true;
 	}

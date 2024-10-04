@@ -24,7 +24,11 @@ const unitMapper = {
 
 export type BytesInString = `${number}${keyof typeof unitMapper}`;
 
-export function stringToBytes(bytesInString: BytesInString) {
+export function stringToBytes(bytesInString: BytesInString | number) {
+	if (typeof bytesInString === "number") {
+		return bytesInString;
+	}
+
 	const regExpResults = parseRegExp.exec(bytesInString);
 
 	const floatValue = regExpResults

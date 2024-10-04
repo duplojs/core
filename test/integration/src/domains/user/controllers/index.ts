@@ -1,5 +1,5 @@
 import { mustBeConnectedBuilder } from "@security/mustBeConnected";
-import { type File, makeResponseContract, OkHttpResponse, zod } from "@duplojs/core";
+import { type File, makeResponseContract, OkHttpResponse, recieveFiles, zod } from "@duplojs/core";
 import { userSchema } from "../schemas";
 import type { ExpectType } from "@test/expectType";
 
@@ -31,16 +31,12 @@ export const uploadPicture = mustBeConnectedBuilder({ role: "USER" })
 	.createRoute("PUT", "/user/picture")
 	.extract({
 		body: zod.receiveFormData({
-			files: {
-				picture: {
-					quantity: 1,
-					maxSize: "5mb",
-					mimeType: "image/png",
-				},
-			},
-			fields: {
-				pictureName: zod.string(),
-			},
+			picture: recieveFiles({
+				quantity: 1,
+				maxSize: "5mb",
+				mimeType: "image/png",
+			}),
+			pictureName: zod.string(),
 		}),
 	})
 	.handler(

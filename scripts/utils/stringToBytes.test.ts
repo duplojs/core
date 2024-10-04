@@ -5,5 +5,7 @@ it("stringToBytes", () => {
 
 	expect(stringToBytes("5.6mb")).toBe(5872025);
 
+	expect(stringToBytes(5872025)).toBe(5872025);
+
 	expect(() => stringToBytes("toto" as any)).toThrowError(InvalidBytesInStringError);
 });

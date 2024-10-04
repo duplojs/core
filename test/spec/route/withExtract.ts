@@ -14,8 +14,8 @@ export const routeWithExtract = useBuilder()
 				prop4: zod.object({
 					prop5: zod.string(),
 				}),
-			}).passthrough(),
-		}).passthrough(),
+			}).strip(),
+		}).strip(),
 	})
 	.handler(
 		(pickup) => {

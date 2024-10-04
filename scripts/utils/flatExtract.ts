@@ -2,6 +2,7 @@ import type { ExtractObject } from "@scripts/duplose";
 import type { ZodSpace, ZodPresetChecker } from "@scripts/parser";
 import type { ObjectKey } from "./types";
 import type { GetPresetCheckerGeneric } from "@scripts/builder/checker";
+import type { SimplifyType } from "./simplifyType";
 
 export interface KeyAndValue<
 	GenericObjectKey extends ObjectKey = ObjectKey,
@@ -37,6 +38,6 @@ export type FlatExtract<
 					: never
 			}[keyof T[P]]
 	}[keyof T],
-> = {
+> = SimplifyType<{
 	[P in O as P["key"]]: P["value"];
-};
+}>;

@@ -39,7 +39,7 @@ describe("uploadPicture", () => {
 								picture: {
 									maxQuantity: 1,
 									maxSize: 5242880,
-									mimeType: ["image/png"],
+									mimeTypes: ["image/png"],
 								},
 							},
 						});
@@ -54,7 +54,7 @@ describe("uploadPicture", () => {
 		expect((result.body as ZodError).issues?.[0].message).toBe("picture : file sizeExceeds");
 	});
 
-	it("invalide content", async() => {
+	it("invalid content", async() => {
 		const result = await builedRoute(
 			makeFakeRequest({
 				headers: { authorization: "valide-USER-1" },

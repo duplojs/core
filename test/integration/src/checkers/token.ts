@@ -17,7 +17,7 @@ export const decodeToken = createChecker("decodeToken")
 			) {
 				return output("valide.token", data);
 			} else {
-				return output("invalide.token", null);
+				return output("invalid.token", null);
 			}
 		},
 	);

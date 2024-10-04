@@ -27,7 +27,7 @@ export class HooksRouteLifeCycle <
 }
 
 export type BuildedHooksRouteLifeCycle<
-	Request extends CurrentRequestObject,
+	Request extends CurrentRequestObject = CurrentRequestObject,
 > = Omit<
 	BuildHooks<HooksRouteLifeCycle<Request>>,
 	keyof HooksLifeCycle

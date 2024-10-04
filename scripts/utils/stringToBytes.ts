@@ -3,11 +3,11 @@
 
 import { hasKey } from "./hasKey";
 
-export class InvalideBytesInStringError extends Error {
+export class InvalidBytesInStringError extends Error {
 	public constructor(
 		public input: string,
 	) {
-		super("Invalide Input");
+		super("Invalid Input");
 	}
 }
 
@@ -24,7 +24,11 @@ const unitMapper = {
 
 export type BytesInString = `${number}${keyof typeof unitMapper}`;
 
-export function stringToBytes(bytesInString: BytesInString) {
+export function stringToBytes(bytesInString: BytesInString | number) {
+	if (typeof bytesInString === "number") {
+		return bytesInString;
+	}
+
 	const regExpResults = parseRegExp.exec(bytesInString);
 
 	const floatValue = regExpResults
@@ -36,7 +40,7 @@ export function stringToBytes(bytesInString: BytesInString) {
 		: "b";
 
 	if (!hasKey(unitMapper, unit) || isNaN(floatValue)) {
-		throw new InvalideBytesInStringError(bytesInString);
+		throw new InvalidBytesInStringError(bytesInString);
 	}
 
 	return Math.floor(unitMapper[unit] * floatValue);

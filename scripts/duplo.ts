@@ -7,6 +7,10 @@ import type { PresetGenericResponse } from "./response";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import { type BuildedHooksInstanceLifeCycle, HooksInstanceifeCycle } from "./hook/instanceLifeCycle";
 import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "./hook/routeLifeCycle";
+import type { PartialKeys } from "@utils/partialKeys";
+import type { SimplifyType } from "@utils/simplifyType";
+import { type BytesInString, stringToBytes } from "@utils/stringToBytes";
+import type { RecieveFormDataOptions } from "./parser";
 
 export interface Environments {
 	DEV: true;
@@ -20,39 +24,68 @@ export type DuploPlugins = (instance: Duplo) => void;
 
 export interface DuploConfig {
 	environment: Environment;
-	disabledRuntimeEndPointCheck?: boolean;
-	disabledZodAccelerator?: boolean;
-	keyToInformationInHeaders?: string;
-	plugins?: DuploPlugins[];
+	disabledRuntimeEndPointCheck: boolean;
+	disabledZodAccelerator: boolean;
+	keyToInformationInHeaders: string;
+	plugins: DuploPlugins[];
+	bodySizeLimit: number;
+	recieveFormDataOptions: Required<RecieveFormDataOptions>;
 }
+
+export type DuploInputConfig = SimplifyType<
+	Omit<
+		PartialKeys<
+			DuploConfig,
+			"disabledRuntimeEndPointCheck" | "disabledZodAccelerator" | "keyToInformationInHeaders" | "plugins"
+		>,
+		"bodySizeLimit" | "recieveFormDataOptions"
+
+	> & {
+		bodySizeLimit?: number | BytesInString;
+		recieveFormDataOptions?: RecieveFormDataOptions;
+	}
+>;
 
 export type NotfoundHandler = (request: CurrentRequestObject) => PresetGenericResponse;
 
 export type DuploHooks = BuildedHooksInstanceLifeCycle & BuildedHooksRouteLifeCycle<CurrentRequestObject>;
 
 export class Duplo {
+	public config: DuploConfig;
+
 	public duploses: Duplose[] = [];
 
 	public hooksRouteLifeCycle = new HooksRouteLifeCycle<CurrentRequestObject>();
 
 	public hooksInstanceLifeCycle = new HooksInstanceifeCycle();
 
-	public keyToInformationInHeaders: string;
-
 	public constructor(
-		public config: DuploConfig,
+		inputConfig: DuploInputConfig,
 	) {
-		config.plugins?.forEach((plugin) => void plugin(this));
-
-		this.keyToInformationInHeaders = config.keyToInformationInHeaders ?? "information";
+		this.config = {
+			...inputConfig,
+			environment: inputConfig.environment,
+			disabledRuntimeEndPointCheck: !!inputConfig.disabledRuntimeEndPointCheck,
+			disabledZodAccelerator: !!inputConfig.disabledZodAccelerator,
+			keyToInformationInHeaders: inputConfig.keyToInformationInHeaders ?? "information",
+			plugins: inputConfig.plugins ?? [],
+			bodySizeLimit: stringToBytes(inputConfig.bodySizeLimit ?? "50mb"),
+			recieveFormDataOptions: {
+				uploadDirectory: inputConfig.recieveFormDataOptions?.uploadDirectory ?? "upload",
+				prefixTempName: inputConfig.recieveFormDataOptions?.prefixTempName ?? "tmp-",
+				strict: !!inputConfig.recieveFormDataOptions?.strict,
+			},
+		};
 
 		this.hooksRouteLifeCycle.beforeSend.addSubscriber(
 			(request, response) => {
 				if (response.information) {
-					response.headers[this.keyToInformationInHeaders] = response.information;
+					response.headers[this.config.keyToInformationInHeaders] = response.information;
 				}
 			},
 		);
+
+		this.config.plugins.forEach((plugin) => void plugin(this));
 	}
 
 	public extractError: ExtractErrorFunction = (type, key, error) => new UnprocessableEntityHttpResponse(`TYPE_ERROR.${type}${key ? `.${key}` : ""}`, error);

@@ -58,6 +58,8 @@ export * from "@utils/hasKey";
 export * from "@utils/incremente";
 export * from "@utils/isAny";
 export * from "@utils/overrideInterface";
+export * from "@utils/partialKeys";
+export * from "@utils/requiredKeys";
 export * from "@utils/simpleClone";
 export * from "@utils/simplifyType";
 export * from "@utils/stringBuilder";

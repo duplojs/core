@@ -1,20 +1,17 @@
+import { strict } from "assert";
 import { zod } from ".";
-import { receiveFormData, ReceiveFormData, ReceiveFormDataIssue } from "./receiveFormData";
+import { receiveFormData, ReceiveFormData, ReceiveFormDataIssue, recieveFiles } from "./receiveFormData";
 import { File } from "@utils/file";
 
 describe("receiveFormData", () => {
 	const zodSchema = receiveFormData({
-		files: {
-			logo: {
-				quantity: 1,
-				maxSize: "4mb",
-				mimeType: "image/png",
-			},
-		},
-		fields: {
-			prop1: zod.string(),
-			prop2: zod.number(),
-		},
+		logo: recieveFiles({
+			quantity: 1,
+			maxSize: "4mb",
+			mimeType: "image/png",
+		}),
+		prop1: zod.string(),
+		prop2: zod.number(),
 	});
 
 	it("pass schema", async() => {
@@ -26,7 +23,7 @@ describe("receiveFormData", () => {
 						logo: {
 							maxQuantity: 1,
 							maxSize: 4194304,
-							mimeType: ["image/png"],
+							mimeTypes: ["image/png"],
 						},
 					},
 				});

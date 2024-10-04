@@ -12,11 +12,11 @@
 - Dépendance des types (sources de vérité, contrats)
 - Introduction aux Génériques
 
-**Zod :**
+[**Zod :**](./zod.md)
 - Présentation (À quoi ça sert ? Comment ça s'utilise ?)
 - Types principaux
 
-**Design pattern builder :**
+[**Design pattern builder :**](./designPaternBuilder.md)
 - Courte explication
 - Référence à des articles qui en parlent
 

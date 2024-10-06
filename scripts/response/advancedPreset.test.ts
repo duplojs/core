@@ -1,5 +1,5 @@
 import { Response } from ".";
-import { MultipleChoicesHttpResponse, RedirectHttpResponse, NoContentHttpResponse, MovedPermanentlyHttpResponse, FoundHttpResponse, SeeOtherHttpResponse, NotModifiedHttpResponse, TemporaryRedirectHttpResponse, PermanentRedirectHttpResponse, SendFileHttpResponse, DownloadFileHttpResponse } from "./advancedPreset";
+import { MultipleChoicesHttpResponse, RedirectHttpResponse, NoContentHttpResponse, MovedPermanentlyHttpResponse, FoundHttpResponse, SeeOtherHttpResponse, NotModifiedHttpResponse, TemporaryRedirectHttpResponse, PermanentRedirectHttpResponse, DownloadFileHttpResponse } from "./advancedPreset";
 import { File } from "@utils/file";
 
 describe("advancedPreset", () => {
@@ -29,13 +29,6 @@ describe("advancedPreset", () => {
 			expect(response.information).toBe("test");
 			expect(response.headers.Location).toBe("/monSuperUrl");
 		});
-	});
-
-	it("SendFileHttpResponse", () => {
-		const response = new SendFileHttpResponse("test", new File("/test.png"));
-
-		expect(response.headers).toStrictEqual({ "content-type": "image/png" });
-		expect(response.body).instanceof(File);
 	});
 
 	it("DownloadFileHttpResponse", () => {

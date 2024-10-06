@@ -50,7 +50,7 @@ export type NotfoundHandler = (request: CurrentRequestObject) => PresetGenericRe
 
 export type DuploHooks = BuildedHooksInstanceLifeCycle & BuildedHooksRouteLifeCycle<CurrentRequestObject>;
 
-export class Duplo {
+export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInputConfig> {
 	public config: DuploConfig;
 
 	public duploses: Duplose[] = [];
@@ -60,7 +60,7 @@ export class Duplo {
 	public hooksInstanceLifeCycle = new HooksInstanceifeCycle();
 
 	public constructor(
-		inputConfig: DuploInputConfig,
+		inputConfig: GenericDuploInputConfig,
 	) {
 		this.config = {
 			...inputConfig,

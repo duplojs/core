@@ -3,10 +3,9 @@
 ## Intro
 - Raison d'être
 - Philosophie du framework
-- Le scope (utilité, possibilités)
+- Le scope
 
 ## Duplo Prérequis :
-
 **Typescript :**
 - Présentation
 - Dépendance des types (sources de vérité, contrats)

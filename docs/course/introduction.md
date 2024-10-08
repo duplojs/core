@@ -13,3 +13,6 @@ Toutes les ressources que vous créerez avec Duplo seront réutilisables. La con
 Duplo est entièrement type-safe. Tout le code que vous imbriquerez ensemble sera automatiquement compatible. Si vous modifiez quelque chose, `TypeScript` vous indiquera immédiatement l'impact de cette modification sur l’ensemble de votre application. Et cela, avec très peu de code supplémentaire en `TypeScript`, ce qui ne vous demandera pas plus de travail.
 
 Enfin, Duplo se veut agnostique*. Son core ne dépend d’aucune plateforme JavaScript spécifique et n'utilise que des APIs natives du langage. Cela le rend utilisable aussi bien avec `Node.js`, `Deno`, `Bun` qu'en environnement navigateur.
+
+### Le scope
+Duplo est comparable a un express ou un fatsify, il ce branche directement au api native des platforms. Duplo ne prend pas en charge la couche ORM et gestion des services. Cependant il met des solutions pour intégrer ce que vous souhaitez. Le rôle de duplo et de vous inciter a faire le plus de vérification possible pour vous garantir la fiabilité des données

@@ -1,10 +1,10 @@
 # Introduction à TypeScript
 
-**TypeScript** est un langage de programmation qui s'appuie sur JavaScript, tout en ajoutant des fonctionnalités comme les **types statiques**, qui permet notamment à savoir à l'avance dans notre IDE si notre code est correct et s'éxecutera bien. C'est un langage qui rend JavaScript plus **robuste**, **lisible** et permet aux développeurs de coder avec plus de **sécurité** en évitant certaines erreurs courantes. Il est de plus en plus utilisé dans le développement d'applications web modernes pour sa capacité à améliorer la **qualité** et la **maintenabilité** du code.
+`TypeScript` est un langage de programmation qui s'appuie sur `JavaScript`, tout en ajoutant des fonctionnalités comme les **types statiques**, qui permet notamment à savoir à l'avance dans notre IDE si notre code est correct et s'éxecutera bien. C'est un langage qui rend JavaScript plus **robuste**, **lisible** et permet aux développeurs de coder avec plus de **sécurité** en évitant certaines erreurs courantes. Il est de plus en plus utilisé dans le développement d'applications web modernes pour sa capacité à améliorer la **qualité** et la **maintenabilité** du code.
 
 ## Qui a créé TypeScript ?
 
-TypeScript a été créé par Microsoft en 2012, sous la direction de Anders Hejlsberg, un ingénieur en chef renommé qui est aussi le principal créateur du C# et d'autres encore. L'idée était **d'améliorer** les outils de développement pour les projets JavaScript à grande échelle.
+TypeScript a été créé par **Microsoft** en 2012, sous la direction de Anders Hejlsberg, un ingénieur en chef renommé qui est aussi le principal créateur du C# et d'autres encore. L'idée était **d'améliorer** les outils de développement pour les projets JavaScript à grande échelle.
 
 ## Pourquoi TypeScript a été créé ?
 
@@ -52,7 +52,7 @@ console.log(action(hamster)) // ✖ Hamster n'a pas de fonction manger() alors T
 
 ## La théorie des ensembles en TypeScript
 
-La théorie des ensembles en TypeScript se reflète dans la manière dont les types sont traités. Les types en TypeScript peuvent être vus comme des ensembles de valeurs possibles. Par exemple, un type string est un ensemble qui contient toutes les valeurs literal. TypeScript permet d'effectuer des opérations sur ces ensembles via des unions ( | ) et des intersections ( & ).
+La théorie des ensembles en TypeScript se reflète dans la manière dont les types sont traités. Les types en TypeScript peuvent être vus comme des ensembles de valeurs possibles. Par exemple, un type string est un ensemble qui contient toutes les valeurs literal. TypeScript permet d'effectuer des opérations sur ces ensembles via des unions `|` et des intersections `&`.
 
 ```ts
 

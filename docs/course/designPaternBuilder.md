@@ -2,7 +2,7 @@
 
 **Qu'est que c'est ?**
 
-C'est modèle de conception utilisé pour simplifier la création d'objets complexes.
+C'est un modèle de conception utilisé pour simplifier la création d'objets complexes.
 
 Au lieu de créer un objet en une seule étape (comme on le fait avec un constructeur classique), le Builder permet de créer un objet en plusieurs étapes, chacune représentant une partie de l'initialisation.
 
@@ -54,7 +54,3 @@ const myCar = new CarBuilder()
 
 console.log(myCar); // Car { engine: 'V8', wheels: 4, color: 'Red' }
 ```
-
-**Pour aller plus loin :**
-- 
-- 

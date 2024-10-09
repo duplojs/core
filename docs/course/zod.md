@@ -15,7 +15,7 @@ const userSchema = zod.object({
 });
 ```
 
-Dans cet exmple, `userNameSchema` et `userSchema` son des schema zod, ils représente des types. D'un point de vu runtime, ce sont des object.
+Dans cet exmple, `userNameSchema` et `userSchema` son des schémas Zod, ils représentent des types. D'un point de vu runtime, ce sont des objets.
 
 ```typescript
 const userName = userNameSchema.parse("William"); // ✔
@@ -25,7 +25,7 @@ const user = userSchema.parse({ name: "William", age: 23 }); // ✔
 userSchema.parse({ toto: "tata" }); // ✖
 ```
 
-Lors du parsing, zod va cloner la valeur reçue en fonction du schema. En cas d'echec il emmetera une erreur.
+Lors du parsing, Zod va cloner la valeur reçue en fonction du schéma. En cas d'echec il emmetera une erreur.
 
 ## Schémas couramment utilisés
 
@@ -221,4 +221,4 @@ const number = numberSchema.parse("42"); // (number)
 ## Conclusion
 
 Zod est une librairie de validation de données puissante et flexible qui s'intègre parfaitement avec TypeScript.
-Elle permet de définir des schémas complexes et de valider des données en fonction de ces schémas, offrant ainsi une solution robuste pour la gestion des entré dans les applications TypeScript.
+Elle permet de définir des schémas complexes et de valider des données en fonction de ces schémas, offrant ainsi une solution robuste pour la gestion des entrées dans les applications TypeScript.

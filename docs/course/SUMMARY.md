@@ -1,45 +1,37 @@
 # DuploJS - Sommaire
 
-## Intro
-- Raison d'être
-- Philosophie du framework
-- Le scope
+## [Introduction](./introduction.md)
+1. [Raison d'être](./introduction.md#raison-dêtre)
+2. [Philosophie du framework](./introduction.md#philosophie-du-framework)
+3. [Le scope](./introduction.md#le-scope)
 
 ## Duplo Prérequis :
-[**Typescript :**](./typescript.md)
 
-- Présentation
-- Dépendance des types (sources de vérité, contrats)
+1. [Typescript](./typescript.md)
 
-[**Zod :**](./zod.md)
+2. [Zod](./zod.md)
 
-- Présentation (À quoi ça sert ? Comment ça s'utilise ?)
-- Types principaux
-
-[**Design pattern builder :**](./designPaternBuilder.md)
-
-- Courte explication
-- Référence à des articles qui en parlent
+3. [Design pattern builder](./designPaternBuilder.md)
 
 ## DuploJS :
 
-- Ma première route
-  - Extraction de données (extract)
-  - Répondre
-- Extract
-  - Niveau simple et profond
-  - Gestion des erreurs (locale ou globale)
-- Mon premier checker
-  - Explication de son rôle d'interface
-  - Création d'un checker
-  - Implémentation dans une route
-  - Preset checker
-  - Implémentation d'un preset dans une route et extract
-- Réponse typée
-  - Intérêt de typer ses réponses
-  - Philosophie d'un document API
-  - Implémenter un contrat de réponse
-  - makeResponseContract
-- Exercice système d'authentification
-- Initiation à la création d'un plugin (Logger)
-- Fonctionnement des Tests (TU Route)
+1. Ma première route
+	- Extraction de données `extract()`
+	- Répondre
+2. Extract
+	- Niveau simple et profond
+	- Gestion des erreurs (locale ou globale)
+3. Mon premier checker
+	- Explication de son rôle d'interface
+	- Création d'un checker
+	- Implémentation dans une route
+	- Preset checker
+	- Implémentation d'un preset dans une route et extract
+4. Réponse typée
+	- Intérêt de typer ses réponses
+	- Philosophie d'un document API
+	- Implémenter un contrat de réponse
+	- makeResponseContract
+5. Exercice système d'authentification
+6. Initiation à la création d'un plugin (Logger)
+7. Fonctionnement des Tests (TU Route)

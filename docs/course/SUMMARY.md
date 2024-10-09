@@ -6,7 +6,7 @@
 - Le scope
 
 ## Duplo Prérequis :
-**Typescript :**
+[**Typescript :**](./typescript.md)
 - Présentation
 - Dépendance des types (sources de vérité, contrats)
 - Introduction aux Génériques

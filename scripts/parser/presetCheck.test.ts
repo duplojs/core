@@ -126,4 +126,50 @@ describe("presetCheck", () => {
 			),
 		).toThrowError(MissingHandlerCheckerError);
 	});
+
+	it("error async", async() => {
+		const errorChecker = createChecker("error")
+			.handler(
+				(input: number, output) => Promise.reject(new Error()),
+			);
+
+		const zodSchema = zod.string().presetCheck(
+			new PresetChecker(
+				errorChecker,
+				{
+					result: "test" as never,
+					catch: () => void undefined as never,
+				},
+				[],
+			),
+		);
+
+		await expect(
+			() => zodSchema.parseAsync("toto"),
+		).rejects.toThrowError(Error);
+	});
+
+	it("error sync", async() => {
+		const errorChecker = createChecker("error")
+			.handler(
+				(input: number, output) => {
+					throw new Error();
+				},
+			);
+
+		const zodSchema = zod.string().presetCheck(
+			new PresetChecker(
+				errorChecker,
+				{
+					result: "test" as never,
+					catch: () => void undefined as never,
+				},
+				[],
+			),
+		);
+
+		await expect(
+			() => zodSchema.parseAsync("toto"),
+		).rejects.toThrowError(Error);
+	});
 });

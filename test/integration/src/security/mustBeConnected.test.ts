@@ -6,10 +6,10 @@ import { NotFoundHttpResponse, UnauthorizedHttpResponse } from "@duplojs/core";
 describe("mustBeConnected", async() => {
 	duplo.register(mustBeConnected);
 
-	const builedProcess = await mustBeConnected.build();
+	const buildedProcess = await mustBeConnected.build();
 
 	it("missing Authorization", async() => {
-		const result = await builedProcess(
+		const result = await buildedProcess(
 			makeFakeRequest(),
 			{ role: "USER" },
 			undefined,
@@ -20,7 +20,7 @@ describe("mustBeConnected", async() => {
 	});
 
 	it("invalid Authorization", async() => {
-		const result = await builedProcess(
+		const result = await buildedProcess(
 			makeFakeRequest({ headers: { authorization: "invalidAuthorization" } }),
 			{ role: "USER" },
 			undefined,
@@ -31,7 +31,7 @@ describe("mustBeConnected", async() => {
 	});
 
 	it("notfound user", async() => {
-		const result = await builedProcess(
+		const result = await buildedProcess(
 			makeFakeRequest({ headers: { authorization: "valide-USER-20" } }),
 			{ role: "USER" },
 			undefined,
@@ -42,7 +42,7 @@ describe("mustBeConnected", async() => {
 	});
 
 	it("notfound user", async() => {
-		const result = await builedProcess(
+		const result = await buildedProcess(
 			makeFakeRequest({ headers: { authorization: "valide-USER-20" } }),
 			{ role: "USER" },
 			undefined,
@@ -53,7 +53,7 @@ describe("mustBeConnected", async() => {
 	});
 
 	it("wrong role", async() => {
-		const result = await builedProcess(
+		const result = await buildedProcess(
 			makeFakeRequest({ headers: { authorization: "valide-USER-1" } }),
 			{ role: "ADMIN" },
 			undefined,
@@ -64,7 +64,7 @@ describe("mustBeConnected", async() => {
 	});
 
 	it("passe", async() => {
-		const result = await builedProcess(
+		const result = await buildedProcess(
 			makeFakeRequest({ headers: { authorization: "valide-ADMIN-9" } }),
 			{ role: "ADMIN" },
 			undefined,

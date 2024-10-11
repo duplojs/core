@@ -23,7 +23,7 @@ export class RouterEvaler extends Evaler<RouterEvalerParams> {
 
 }
 
-export class BuiledRouter {
+export class BuildedRouter {
 	public constructor(
 		public router: Router,
 		public readonly methodToFinderMapper: Partial<
@@ -85,7 +85,7 @@ export class Router {
 		const evaler = this.evaler ?? this.instance.evalers.router ?? Router.defaultEvaler;
 
 		const methodToFinderMapper = await getTypedEntries(this.methodToRoutesMapper)
-			.reduce<Promise<BuiledRouter["methodToFinderMapper"]>>(
+			.reduce<Promise<BuildedRouter["methodToFinderMapper"]>>(
 				async(pv, [method, routes]) => {
 					const functionContent = routes.flatMap(
 						(route, index) => route.paths.map(
@@ -127,7 +127,7 @@ export class Router {
 
 		const buildedNotfoundRoutes = await this.notfoundRoutes.build();
 
-		return new BuiledRouter(
+		return new BuildedRouter(
 			this,
 			methodToFinderMapper,
 			buildedNotfoundRoutes,

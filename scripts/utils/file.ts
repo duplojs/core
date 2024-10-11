@@ -68,11 +68,11 @@ export class File {
 		return Promise.reject<void>(new NeedOverrideError());
 	}
 
-	public static move(path: string, newBasePath: string) {
+	public static move(path: string, newPath: string) {
 		return Promise.reject<void>(new NeedOverrideError());
 	}
 
-	public static rename(path: string, newName: string) {
+	public static rename(path: string, newPath: string) {
 		return Promise.reject<void>(new NeedOverrideError());
 	}
 

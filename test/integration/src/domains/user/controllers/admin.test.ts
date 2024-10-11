@@ -6,10 +6,10 @@ import { makeFakeRequest } from "@test/request";
 describe("adminEditUser", async() => {
 	duplo.register(...useBuilder.getAllCreatedDuplose());
 
-	const builedRoute = await adminEditUser.build();
+	const buildedRoute = await adminEditUser.build();
 
 	it("presetCheck in extract", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				headers: { authorization: "valide-ADMIN-9" },
 				params: { userId: "tt" },
@@ -21,7 +21,7 @@ describe("adminEditUser", async() => {
 	});
 
 	it("presetCheck in extract", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				headers: { authorization: "valide-ADMIN-9" },
 				params: { userId: "30" },
@@ -33,7 +33,7 @@ describe("adminEditUser", async() => {
 	});
 
 	it("edit user", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				headers: { authorization: "valide-ADMIN-9" },
 				params: { userId: "10" },

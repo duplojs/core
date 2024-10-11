@@ -26,6 +26,6 @@ export class HandlerStep<
 	}
 
 	public build(instance: Duplo) {
-		return new BuildedHandlerStep(instance, this);
+		return Promise.resolve(new BuildedHandlerStep(instance, this));
 	}
 }

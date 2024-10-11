@@ -1,5 +1,5 @@
 import { hasKey } from "@utils/hasKey";
-import type { Duplose, ExtractErrorFunction } from "./duplose";
+import type { Duplose, ExtractErrorFunction, DuploseEvaler } from "./duplose";
 import { NotFoundHttpResponse, UnprocessableEntityHttpResponse } from "./response/simplePreset";
 import type { AnyFunction } from "@utils/types";
 import type { CurrentRequestObject } from "./request";
@@ -11,6 +11,9 @@ import type { PartialKeys } from "@utils/partialKeys";
 import type { SimplifyType } from "@utils/simplifyType";
 import { type BytesInString, stringToBytes } from "@utils/stringToBytes";
 import type { RecieveFormDataOptions } from "./parser";
+import type { RequiredKeys } from "@utils/requiredKeys";
+import type { HookEvaler } from "./hook";
+import type { RouterEvaler } from "./router";
 
 export interface Environments {
 	DEV: true;
@@ -29,7 +32,10 @@ export interface DuploConfig {
 	keyToInformationInHeaders: string;
 	plugins: DuploPlugins[];
 	bodySizeLimit: number;
-	recieveFormDataOptions: Required<RecieveFormDataOptions>;
+	recieveFormDataOptions: RequiredKeys<
+		RecieveFormDataOptions,
+		"prefixTempName" | "strict" | "uploadDirectory"
+	>;
 }
 
 export type DuploInputConfig = SimplifyType<
@@ -42,13 +48,19 @@ export type DuploInputConfig = SimplifyType<
 
 	> & {
 		bodySizeLimit?: number | BytesInString;
-		recieveFormDataOptions?: RecieveFormDataOptions;
+		recieveFormDataOptions?: Partial<RecieveFormDataOptions>;
 	}
 >;
 
 export type NotfoundHandler = (request: CurrentRequestObject) => PresetGenericResponse;
 
 export type DuploHooks = BuildedHooksInstanceLifeCycle & BuildedHooksRouteLifeCycle<CurrentRequestObject>;
+
+export interface Evalers {
+	duplose?: DuploseEvaler;
+	hook?: HookEvaler;
+	router?: RouterEvaler;
+}
 
 export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInputConfig> {
 	public config: DuploConfig;
@@ -58,6 +70,8 @@ export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInput
 	public hooksRouteLifeCycle = new HooksRouteLifeCycle<CurrentRequestObject>();
 
 	public hooksInstanceLifeCycle = new HooksInstanceifeCycle();
+
+	public evalers: Evalers = {};
 
 	public constructor(
 		inputConfig: GenericDuploInputConfig,
@@ -71,6 +85,7 @@ export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInput
 			plugins: inputConfig.plugins ?? [],
 			bodySizeLimit: stringToBytes(inputConfig.bodySizeLimit ?? "50mb"),
 			recieveFormDataOptions: {
+				...inputConfig.recieveFormDataOptions,
 				uploadDirectory: inputConfig.recieveFormDataOptions?.uploadDirectory ?? "upload",
 				prefixTempName: inputConfig.recieveFormDataOptions?.prefixTempName ?? "tmp-",
 				strict: !!inputConfig.recieveFormDataOptions?.strict,

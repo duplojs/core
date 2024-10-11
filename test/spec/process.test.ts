@@ -15,7 +15,7 @@ describe("process", () => {
 	duploTest.register(...useBuilder.getAllCreatedDuplose());
 
 	it("with cut", async() => {
-		const buildedProcess = processWithCut.build();
+		const buildedProcess = await processWithCut.build();
 
 		const result = await buildedProcess(makeFakeRequest(), undefined, undefined);
 
@@ -25,7 +25,7 @@ describe("process", () => {
 	});
 
 	it("with extract", async() => {
-		const buildedProcess = processWithExtract.build();
+		const buildedProcess = await processWithExtract.build();
 
 		const result1 = await buildedProcess(makeFakeRequest(), undefined, undefined);
 
@@ -63,7 +63,7 @@ describe("process", () => {
 	});
 
 	it("with checker", async() => {
-		const buildedProcess = processWithChecker.build();
+		const buildedProcess = await processWithChecker.build();
 
 		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
 
@@ -84,7 +84,7 @@ describe("process", () => {
 	});
 
 	it("with checker has no options", async() => {
-		const buildedProcess = processWithCheckerWithNoOptions.build();
+		const buildedProcess = await processWithCheckerWithNoOptions.build();
 
 		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
 
@@ -98,7 +98,7 @@ describe("process", () => {
 	});
 
 	it("with preset checker", async() => {
-		const buildedProcess = processWithPresetChecker.build();
+		const buildedProcess = await processWithPresetChecker.build();
 
 		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
 
@@ -115,7 +115,7 @@ describe("process", () => {
 	});
 
 	it("with skip checker", async() => {
-		const buildedProcess = processWithSkipChecker.build();
+		const buildedProcess = await processWithSkipChecker.build();
 
 		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
 
@@ -131,7 +131,7 @@ describe("process", () => {
 	});
 
 	it("with options and input", async() => {
-		const buildedProcess = processWithOptionsAndInput.build();
+		const buildedProcess = await processWithOptionsAndInput.build();
 
 		const result = await buildedProcess(
 			makeFakeRequest(),
@@ -152,7 +152,7 @@ describe("process", () => {
 	});
 
 	it("with Process", async() => {
-		const buildedProcess = processWithProcess.build();
+		const buildedProcess = await processWithProcess.build();
 
 		const result = await buildedProcess(
 			makeFakeRequest(),
@@ -175,7 +175,7 @@ describe("process", () => {
 	});
 
 	it("with skip process", async() => {
-		const buildedProcess = processWithSkipProcess.build();
+		const buildedProcess = await processWithSkipProcess.build();
 
 		const result1 = await buildedProcess(makeFakeRequest({ body: 0 }), undefined, undefined);
 

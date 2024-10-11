@@ -3,10 +3,10 @@ import { mustBeConnected } from "./mustBeConnected";
 import { makeFakeRequest } from "@test/request";
 import { NotFoundHttpResponse, UnauthorizedHttpResponse } from "@duplojs/core";
 
-describe("mustBeConnected", () => {
+describe("mustBeConnected", async() => {
 	duplo.register(mustBeConnected);
 
-	const builedProcess = mustBeConnected.build();
+	const builedProcess = await mustBeConnected.build();
 
 	it("missing Authorization", async() => {
 		const result = await builedProcess(

@@ -3,7 +3,6 @@ import { type PresetGenericResponse, Response } from "@scripts/response";
 import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext, type AcceleratedExtractObject } from ".";
 import type { Step } from "@scripts/step";
 import type { Description } from "@scripts/description";
-import { advancedEval } from "@utils/advancedEval";
 import { checkResult, condition, extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { makeFloor } from "@scripts/floor";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
@@ -85,7 +84,7 @@ export class Route<
 		this.paths = paths;
 	}
 
-	public build() {
+	public async build() {
 		if (!this.instance) {
 			throw new BuildNoRegisteredDuploseError(this);
 		}
@@ -101,8 +100,10 @@ export class Route<
 		hooks.onError.addSubscriber(hookRouteRangeError);
 		hooks.onError.addSubscriber(hookRouteError);
 
-		const buildedPreflight = this.preflightSteps.map(
-			(step) => step.build(this.instance!),
+		const buildedPreflight = await Promise.all(
+			this.preflightSteps.map(
+				(step) => step.build(this.instance!),
+			),
 		);
 
 		let extract: ExtractObject | AcceleratedExtractObject | undefined = simpleClone(this.extract);
@@ -128,8 +129,10 @@ export class Route<
 			`,
 		);
 
-		const buildedStep = this.steps.map(
-			(step) => step.build(this.instance!),
+		const buildedStep = await Promise.all(
+			this.steps.map(
+				(step) => step.build(this.instance!),
+			),
 		);
 
 		let content = /* js */`
@@ -192,12 +195,12 @@ export class Route<
 
 		const context: RouteBuildedFunctionContext = {
 			hooks: {
-				beforeRouteExecution: hooks.beforeRouteExecution.build(),
-				parsingBody: hooks.parsingBody.build(),
-				beforeSend: hooks.beforeSend.build(),
-				serializeBody: hooks.serializeBody.build(),
-				afterSend: hooks.afterSend.build(),
-				onError: hooks.onError.build(),
+				beforeRouteExecution: await hooks.beforeRouteExecution.build(),
+				parsingBody: await hooks.parsingBody.build(),
+				beforeSend: await hooks.beforeSend.build(),
+				serializeBody: await hooks.serializeBody.build(),
+				afterSend: await hooks.afterSend.build(),
+				onError: await hooks.onError.build(),
 			},
 			makeFloor,
 			Response,
@@ -212,7 +215,10 @@ export class Route<
 			duplo: this.instance,
 		};
 
-		const buildedFunction = advancedEval<RouteBuildedFunction>({
+		const evaler = this.evaler ?? this.instance.evalers.duplose ?? Duplose.defaultEvaler;
+
+		const buildedFunction = await evaler.makeFunction<RouteBuildedFunction>({
+			duplose: this,
 			forceAsync: true,
 			args: [StringBuilder.request],
 			content,

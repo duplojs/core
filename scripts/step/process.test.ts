@@ -1,7 +1,7 @@
 import { duploTest } from "@test/utils/duploTest";
 import { BuildedProcessStep, Process, ProcessStep, type ProcessStepParams } from "..";
 
-it("ProcessStep", () => {
+it("ProcessStep", async() => {
 	const process = new Process("test");
 	process.instance = duploTest;
 
@@ -13,5 +13,5 @@ it("ProcessStep", () => {
 
 	expect(step.params).toBe(params);
 
-	expect(step.build(duploTest)).instanceOf(BuildedProcessStep);
+	expect(await step.build(duploTest)).instanceOf(BuildedProcessStep);
 });

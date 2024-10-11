@@ -6,13 +6,12 @@ import type { ProcessBuildedFunction } from "@scripts/duplose/process";
 import { type Duplo } from "@scripts/duplo";
 
 export class BuildedProcessStep extends BuildedStep<ProcessStep> {
-	public processFunction: ProcessBuildedFunction;
-
 	public params: ProcessStepParams;
 
 	public constructor(
 		instance: Duplo,
 		step: ProcessStep,
+		public processFunction: ProcessBuildedFunction,
 	) {
 		super(instance, step);
 		this.params = simpleClone(step.params);
@@ -37,8 +36,6 @@ export class BuildedProcessStep extends BuildedStep<ProcessStep> {
 				? () => step.parent.input
 				: undefined;
 		}
-
-		this.processFunction = step.parent.build();
 	}
 
 	public toString(index: number): string {

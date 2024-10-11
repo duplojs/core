@@ -14,6 +14,8 @@ export class DuploTest extends Duplo {
 			notfoundRoute,
 		);
 
+		this.buildedRouter = await router.build();
+
 		if (onStart) {
 			this.hooksInstanceLifeCycle.onStart.addSubscriber(onStart);
 		}

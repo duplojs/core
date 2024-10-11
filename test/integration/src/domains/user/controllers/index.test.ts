@@ -6,10 +6,10 @@ import { promise, type ZodError } from "zod";
 
 describe("self", async() => {
 	duplo.register(...useBuilder.getAllCreatedDuplose());
-	const builedRoute = await getSelf.build();
+	const buildedRoute = await getSelf.build();
 
 	it("getSelf", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({ headers: { authorization: "valide-USER-1" } }),
 		) as OkHttpResponse;
 
@@ -25,10 +25,10 @@ describe("uploadPicture", async() => {
 			throw error;
 		},
 	);
-	const builedRoute = await uploadPicture.build();
+	const buildedRoute = await uploadPicture.build();
 
 	it("Receive Form Data Issue", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				headers: { authorization: "valide-USER-1" },
 				body: new ReceiveFormData(
@@ -55,7 +55,7 @@ describe("uploadPicture", async() => {
 	});
 
 	it("invalid content", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				headers: { authorization: "valide-USER-1" },
 				body: new ReceiveFormData(
@@ -73,7 +73,7 @@ describe("uploadPicture", async() => {
 	});
 
 	it("upload picture", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				headers: { authorization: "valide-USER-1" },
 				body: new ReceiveFormData(

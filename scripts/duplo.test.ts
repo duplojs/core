@@ -57,11 +57,11 @@ describe("duplo", () => {
 
 	it("create router", async() => {
 		const router = await duplo.start();
-		const builedRouter = await router.build();
+		const buildedRouter = await router.build();
 		expect(router.notfoundRoutes.paths[0]).toBe("/*");
 		expect(router.notfoundRoutes.method).toBe("GET");
 
-		const response = await builedRouter.buildedNotfoundRoutes(new Request({} as any));
+		const response = await buildedRouter.buildedNotfoundRoutes(new Request({} as any));
 
 		expect(response.code).toBe(404);
 		expect(response.information).toBe("55");

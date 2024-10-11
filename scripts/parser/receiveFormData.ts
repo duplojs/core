@@ -1,7 +1,8 @@
-import { ZodType, z as zod } from "zod";
+import { ZodEffects, ZodType, z as zod, type ZodTypeAny, type input, type ZodEffectsDef, ZodFirstPartyTypeKind, type ZodTypeDef } from "zod";
 import { File } from "@utils/file";
 import { stringToBytes, type BytesInString } from "@utils/stringToBytes";
 import type { SimplifyType } from "@utils/simplifyType";
+import { findZodTypeInZodSchema } from "@utils/findZodTypeInZodSchema";
 
 export interface RecieveFormDataOptions {
 	uploadDirectory?: string;
@@ -56,7 +57,7 @@ export interface ReceiveFormDataExtractorParams extends RecieveFormDataOptions {
 
 export type ReceiveFormDataExtractor =
 	(params: ReceiveFormDataExtractorParams) => Promise<
-		Record<string, unknown> | ReceiveFormDataIssue
+		Record<string, string | string[] | File[]> | ReceiveFormDataIssue
 	>;
 
 export class ReceiveFormData {
@@ -71,9 +72,31 @@ export type TransformRecieveFormDataParams<
 	[P in keyof T]: T[P] extends ZodType ? T[P]["_output"] : File[]
 };
 
+export class ZodReceiveFormData<
+	GenericZodType extends ZodTypeAny = ZodTypeAny,
+	GenericRecieveFormDataParams extends RecieveFormDataParams = RecieveFormDataParams,
+	_GenericInput extends unknown = input<GenericZodType>,
+> extends ZodEffects<
+		GenericZodType,
+		SimplifyType<TransformRecieveFormDataParams<GenericRecieveFormDataParams>>,
+		_GenericInput
+	> {
+	public recieveFormDataParams: GenericRecieveFormDataParams;
+
+	public constructor(
+		{
+			recieveFormDataParams,
+			...def
+		}: ZodEffectsDef<GenericZodType> & { recieveFormDataParams: GenericRecieveFormDataParams },
+	) {
+		super(def);
+		this.recieveFormDataParams = recieveFormDataParams;
+	}
+}
+
 export function receiveFormData<
-	T extends RecieveFormDataParams,
->(params: T, options: RecieveFormDataOptions = {}) {
+	GenericRecieveFormDataParams extends RecieveFormDataParams,
+>(params: GenericRecieveFormDataParams, options: RecieveFormDataOptions = {}) {
 	const zodSchemaPostExtract = zod.object(
 		Object.entries(params)
 			.reduce<Record<string, ZodType>>(
@@ -137,31 +160,53 @@ export function receiveFormData<
 			: undefined,
 	};
 
-	return zod
-		.instanceof(ReceiveFormData)
-		.transform(async(value, ctx) => {
-			const result = await value.extractor(extractorParams);
+	return new ZodReceiveFormData<
+		ZodType<ReceiveFormData, ZodTypeDef, ReceiveFormData>,
+		GenericRecieveFormDataParams
+	>({
+		recieveFormDataParams: params,
+		schema: zod.instanceof(ReceiveFormData),
+		typeName: ZodFirstPartyTypeKind.ZodEffects,
+		effect: {
+			type: "transform",
+			transform: (value: ReceiveFormData, ctx) => new Promise<any>(
+				(resolve) => void value
+					.extractor(extractorParams)
+					.then((result) => {
+						if (result instanceof ReceiveFormDataIssue) {
+							ctx.addIssue({
+								code: "custom",
+								message: result.message,
+								params: {
+									receiveFormDataIssue: result,
+								},
+								path: [result.key],
+							});
 
-			if (result instanceof ReceiveFormDataIssue) {
-				ctx.addIssue({
-					code: "custom",
-					message: result.message,
-					params: {
-						receiveFormDataIssue: result,
-					},
-					path: [result.key],
-				});
+							resolve(zod.NEVER);
+						}
 
-				return zod.NEVER;
-			}
-
-			return result;
-		})
-		.pipe(zodSchemaPostExtract) as
+						resolve(result);
+					}),
+			),
+		},
+	}).pipe(zodSchemaPostExtract) as
 		ZodType<
-			SimplifyType<TransformRecieveFormDataParams<T>>,
+			SimplifyType<
+				TransformRecieveFormDataParams<
+					GenericRecieveFormDataParams
+				>
+			>,
 			any,
 			ReceiveFormData
 		>;
 }
 
+export function zodSchemaHasReceiveFormData(zodSchema: ZodType): zodSchema is ZodReceiveFormData {
+	const [zodReceiveFormData] = findZodTypeInZodSchema(
+		[ZodReceiveFormData],
+		zodSchema,
+	);
+
+	return !!zodReceiveFormData;
+}

@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { GetPresetCheckerGeneric, PresetChecker } from "@scripts/builder/checker";
-import type { Checker, CheckerOutput, GetCheckerGeneric } from "@scripts/checker";
+import type { Checker, CheckerOutput } from "@scripts/checker";
 import { type ZodEffectsDef, ZodEffects, type infer as ZodInfer, ZodType, type input, z as zod, type ZodTypeAny, ZodFirstPartyTypeKind } from "zod";
 import { MissingHandlerCheckerError } from "@scripts/error/missingHandlerCheckerError";
 import { makeFloor } from "@scripts/floor";
@@ -30,9 +29,12 @@ declare module "zod" {
 export class ZodPresetChecker<
 	GenericZodType extends ZodTypeAny = ZodTypeAny,
 	GenericPresetChecker extends PresetChecker = PresetChecker,
-	_GenericOutput extends unknown = GetPresetCheckerGeneric<GenericPresetChecker>["outputData"],
 	_GenericInput extends unknown = input<GenericZodType>,
-> extends ZodEffects<GenericZodType, _GenericOutput, _GenericInput> {
+> extends ZodEffects<
+		GenericZodType,
+		GetPresetCheckerGeneric<GenericPresetChecker>["outputData"],
+		_GenericInput
+	> {
 	public presetChecker: GenericPresetChecker;
 
 	public constructor(
@@ -65,51 +67,49 @@ ZodType.prototype.presetCheck = function(presetChecker, ..._args) {
 
 	const pickup = makeFloor().pickup;
 
-	return new ZodPresetChecker(
-		{
-			presetChecker: presetChecker,
-			schema: this,
-			typeName: ZodFirstPartyTypeKind.ZodEffects,
-			effect: {
-				type: "transform",
-				transform: (value, ctx) => new Promise<CheckerOutput>(
-					(resolve) => void resolve(
-						checkerHandler(
-							presetCheckerTransformInput(value),
-							(info, data) => ({
-								info,
-								data,
-							}),
-							options,
-						),
+	return new ZodPresetChecker({
+		presetChecker,
+		schema: this,
+		typeName: ZodFirstPartyTypeKind.ZodEffects,
+		effect: {
+			type: "transform",
+			transform: (value, ctx) => new Promise<CheckerOutput>(
+				(resolve) => void resolve(
+					checkerHandler(
+						presetCheckerTransformInput(value),
+						(info, data) => ({
+							info,
+							data,
+						}),
+						options,
 					),
-				).then(
-					(result) => {
-						if (!presetCheckerResult.includes(result.info)) {
-							ctx.addIssue({
-								code: "custom",
-								message: "",
-								params: {
-									response: presetCheckerCatch(
-										result.info,
-										result.data,
-										pickup,
-									),
-								},
-							});
-
-							return zod.NEVER;
-						}
-
-						return result.data;
-					},
 				),
-			},
+			).then(
+				(result) => {
+					if (!presetCheckerResult.includes(result.info)) {
+						ctx.addIssue({
+							code: "custom",
+							message: "",
+							params: {
+								response: presetCheckerCatch(
+									result.info,
+									result.data,
+									pickup,
+								),
+							},
+						});
+
+						return zod.NEVER;
+					}
+
+					return result.data;
+				},
+			),
 		},
-	);
+	});
 };
 
-export function zodSchemaHasPresetChecker(zodSchema: ZodType): boolean {
+export function zodSchemaHasPresetChecker(zodSchema: ZodType): zodSchema is ZodPresetChecker {
 	const [zodPresetChecker] = findZodTypeInZodSchema(
 		[ZodPresetChecker],
 		zodSchema,

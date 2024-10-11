@@ -177,7 +177,7 @@ export function receiveFormData<
 		effect: {
 			type: "transform",
 			transform: (value: ReceiveFormData, ctx) => new Promise<any>(
-				(resolve) => void value
+				(resolve, reject) => void value
 					.extractor(extractorParams)
 					.then((result) => {
 						if (result instanceof ReceiveFormDataIssue) {
@@ -194,7 +194,8 @@ export function receiveFormData<
 						}
 
 						resolve(result);
-					}),
+					})
+					.catch(reject),
 			),
 		},
 	}).pipe(zodSchemaPostExtract) as

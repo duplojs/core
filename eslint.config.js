@@ -24,6 +24,7 @@ export default [
 			"max-classes-per-file": "off",
 			"no-useless-assignment": "off",
 			"@typescript-eslint/no-namespace": "off",
+			"@typescript-eslint/use-unknown-in-catch-callback-variable": "off",
 		},
 		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],

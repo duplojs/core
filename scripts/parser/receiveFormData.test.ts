@@ -79,6 +79,14 @@ describe("receiveFormData", () => {
 		]);
 	});
 
+	it("reject error", async() => {
+		const rfd = new ReceiveFormData(
+			() => Promise.reject(new Error()),
+		);
+
+		await expect(() => zodSchema.safeParseAsync(rfd)).rejects.toThrow(Error);
+	});
+
 	it("zodSchemaHasReceiveFormData", () => {
 		expect(zodSchemaIsAsync(zodSchema)).toBe(true);
 

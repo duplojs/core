@@ -3,6 +3,7 @@ import { File } from "@utils/file";
 import { stringToBytes, type BytesInString } from "@utils/stringToBytes";
 import type { SimplifyType } from "@utils/simplifyType";
 import { findZodTypeInZodSchema } from "@utils/findZodTypeInZodSchema";
+import { escapeRegExp } from "@utils/escapeRegExp";
 
 export interface RecieveFormDataOptions {
 	uploadDirectory?: string;
@@ -13,7 +14,7 @@ export interface RecieveFormDataOptions {
 export interface RecieveFormDataFileParams {
 	quantity: number | [number, number];
 	maxSize: number | BytesInString;
-	mimeType: string | string[];
+	mimeType: string | string[] | RegExp | RegExp[];
 }
 
 export class ReceiveFile {
@@ -47,7 +48,7 @@ export class ReceiveFormDataIssue extends Error {
 export interface ReceiveFormDataExtractorFileParams {
 	maxQuantity: number;
 	maxSize: number;
-	mimeTypes: string[];
+	mimeTypes: RegExp[];
 }
 
 export interface ReceiveFormDataExtractorParams extends RecieveFormDataOptions {
@@ -126,9 +127,9 @@ export function receiveFormData<
 			.filter((entry): entry is [string, ReceiveFile] => entry[1] instanceof ReceiveFile);
 
 	const extractorFieldsParams
-			= Object.entries(params)
-				.filter(([_key, value]) => value instanceof ZodType)
-				.map(([key]) => key);
+		= Object.entries(params)
+			.filter(([_key, value]) => value instanceof ZodType)
+			.map(([key]) => key);
 
 	const extractorParams: ReceiveFormDataExtractorParams = {
 		...options,
@@ -148,9 +149,15 @@ export function receiveFormData<
 							maxSize: typeof filesParams.maxSize === "string"
 								? stringToBytes(filesParams.maxSize)
 								: filesParams.maxSize,
-							mimeTypes: filesParams.mimeType instanceof Array
-								? filesParams.mimeType
-								: [filesParams.mimeType],
+							mimeTypes: (
+								filesParams.mimeType instanceof Array
+									? filesParams.mimeType
+									: [filesParams.mimeType]
+							).map(
+								(value) => typeof value === "string"
+									? new RegExp(`^${escapeRegExp(value)}$`)
+									: value,
+							),
 						};
 
 						return pv;

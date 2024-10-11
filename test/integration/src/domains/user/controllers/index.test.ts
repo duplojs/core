@@ -39,7 +39,7 @@ describe("uploadPicture", () => {
 								picture: {
 									maxQuantity: 1,
 									maxSize: 5242880,
-									mimeTypes: ["image/png"],
+									mimeTypes: [/^image\/png$/],
 								},
 							},
 						});

@@ -74,16 +74,28 @@ ZodType.prototype.presetCheck = function(presetChecker, ..._args) {
 		effect: {
 			type: "transform",
 			transform: (value, ctx) => new Promise<CheckerOutput>(
-				(resolve) => void resolve(
-					checkerHandler(
-						presetCheckerTransformInput(value),
-						(info, data) => ({
-							info,
-							data,
-						}),
-						options,
-					),
-				),
+				(resolve, reject) => {
+					try {
+						const result = checkerHandler(
+							presetCheckerTransformInput(value),
+							(info, data) => ({
+								info,
+								data,
+							}),
+							options,
+						);
+
+						if (result instanceof Promise) {
+							result
+								.then(resolve)
+								.catch(reject);
+						} else {
+							resolve(result);
+						}
+					} catch (error) {
+						reject(error as Error);
+					}
+				},
 			).then(
 				(result) => {
 					if (!presetCheckerResult.includes(result.info)) {

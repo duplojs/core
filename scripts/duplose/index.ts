@@ -18,6 +18,7 @@ import { getTypedEntries } from "@utils/getTypedEntries";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 import { StringBuilder } from "@utils/stringBuilder";
 import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKeyError";
+import { Evaler, type EvalerParams } from "@scripts/evaler";
 
 export interface DuploseBuildedFunctionContext<
 	T extends Duplose = Duplose,
@@ -85,6 +86,14 @@ export type EditInjectFunction = (
 	result: unknown,
 ) => void;
 
+export interface DuploseEvalerParams extends EvalerParams {
+	duplose: Duplose;
+}
+
+export class DuploseEvaler extends Evaler<DuploseEvalerParams> {
+
+}
+
 export abstract class Duplose<
 	GenericBuildedFunction extends AnyFunction = any,
 	_GenericRequest extends CurrentRequestObject = any,
@@ -114,6 +123,8 @@ export abstract class Duplose<
 	public descriptions: Description[] = [];
 
 	public origin?: unknown;
+
+	public evaler?: DuploseEvaler;
 
 	public constructor(descriptions: Description[] = []) {
 		this.descriptions.push(...descriptions);
@@ -288,5 +299,7 @@ export abstract class Duplose<
 		return false;
 	}
 
-	public abstract build(): GenericBuildedFunction;
+	public abstract build(): Promise<GenericBuildedFunction>;
+
+	public static readonly defaultEvaler = new DuploseEvaler();
 }

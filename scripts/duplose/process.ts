@@ -4,7 +4,6 @@ import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext, type A
 import type { Step } from "@scripts/step";
 import type { Description } from "@scripts/description";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
-import { advancedEval } from "@utils/advancedEval";
 import { extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { simpleClone } from "@utils/simpleClone";
 import { makeFloor } from "@scripts/floor";
@@ -98,13 +97,15 @@ export class Process<
 		this.descriptions.push(...descriptions);
 	}
 
-	public build(): ProcessBuildedFunction<_Options, _Input> {
+	public async build(): Promise<ProcessBuildedFunction<_Options, _Input>> {
 		if (!this.instance) {
 			throw new BuildNoRegisteredDuploseError(this);
 		}
 
-		const buildedPreflight = this.preflightSteps.map(
-			(step) => step.build(this.instance!),
+		const buildedPreflight = await Promise.all(
+			this.preflightSteps.map(
+				(step) => step.build(this.instance!),
+			),
 		);
 
 		let extract: ExtractObject | AcceleratedExtractObject | undefined = simpleClone(this.extract);
@@ -113,8 +114,10 @@ export class Process<
 			extract = this.acceleratedExtract();
 		}
 
-		const buildedStep = this.steps.map(
-			(step) => step.build(this.instance!),
+		const buildedStep = await Promise.all(
+			this.steps.map(
+				(step) => step.build(this.instance!),
+			),
 		);
 
 		const drop = mapped(
@@ -171,7 +174,10 @@ export class Process<
 			duplo: this.instance,
 		};
 
-		const buildedFunction = advancedEval<ProcessBuildedFunction>({
+		const evaler = this.evaler ?? this.instance.evalers.duplose ?? Duplose.defaultEvaler;
+
+		const buildedFunction = await evaler.makeFunction<ProcessBuildedFunction>({
+			duplose: this,
 			args: [StringBuilder.request, StringBuilder.options, StringBuilder.input],
 			content,
 			bind: context,

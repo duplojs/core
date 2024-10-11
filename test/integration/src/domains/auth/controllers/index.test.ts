@@ -3,9 +3,9 @@ import { loginUser, registerUser } from ".";
 import { makeFakeRequest } from "@test/request";
 import { ForbiddenHttpResponse, OkHttpResponse } from "@duplojs/core";
 
-describe("register", () => {
+describe("register", async() => {
 	duplo.register(registerUser);
-	const builedRoute = registerUser.build();
+	const builedRoute = await registerUser.build();
 
 	it("email already use", async() => {
 		const result = await builedRoute(
@@ -42,9 +42,9 @@ describe("register", () => {
 	});
 });
 
-describe("login", () => {
+describe("login", async() => {
 	duplo.register(loginUser);
-	const builedRoute = loginUser.build();
+	const builedRoute = await loginUser.build();
 
 	it("wrong password", async() => {
 		const result = await builedRoute(

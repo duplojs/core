@@ -9,6 +9,7 @@ export class DuploTest extends Duplo {
 		await this.hooksInstanceLifeCycle.beforeBuildRouter.launchSubscriber(this);
 
 		const router = new Router(
+			this,
 			this.duploses.filter((duplose) => duplose instanceof Route),
 			notfoundRoute,
 		);

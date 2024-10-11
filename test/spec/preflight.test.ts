@@ -10,7 +10,7 @@ describe("preflight", () => {
 	duploTest.register(...useBuilder.getAllCreatedDuplose());
 
 	it("on process", async() => {
-		const buildedProcess = preflightOnProcess.build();
+		const buildedProcess = await preflightOnProcess.build();
 
 		const result = await buildedProcess(makeFakeRequest(), undefined, undefined);
 
@@ -24,7 +24,7 @@ describe("preflight", () => {
 	});
 
 	it("on route", async() => {
-		const buildedProcess = preflightOnRoute.build();
+		const buildedProcess = await preflightOnRoute.build();
 
 		const result = await buildedProcess(makeFakeRequest());
 
@@ -38,7 +38,7 @@ describe("preflight", () => {
 	});
 
 	it("with options and input on route", async() => {
-		const buildedProcess = preflightwithOptionsAndInputOnRoute.build();
+		const buildedProcess = await preflightwithOptionsAndInputOnRoute.build();
 
 		const result = await buildedProcess(makeFakeRequest());
 
@@ -52,7 +52,7 @@ describe("preflight", () => {
 	});
 
 	it("with skip on route", async() => {
-		const buildedProcess = preflightWithSkipOnRoute.build();
+		const buildedProcess = await preflightWithSkipOnRoute.build();
 
 		const result1 = await buildedProcess(makeFakeRequest({ body: 1 }));
 

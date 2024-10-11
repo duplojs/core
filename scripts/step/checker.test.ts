@@ -2,7 +2,7 @@ import { duploTest } from "@test/utils/duploTest";
 import { BuildedCheckerStep, Checker, CheckerStep, type CheckerStepParams } from "..";
 import { Response } from "@scripts/response";
 
-it("CheckerStep", () => {
+it("CheckerStep", async() => {
 	const checker = new Checker("test");
 
 	const params: CheckerStepParams = {
@@ -17,5 +17,5 @@ it("CheckerStep", () => {
 
 	expect(step.params).toBe(params);
 
-	expect(step.build(duploTest)).instanceOf(BuildedCheckerStep);
+	expect(await step.build(duploTest)).instanceOf(BuildedCheckerStep);
 });

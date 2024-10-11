@@ -12,7 +12,7 @@ export abstract class Step<
 		public descriptions: Description[] = [],
 	) {}
 
-	public abstract build(instance: Duplo): BuildedStep;
+	public abstract build(instance: Duplo): Promise<BuildedStep>;
 }
 
 export abstract class StepWithResponse<
@@ -28,5 +28,5 @@ export abstract class StepWithResponse<
 		super(parent, descriptions);
 	}
 
-	public abstract build(instance: Duplo): BuildedStepWithResponses;
+	public abstract build(instance: Duplo): Promise<BuildedStepWithResponses>;
 }

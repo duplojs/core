@@ -3,10 +3,10 @@ import { duplo } from "@src/main";
 import { adminEditUser } from "./admin";
 import { makeFakeRequest } from "@test/request";
 
-describe("adminEditUser", () => {
+describe("adminEditUser", async() => {
 	duplo.register(...useBuilder.getAllCreatedDuplose());
 
-	const builedRoute = adminEditUser.build();
+	const builedRoute = await adminEditUser.build();
 
 	it("presetCheck in extract", async() => {
 		const result = await builedRoute(

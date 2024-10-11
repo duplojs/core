@@ -2,7 +2,7 @@ import { Duplo, getTypedEntries, OkHttpResponse, useBuilder, zod } from "@script
 import { CheckpointList } from "@test/utils/checkpointList";
 import { makeFakeRequest } from "@test/utils/request";
 
-describe("life cycle hooks", () => {
+describe("life cycle hooks", async() => {
 	const checkPoint = new CheckpointList();
 
 	const deepPreflight1 = useBuilder()
@@ -96,7 +96,7 @@ describe("life cycle hooks", () => {
 		.hook("afterSend", () => void checkPoint.addPoint("instance afterSend"));
 
 	duplo.register(...useBuilder.getAllCreatedDuplose());
-	const buildedRoute = route.build();
+	const buildedRoute = await route.build();
 
 	beforeEach(() => {
 		checkPoint.reset();
@@ -170,7 +170,7 @@ describe("life cycle hooks", () => {
 
 		duplo.register(route);
 
-		const buildedRoute = route.build();
+		const buildedRoute = await route.build();
 
 		const result1 = await buildedRoute(makeFakeRequest({ params: { type: "beforeRouteExecution" } }));
 

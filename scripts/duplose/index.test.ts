@@ -8,13 +8,12 @@ import { Hook } from "@scripts/hook";
 import { zod } from "@scripts/parser";
 import { ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 import { insertBlock } from "@utils/stringBuilder";
-import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKeyError";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 
 describe("Duplose", () => {
 	class SubDuplo extends Duplose {
 		public build() {
-			throw new Error("Method not implemented.");
+			return Promise.reject(new Error("Method not implemented."));
 		}
 
 		public get aef() {

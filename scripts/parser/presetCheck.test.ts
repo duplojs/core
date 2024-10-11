@@ -61,7 +61,6 @@ describe("presetCheck", () => {
 			ZodPresetChecker<
 				ZodNumber,
 				typeof wantEven,
-				"even",
 				number
 			>,
 			"strict"
@@ -82,7 +81,15 @@ describe("presetCheck", () => {
 			},
 		});
 
-		expect(await zodSchema.parseAsync(2)).toBe("even");
+		const data = await zodSchema.parseAsync(2);
+
+		expect(data).toBe("even");
+
+		type check = ExpectType<
+			typeof data,
+			"even",
+			"strict"
+		>;
 	});
 
 	it("perset check async", async() => {

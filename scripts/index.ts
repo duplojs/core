@@ -46,6 +46,7 @@ export * from "@utils/addThis";
 export * from "@utils/advancedEval";
 export * from "@utils/brand";
 export * from "@utils/entryUseMapper";
+export * from "@utils/escapeRegExp";
 export * from "@utils/file";
 export * from "@utils/findZodTypeInZodSchema";
 export * from "@utils/fixPath";

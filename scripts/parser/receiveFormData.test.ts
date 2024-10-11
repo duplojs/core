@@ -24,7 +24,7 @@ describe("receiveFormData", () => {
 						logo: {
 							maxQuantity: 1,
 							maxSize: 4194304,
-							mimeTypes: ["image/png"],
+							mimeTypes: [/^image\/png$/],
 						},
 					},
 				});

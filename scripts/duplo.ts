@@ -13,7 +13,7 @@ import { type BytesInString, stringToBytes } from "@utils/stringToBytes";
 import type { RecieveFormDataOptions } from "./parser";
 import type { RequiredKeys } from "@utils/requiredKeys";
 import type { HookEvaler } from "./hook";
-import type { RouterEvaler } from "./router";
+import type { BuildedRouter, RouterEvaler } from "./router";
 
 export interface Environments {
 	DEV: true;
@@ -70,6 +70,8 @@ export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInput
 	public hooksRouteLifeCycle = new HooksRouteLifeCycle<CurrentRequestObject>();
 
 	public hooksInstanceLifeCycle = new HooksInstanceifeCycle();
+
+	public buildedRouter?: BuildedRouter;
 
 	public evalers: Evalers = {};
 

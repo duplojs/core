@@ -5,10 +5,10 @@ import { ForbiddenHttpResponse, OkHttpResponse } from "@duplojs/core";
 
 describe("register", async() => {
 	duplo.register(registerUser);
-	const builedRoute = await registerUser.build();
+	const buildedRoute = await registerUser.build();
 
 	it("email already use", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				body: {
 					id: 55,
@@ -25,7 +25,7 @@ describe("register", async() => {
 	});
 
 	it("created user", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				body: {
 					id: 55,
@@ -44,10 +44,10 @@ describe("register", async() => {
 
 describe("login", async() => {
 	duplo.register(loginUser);
-	const builedRoute = await loginUser.build();
+	const buildedRoute = await loginUser.build();
 
 	it("wrong password", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				body: {
 					email: "elon@example.com",
@@ -61,7 +61,7 @@ describe("login", async() => {
 	});
 
 	it("user logged", async() => {
-		const result = await builedRoute(
+		const result = await buildedRoute(
 			makeFakeRequest({
 				body: {
 					email: "elon@example.com",

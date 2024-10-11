@@ -48,6 +48,6 @@ export class CheckerStep<
 	}
 
 	public build(instance: Duplo) {
-		return new BuildedCheckerStep(instance, this);
+		return Promise.resolve(new BuildedCheckerStep(instance, this));
 	}
 }

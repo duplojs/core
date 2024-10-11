@@ -113,7 +113,7 @@ describe("hook", () => {
 		copyedHook.addSubscriber(fnc);
 		hook.addSubscriber(copyedHook);
 
-		const buidedHook = hook.build();
+		const buidedHook = await hook.build();
 		await buidedHook();
 
 		expect(testlaunch).toBe(true);
@@ -126,7 +126,7 @@ describe("hook", () => {
 		};
 
 		hook.addSubscriber(fnc);
-		const buidedHook = hook.build();
+		const buidedHook = await hook.build();
 		await buidedHook();
 
 		expect(testlaunch).toBe(true);
@@ -141,13 +141,13 @@ describe("hook", () => {
 
 		hook.addSubscriber(fnc1);
 		hook.addSubscriber(fnc2);
-		const buidedHook = hook.build();
+		const buidedHook = await hook.build();
 		await buidedHook();
 
 		expect(testlaunch).toBe(false);
 	});
 
-	it("test stop execution", () => {
+	it("test stop execution", async() => {
 		const hook = new Hook(0);
 		const checkpointList = new CheckpointList();
 
@@ -167,7 +167,7 @@ describe("hook", () => {
 
 		checkpointList.reset();
 
-		const buidedHook = hook.build();
+		const buidedHook = await hook.build();
 
 		expect(buidedHook()).toBe("toto");
 		expect(checkpointList.getPointList()).toStrictEqual(["start", "1", "2", "end"]);

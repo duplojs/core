@@ -1,17 +1,11 @@
 /* eslint-disable no-eval */
-import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 import { Router } from "./router";
 import { Route } from "./duplose/route";
 import { HandlerStep } from "./step/handler";
 import type { AnyFunction } from "@utils/types";
 import { DuploTest } from "@test/utils/duploTest";
 
-describe("Router", async() => {
-	const {
-		advancedEval: spy,
-		advancedEvalOriginal,
-	} = await mokeAdvancedEval();
-
+describe("Router", () => {
 	const duplo = new DuploTest({ environment: "TEST" });
 
 	const routes = [
@@ -37,12 +31,11 @@ describe("Router", async() => {
 		duplo.register(route);
 	});
 
-	beforeEach(() => {
-		spy.mockImplementation(() => (() => ({})));
-	});
-
 	it("mapper and function builder", async() => {
-		const router = new Router(routes, notfoundRoute);
+		const spy = vi.spyOn(Router.defaultEvaler, "makeFunction");
+		const router = new Router(duplo, routes, notfoundRoute);
+
+		const buildedRouter = await router.build();
 
 		expect(router.methodToRoutesMapper).toStrictEqual({
 			GET: [routes[0], routes[1]],
@@ -50,7 +43,7 @@ describe("Router", async() => {
 			PATCH: [routes[4], routes[5]],
 		});
 
-		Object.values(router.methodToFinderMapper).forEach(
+		Object.values(buildedRouter.methodToFinderMapper).forEach(
 			(value) => {
 				expect(value).toBeTypeOf("function");
 			},
@@ -59,13 +52,13 @@ describe("Router", async() => {
 		await expect(spy.mock.lastCall?.[0].content).toMatchFileSnapshot("__data__/router.txt");
 	});
 
-	it("test finder", () => {
-		spy.mockImplementation(advancedEvalOriginal);
+	it("test finder", async() => {
+		const router = new Router(duplo, routes, notfoundRoute);
 
-		const router = new Router(routes, notfoundRoute);
+		const buildedRouter = await router.build();
 
 		expect({
-			...router.find("GET", "/users"),
+			...buildedRouter.find("GET", "/users"),
 			buildedRoute: undefined,
 		}).toStrictEqual({
 			matchedPath: "/users",
@@ -74,7 +67,7 @@ describe("Router", async() => {
 		});
 
 		expect({
-			...router.find("GET", "/users/15"),
+			...buildedRouter.find("GET", "/users/15"),
 			buildedRoute: undefined,
 		}).toEqual({
 			matchedPath: "/users/{userId}",
@@ -82,28 +75,28 @@ describe("Router", async() => {
 			buildedRoute: undefined,
 		});
 
-		expect(router.find("GET", "/user")).toStrictEqual({
-			buildedRoute: router.buildedNotfoundRoutes,
+		expect(buildedRouter.find("GET", "/user")).toStrictEqual({
+			buildedRoute: buildedRouter.buildedNotfoundRoutes,
 			matchedPath: null,
 			params: {},
 		});
 
-		expect(router.find("PUT", "/user")).toStrictEqual({
-			buildedRoute: router.buildedNotfoundRoutes,
+		expect(buildedRouter.find("PUT", "/user")).toStrictEqual({
+			buildedRoute: buildedRouter.buildedNotfoundRoutes,
 			matchedPath: null,
 			params: {},
 		});
 
 		expect(
-			router.find("GET", "/users/15")?.buildedRoute.context.duplose,
+			buildedRouter.find("GET", "/users/15")?.buildedRoute.context.duplose,
 		).toBe(routes[0]);
 
 		expect(
-			router.find("GET", "/users")?.buildedRoute.context.duplose,
+			buildedRouter.find("GET", "/users")?.buildedRoute.context.duplose,
 		).toBe(routes[0]);
 
 		expect(
-			router.find("POST", "/posts")?.buildedRoute.context.duplose,
+			buildedRouter.find("POST", "/posts")?.buildedRoute.context.duplose,
 		).toBe(routes[3]);
 	});
 

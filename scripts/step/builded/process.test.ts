@@ -13,7 +13,7 @@ describe("BuildedProcessStep", () => {
 	});
 	process.setInput(22);
 
-	it("merge object options", () => {
+	it("merge object options", async() => {
 		const params: ProcessStepParams = {
 			options: {
 				toto: 2,
@@ -23,7 +23,7 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
+		const buildedProcessStep = new BuildedProcessStep(duploTest, step, await process.build());
 
 		expect(buildedProcessStep.params.options).toStrictEqual({
 			toto: 2,
@@ -34,7 +34,7 @@ describe("BuildedProcessStep", () => {
 		expect(buildedProcessStep.params.input?.(makeFloor().pickup)).toBe(22);
 	});
 
-	it("merge function options", () => {
+	it("merge function options", async() => {
 		const params: ProcessStepParams = {
 			options: () => ({
 				toto: 2,
@@ -44,7 +44,7 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
+		const buildedProcessStep = new BuildedProcessStep(duploTest, step, await process.build());
 
 		expect(
 			typeof buildedProcessStep.params.options === "function"
@@ -68,7 +68,7 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
+		const buildedProcessStep = new BuildedProcessStep(duploTest, step, await process.build());
 
 		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/process1.txt");
 	});
@@ -85,7 +85,7 @@ describe("BuildedProcessStep", () => {
 
 		const step = new ProcessStep(process, params);
 
-		const buildedProcessStep = new BuildedProcessStep(duploTest, step);
+		const buildedProcessStep = new BuildedProcessStep(duploTest, step, await process.build());
 
 		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/process2.txt");
 	});

@@ -1,7 +1,7 @@
 
-							let result;
-
-							
+								let result;
+	
+								
 								result = /^\/users\/(?<userId>[A-zÀ-ÿ0-9_\- ]+)\/?(?:\?[^]*)?$/.exec(path);
 								if(result !== null) return {
 									buildedRoute: this.buildedRoutes[0],
@@ -17,6 +17,6 @@
 									matchedPath: "/posts/{postId}",
 								};
 							
-
-							return null;
-						
+	
+								return null;
+							

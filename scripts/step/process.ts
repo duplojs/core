@@ -1,5 +1,5 @@
 import type { Description } from "@scripts/description";
-import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
+import type { GetProcessGeneric, Process, ProcessBuildedFunction } from "@scripts/duplose/process";
 import { Step } from ".";
 import type { Floor } from "@scripts/floor";
 import { BuildedProcessStep } from "./builded/process";
@@ -32,7 +32,13 @@ export class ProcessStep<
 		this.params = params;
 	}
 
-	public build(instance: Duplo) {
-		return new BuildedProcessStep(instance, this);
+	public async build(instance: Duplo) {
+		const processFunction: ProcessBuildedFunction = await this.parent.build();
+
+		return new BuildedProcessStep(
+			instance,
+			this,
+			processFunction,
+		);
 	}
 }

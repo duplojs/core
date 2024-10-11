@@ -215,7 +215,7 @@ it("all execute", async() => {
 		);
 
 	duploTest.register(...useBuilder.getAllCreatedDuplose());
-	const buildedRoute = route.build();
+	const buildedRoute = await route.build();
 	const response = await buildedRoute(makeFakeRequest());
 
 	expect(response).instanceOf(OkHttpResponse);

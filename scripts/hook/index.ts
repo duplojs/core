@@ -1,7 +1,15 @@
-import { advancedEval } from "@utils/advancedEval";
 import type { AnyFunction } from "@utils/types";
 import type { HooksRouteLifeCycle } from "./routeLifeCycle";
 import type { HooksInstanceifeCycle } from "./instanceLifeCycle";
+import { Evaler, type EvalerParams } from "@scripts/evaler";
+
+export interface HookEvalerParams extends EvalerParams {
+	hook: Hook;
+}
+
+export class HookEvaler extends Evaler<HookEvalerParams> {
+
+}
 
 export class Hook<
 	subscriber extends AnyFunction = AnyFunction,
@@ -9,6 +17,8 @@ export class Hook<
 	private numberArgs: number;
 
 	public subscribers: (subscriber | Hook<subscriber>)[] = [];
+
+	public evaler?: HookEvaler;
 
 	public constructor(numberArgs: Parameters<subscriber>["length"]) {
 		this.numberArgs = numberArgs;
@@ -84,18 +94,23 @@ export class Hook<
 			}
 		`).join("");
 
-		return advancedEval<subscriber>({
+		const evaler = this.evaler ?? Hook.defaultEvaler;
+
+		return evaler.makeFunction<subscriber>({
+			hook: this,
 			content: `let result;\n${functionContent}`,
 			args: [mapArgs],
 			bind: { subscribers },
 		});
 	}
+
+	protected static readonly defaultEvaler = new HookEvaler();
 }
 
 export type Hooks = HooksRouteLifeCycle<any> | HooksInstanceifeCycle;
 
 export type BuildHooks<T extends Hooks> = {
-	[P in keyof T]: T[P] extends Hook
-		? ReturnType<T[P]["build"]>
+	[P in keyof T]: T[P] extends Hook<infer InferedSubscriber>
+		? InferedSubscriber
 		: never
 };

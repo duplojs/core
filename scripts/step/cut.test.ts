@@ -1,7 +1,7 @@
 import { duploTest } from "@test/utils/duploTest";
 import { BuildedCutStep, type Cut, CutStep } from "..";
 
-it("CutStep", () => {
+it("CutStep", async() => {
 	const cutFunction: Cut = ({ dropper }) => dropper({});
 
 	const step = new CutStep(cutFunction, ["test"]);
@@ -10,5 +10,5 @@ it("CutStep", () => {
 
 	expect(step.drop).toStrictEqual(["test"]);
 
-	expect(step.build(duploTest)).instanceOf(BuildedCutStep);
+	expect(await step.build(duploTest)).instanceOf(BuildedCutStep);
 });

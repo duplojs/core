@@ -1,7 +1,8 @@
-import { strict } from "assert";
+import type { ExpectType } from "@test/utils/expectType";
 import { zod } from ".";
-import { receiveFormData, ReceiveFormData, ReceiveFormDataIssue, recieveFiles } from "./receiveFormData";
+import { receiveFormData, ReceiveFormData, ReceiveFormDataIssue, recieveFiles, zodSchemaHasReceiveFormData } from "./receiveFormData";
 import { File } from "@utils/file";
+import { zodSchemaIsAsync } from "@duplojs/zod-accelerator";
 
 describe("receiveFormData", () => {
 	const zodSchema = receiveFormData({
@@ -11,7 +12,7 @@ describe("receiveFormData", () => {
 			mimeType: "image/png",
 		}),
 		prop1: zod.string(),
-		prop2: zod.number(),
+		prop2: zod.coerce.number(),
 	});
 
 	it("pass schema", async() => {
@@ -23,7 +24,7 @@ describe("receiveFormData", () => {
 						logo: {
 							maxQuantity: 1,
 							maxSize: 4194304,
-							mimeTypes: ["image/png"],
+							mimeTypes: [/^image\/png$/],
 						},
 					},
 				});
@@ -31,7 +32,7 @@ describe("receiveFormData", () => {
 				return Promise.resolve({
 					logo: [new File("test.png")],
 					prop1: "tt",
-					prop2: 2,
+					prop2: "2",
 				});
 			},
 		);
@@ -43,6 +44,16 @@ describe("receiveFormData", () => {
 			prop1: "tt",
 			prop2: 2,
 		});
+
+		type check = ExpectType<
+			typeof result,
+			{
+				logo: File[];
+				prop1: string;
+				prop2: number;
+			},
+			"strict"
+		>;
 	});
 
 	it("receive error", async() => {
@@ -66,5 +77,11 @@ describe("receiveFormData", () => {
 				path: ["prop1"],
 			},
 		]);
+	});
+
+	it("zodSchemaHasReceiveFormData", () => {
+		expect(zodSchemaIsAsync(zodSchema)).toBe(true);
+
+		expect(zodSchemaHasReceiveFormData(zodSchema)).toBe(true);
 	});
 });

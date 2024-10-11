@@ -58,10 +58,6 @@ export abstract class BuildedStepWithResponses<
 				if(!temp.success){
 					throw new this.ContractResponseError(temp.error, ${StringBuilder.result});
 				}
-
-				${StringBuilder.result}.code = temp.data.code;
-				${StringBuilder.result}.information = temp.data.information;
-				${StringBuilder.result}.body = temp.data.body;
 			`,
 		);
 	}

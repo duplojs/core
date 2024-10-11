@@ -4,9 +4,9 @@ import { makeFakeRequest } from "@test/request";
 import { OkHttpResponse, ReceiveFormData, ReceiveFormDataIssue, UnprocessableEntityHttpResponse, useBuilder, File } from "@duplojs/core";
 import { promise, type ZodError } from "zod";
 
-describe("self", () => {
+describe("self", async() => {
 	duplo.register(...useBuilder.getAllCreatedDuplose());
-	const builedRoute = getSelf.build();
+	const builedRoute = await getSelf.build();
 
 	it("getSelf", async() => {
 		const result = await builedRoute(
@@ -18,14 +18,14 @@ describe("self", () => {
 	});
 });
 
-describe("uploadPicture", () => {
+describe("uploadPicture", async() => {
 	duplo.register(...useBuilder.getAllCreatedDuplose());
 	uploadPicture.hooks.onError.addSubscriber(
 		(request, error) => {
 			throw error;
 		},
 	);
-	const builedRoute = uploadPicture.build();
+	const builedRoute = await uploadPicture.build();
 
 	it("Receive Form Data Issue", async() => {
 		const result = await builedRoute(
@@ -39,7 +39,7 @@ describe("uploadPicture", () => {
 								picture: {
 									maxQuantity: 1,
 									maxSize: 5242880,
-									mimeTypes: ["image/png"],
+									mimeTypes: [/^image\/png$/],
 								},
 							},
 						});

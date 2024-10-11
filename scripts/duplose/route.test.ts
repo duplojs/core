@@ -1,8 +1,8 @@
-import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 import { Process } from "./process";
 import {
 	BuildNoRegisteredDuploseError,
 	CutStep,
+	Duplose,
 	LastStepMustBeHandlerError,
 	OkHttpResponse,
 	zod,
@@ -17,7 +17,7 @@ import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { DuploTest } from "@test/utils/duploTest";
 
-describe("Route", async() => {
+describe("Route", () => {
 	const checkpointList = new CheckpointList();
 	const duplo = new DuploTest({ environment: "TEST" });
 
@@ -42,24 +42,20 @@ describe("Route", async() => {
 	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
 	route.addPreflightSteps(preflight);
 
-	const {
-		advancedEval: spy,
-		advancedEvalOriginal,
-	} = await mokeAdvancedEval();
-
 	it("constructor props", () => {
 		expect(route.method).toBe("GET");
 		expect(route.paths).toStrictEqual(["/"]);
 	});
 
 	it("build", async() => {
+		const spy = vi.spyOn(Duplose.defaultEvaler, "makeFunction");
 		checkpointList.reset();
 
-		expect(() => route.build()).toThrowError(BuildNoRegisteredDuploseError);
+		await expect(() => route.build()).rejects.toThrowError(BuildNoRegisteredDuploseError);
 
 		route.instance = duplo;
 
-		expect(() => route.build()).toThrowError(LastStepMustBeHandlerError);
+		await expect(() => route.build()).rejects.toThrowError(LastStepMustBeHandlerError);
 
 		const handlerStep = new HandlerStep(
 			(
@@ -73,14 +69,12 @@ describe("Route", async() => {
 		);
 		route.addStep(handlerStep);
 
-		route.build();
+		await route.build();
 
 		expect(spy).toBeCalled();
 
 		await expect(spy.mock.lastCall?.[0].content)
 			.toMatchFileSnapshot("__data__/route.txt");
-
-		spy.mockImplementation(advancedEvalOriginal);
 
 		route.hooks.onError.addSubscriber((_request, error) => {
 			checkpointList.addPoint("onError");
@@ -94,7 +88,7 @@ describe("Route", async() => {
 			expect(response.body).toBe(2);
 		});
 
-		const routeFunction = route.build();
+		const routeFunction = await route.build();
 
 		await routeFunction(new Request({ params: { userId: "2" } } as any));
 

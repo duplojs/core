@@ -43,9 +43,10 @@ export * from "@scripts/error/missingHandlerCheckerError";
 export * from "@scripts/error/resultIsNotAResponseError";
 
 export * from "@utils/addThis";
-export * from "@utils/advancedEval";
 export * from "@utils/brand";
 export * from "@utils/entryUseMapper";
+export * from "@utils/escapeRegExp";
+export * from "@scripts/evaler";
 export * from "@utils/file";
 export * from "@utils/findZodTypeInZodSchema";
 export * from "@utils/fixPath";

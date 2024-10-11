@@ -1,13 +1,12 @@
-import { mokeAdvancedEval } from "@test/utils/mokeAdvancedEval";
 import { Process } from "./process";
-import { BuildNoRegisteredDuploseError, CutStep, zod } from "..";
+import { BuildNoRegisteredDuploseError, CutStep, Duplose, zod } from "..";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { DuploTest } from "@test/utils/duploTest";
 
-describe("Process", async() => {
+describe("Process", () => {
 	const checkpointList = new CheckpointList();
 	const duplo = new DuploTest({ environment: "TEST" });
 	const process = new Process("test");
@@ -27,11 +26,6 @@ describe("Process", async() => {
 	preflightProcess.instance = duplo;
 	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
 	process.addPreflightSteps(preflight);
-
-	const {
-		advancedEval: spy,
-		advancedEvalOriginal,
-	} = await mokeAdvancedEval();
 
 	it("name", () => {
 		expect(process.name).toBe("test");
@@ -59,21 +53,20 @@ describe("Process", async() => {
 
 	it("build", async() => {
 		checkpointList.reset();
+		const spy = vi.spyOn(Duplose.defaultEvaler, "makeFunction");
 
-		expect(() => process.build()).toThrowError(BuildNoRegisteredDuploseError);
+		await expect(() => process.build()).rejects.toThrowError(BuildNoRegisteredDuploseError);
 
 		process.instance = duplo;
 
-		process.build();
+		await process.build();
 
 		expect(spy).toBeCalled();
 
 		await expect(spy.mock.lastCall?.[0].content)
 			.toMatchFileSnapshot("__data__/process.txt");
 
-		spy.mockImplementation(advancedEvalOriginal);
-
-		const processFunction = process.build();
+		const processFunction = await process.build();
 
 		expect(processFunction(new Request({ params: { userId: "2" } } as any), undefined, undefined)).toStrictEqual({
 			toto: "true",

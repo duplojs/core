@@ -32,6 +32,6 @@ export class CutStep<
 	}
 
 	public build(instance: Duplo) {
-		return new BuildedCutStep(instance, this);
+		return Promise.resolve(new BuildedCutStep(instance, this));
 	}
 }

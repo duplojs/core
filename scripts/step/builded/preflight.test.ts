@@ -14,7 +14,7 @@ describe("BuildedPreflightStep", () => {
 	});
 	process.setInput(22);
 
-	it("merge object options", () => {
+	it("merge object options", async() => {
 		const params: ProcessStepParams = {
 			options: {
 				toto: 2,
@@ -24,7 +24,7 @@ describe("BuildedPreflightStep", () => {
 
 		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
+		const buildedProcessStep = new BuildedPreflightStep(duploTest, step, await process.build());
 
 		expect(buildedProcessStep.params.options).toStrictEqual({
 			toto: 2,
@@ -35,7 +35,7 @@ describe("BuildedPreflightStep", () => {
 		expect(buildedProcessStep.params.input?.(makeFloor().pickup)).toBe(22);
 	});
 
-	it("merge function options", () => {
+	it("merge function options", async() => {
 		const params: ProcessStepParams = {
 			options: () => ({
 				toto: 2,
@@ -45,7 +45,7 @@ describe("BuildedPreflightStep", () => {
 
 		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
+		const buildedProcessStep = new BuildedPreflightStep(duploTest, step, await process.build());
 
 		expect(
 			typeof buildedProcessStep.params.options === "function"
@@ -69,7 +69,7 @@ describe("BuildedPreflightStep", () => {
 
 		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
+		const buildedProcessStep = new BuildedPreflightStep(duploTest, step, await process.build());
 
 		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/preflight1.txt");
 	});
@@ -86,7 +86,7 @@ describe("BuildedPreflightStep", () => {
 
 		const step = new PreflightStep(process, params);
 
-		const buildedProcessStep = new BuildedPreflightStep(duploTest, step);
+		const buildedProcessStep = new BuildedPreflightStep(duploTest, step, await process.build());
 
 		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/preflight2.txt");
 	});

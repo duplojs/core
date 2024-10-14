@@ -26,12 +26,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: get current version
-        uses: duplojs/action-semver@v0.3.0
+        uses: duplojs/action-semver@v1
         id: semver
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_OWNER: ${{ github.repository_owner }}
-          GITHUB_REPO: core
+          GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_BRANCHE: develop
           REGEXP_PATCH: '^fix'
           REGEXP_MINOR: '^feat'

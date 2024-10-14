@@ -14,6 +14,7 @@ import type { RecieveFormDataOptions } from "./parser";
 import type { RequiredKeys } from "@utils/requiredKeys";
 import type { HookEvaler } from "./hook";
 import type { BuildedRouter, RouterEvaler } from "./router";
+import { makeHookInformation } from "./hook/default";
 
 export interface Environments {
 	DEV: true;
@@ -45,7 +46,6 @@ export type DuploInputConfig = SimplifyType<
 			"disabledRuntimeEndPointCheck" | "disabledZodAccelerator" | "keyToInformationInHeaders" | "plugins"
 		>,
 		"bodySizeLimit" | "recieveFormDataOptions"
-
 	> & {
 		bodySizeLimit?: number | BytesInString;
 		recieveFormDataOptions?: Partial<RecieveFormDataOptions>;
@@ -95,11 +95,7 @@ export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInput
 		};
 
 		this.hooksRouteLifeCycle.beforeSend.addSubscriber(
-			(request, response) => {
-				if (response.information) {
-					response.headers[this.config.keyToInformationInHeaders] = response.information;
-				}
-			},
+			makeHookInformation(this.config.keyToInformationInHeaders),
 		);
 
 		this.config.plugins.forEach((plugin) => void plugin(this));

@@ -1,6 +1,7 @@
 import type { AnyFunction } from "./utils/types";
 
-const { eval: shadowEval } = global;
+// eslint-disable-next-line no-eval
+const shadowEval = eval;
 
 export interface EvalerParams {
 	args?: string[];

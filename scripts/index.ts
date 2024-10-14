@@ -6,6 +6,7 @@ export * from "@scripts/floor";
 export * from "@scripts/router";
 export * from "@scripts/parser";
 export * from "@scripts/mimeType";
+export * from "@scripts/globals";
 
 export * from "@scripts/builder/duplose";
 export * from "@scripts/builder/route";

@@ -1,4 +1,4 @@
-import { Duplo, type Request } from "@duplojs/core";
+import { Duplo, type Request, type globalValues } from "@duplojs/core";
 import type { ExpectType } from "@test/expectType";
 
 export const duplo = new Duplo({
@@ -12,3 +12,9 @@ duplo.hook("beforeRouteExecution", (request) => {
 duplo.hook("onError", (request) => {
 	type check = ExpectType<typeof request, Request, "strict">;
 });
+
+type globalChek = ExpectType<
+	keyof Pick<typeof globalThis, keyof typeof globalValues>,
+	keyof typeof globalValues,
+	"strict"
+>;

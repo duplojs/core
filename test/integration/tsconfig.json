@@ -11,7 +11,8 @@
 		"@types": ["src/types.d.ts"],
 		"@src/*": ["src/*"],
 		"@test/*": ["test/*"],
-	}, 
+	},
+	"types": ["@duplojs/core/globals", "vitest/globals", "node"]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
 }

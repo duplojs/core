@@ -45,7 +45,7 @@ describe("response", () => {
 
 		type check1 = ExpectType<
 			typeof contract1,
-			Response<400, string | undefined, ZodSpace.ZodUndefined>[],
+			[Response<400, string | undefined, ZodSpace.ZodUndefined>],
 			"strict"
 		>;
 
@@ -57,10 +57,10 @@ describe("response", () => {
 
 		type check2 = ExpectType<
 			typeof contract2,
-			(
-				| Response<400, "superInfo1", ZodSpace.ZodUndefined>
-				| Response<400, "superInfo2", ZodSpace.ZodUndefined>
-			)[],
+			[
+				Response<400, "superInfo1", ZodSpace.ZodUndefined>,
+				Response<400, "superInfo2", ZodSpace.ZodUndefined>,
+			],
 			"strict"
 		>;
 
@@ -71,7 +71,7 @@ describe("response", () => {
 
 		type check3 = ExpectType<
 			typeof contract3,
-			Response<400, "toto", ZodSpace.ZodString>[],
+			[Response<400, "toto", ZodSpace.ZodString>],
 			"strict"
 		>;
 

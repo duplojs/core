@@ -23,7 +23,6 @@ export type ZodTypeToKeyAndValue<
 				GetPresetCheckerGeneric<inferedPresetChecker>["key"],
 				ZodSpace.infer<GenericZodType>
 			>
-
 	)
 	: KeyAndValue<GenericObjectKey, ZodSpace.infer<GenericZodType>>;
 

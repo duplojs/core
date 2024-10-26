@@ -1,7 +1,7 @@
 import { getTypedEntries } from "@utils/getTypedEntries";
 import { zod, type ZodSpace } from "@scripts/parser";
 import type { UniqueGeneric } from "@utils/uniqueGeneric";
-import type { SimplifyType } from "@utils/simplifyType";
+import type { UnionToTuple } from "@utils/unionToTuple";
 
 const unique = Symbol("unique");
 
@@ -89,13 +89,13 @@ export type MakeResponseContract<
 	T extends ResponseToMakeContracts,
 	I extends string,
 	B extends UniqueGeneric<ZodSpace.ZodType>,
-> = {
+> = UnionToTuple<{
 	[P in I]: Response<
 		T["code"],
 		string extends P ? string | undefined : P,
 		UniqueGeneric<ZodSpace.ZodType> extends B ? ZodSpace.ZodUndefined : B
 	>
-}[I][];
+}[I]>;
 
 export function makeResponseContract<
 	T extends ResponseToMakeContracts,
@@ -105,12 +105,12 @@ export function makeResponseContract<
 	response: T,
 	info?: I | I[],
 	body?: B,
-): SimplifyType<MakeResponseContract<T, I, B>> {
+): MakeResponseContract<T, I, B> {
 	const informations = info instanceof Array
 		? info
 		: [info];
 
 	return informations.map(
 		(information) => new Response(response.code, information, body ?? zod.undefined()),
-	) satisfies ContractResponse[] as any;
+	) satisfies ContractResponse[] as never;
 }

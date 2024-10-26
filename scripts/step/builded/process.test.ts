@@ -70,7 +70,7 @@ describe("BuildedProcessStep", () => {
 
 		const buildedProcessStep = new BuildedProcessStep(duploTest, step, await process.build());
 
-		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/process1.txt");
+		expect(buildedProcessStep.toString(1)).toMatchSnapshot();
 	});
 
 	it("toString options: object, input, skip", async() => {
@@ -87,6 +87,6 @@ describe("BuildedProcessStep", () => {
 
 		const buildedProcessStep = new BuildedProcessStep(duploTest, step, await process.build());
 
-		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/process2.txt");
+		expect(buildedProcessStep.toString(1)).toMatchSnapshot();
 	});
 });

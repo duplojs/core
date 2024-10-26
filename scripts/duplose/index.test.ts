@@ -89,7 +89,7 @@ describe("Duplose", () => {
 		expect(acceleratedExtact.params.userId).instanceOf(ZodAcceleratorParser);
 	});
 
-	it("injectCode", async() => {
+	it("injectCode", () => {
 		duplose.edition.injectCode(
 			"(ttt)",
 			"let toto = 1;",
@@ -124,17 +124,17 @@ describe("Duplose", () => {
 			"bottom",
 		);
 
-		await expect(duplose.aef(insertBlock("test"))).toMatchFileSnapshot("__data__/injectCode.txt");
+		expect(duplose.aef(insertBlock("test"))).toMatchSnapshot();
 	});
 
-	it("injectFunction", async() => {
+	it("injectFunction", () => {
 		duplose.edition.injectFunction(
 			"test",
 			() => void "",
 			"top",
 		);
 
-		await expect(duplose.aef(insertBlock("test"))).toMatchFileSnapshot("__data__/injectFunction.txt");
+		expect(duplose.aef(insertBlock("test"))).toMatchSnapshot();
 	});
 
 	it("addExtensions", () => {

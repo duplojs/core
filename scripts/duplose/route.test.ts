@@ -73,8 +73,7 @@ describe("Route", () => {
 
 		expect(spy).toBeCalled();
 
-		await expect(spy.mock.lastCall?.[0].content)
-			.toMatchFileSnapshot("__data__/route.txt");
+		expect(spy.mock.lastCall?.[0].content).toMatchSnapshot();
 
 		route.hooks.onError.addSubscriber((_request, error) => {
 			checkpointList.addPoint("onError");

@@ -25,8 +25,6 @@ export interface DuploseBuildedFunctionContext<
 > {
 	makeFloor: typeof makeFloor;
 	Response: typeof Response;
-	extract?: ExtractObject | AcceleratedExtractObject;
-	extractError: ExtractErrorFunction;
 	preflightSteps: BuildedPreflightStep[];
 	steps: BuildedStep[];
 	extensions: DuploseContextExtensions;
@@ -38,35 +36,6 @@ export interface DuploseBuildedFunctionContext<
 export interface DuploseContextExtensions {
 	injectedFunction: EditInjectFunction[];
 	[x: ObjectKey]: unknown;
-}
-
-export type ExtractErrorFunction = (
-	type: keyof ExtractObject,
-	key: string,
-	error: ZodSpace.ZodError
-) => PresetGenericResponse;
-
-export interface DisabledExtractKey {
-	method: true;
-}
-
-export type ExtractKey<
-	T extends object = CurrentRequestObject,
-> = Exclude<
-	keyof T,
-	GetPropsWithTrueValue<DisabledExtractKey>
->;
-
-export type ExtractObject<
-	T extends object = CurrentRequestObject,
-> = {
-	[P in ExtractKey<T>]?: { [x: string]: ZodSpace.ZodType } | ZodSpace.ZodType;
-};
-
-export interface AcceleratedExtractObject {
-	[x: ObjectKey]:
-		| Record<string, ZodAcceleratorParser<ZodSpace.ZodType, unknown>>
-		| ZodAcceleratorParser<ZodSpace.ZodType, unknown>;
 }
 
 export type DefineHooksRouteLifeCycle<

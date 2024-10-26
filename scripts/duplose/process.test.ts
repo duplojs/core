@@ -63,8 +63,7 @@ describe("Process", () => {
 
 		expect(spy).toBeCalled();
 
-		await expect(spy.mock.lastCall?.[0].content)
-			.toMatchFileSnapshot("__data__/process.txt");
+		expect(spy.mock.lastCall?.[0].content).toMatchSnapshot();
 
 		const processFunction = await process.build();
 

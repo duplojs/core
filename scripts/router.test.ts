@@ -49,7 +49,7 @@ describe("Router", () => {
 			},
 		);
 
-		await expect(spy.mock.lastCall?.[0].content).toMatchFileSnapshot("__data__/router.txt");
+		expect(spy.mock.lastCall?.[0].content).toMatchSnapshot();
 	});
 
 	it("test finder", async() => {

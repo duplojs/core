@@ -4,7 +4,7 @@ import { Response } from "@scripts/response";
 import { zod } from "@scripts/parser";
 import { duploTest } from "@test/utils/duploTest";
 
-it("BuildedCutStep", async() => {
+it("BuildedCutStep", () => {
 	const cutFunction: Cut = ({ dropper }) => dropper({});
 
 	const step = new CutStep(cutFunction, ["test"], [new Response(100, "toto", zod.undefined())]);
@@ -16,5 +16,5 @@ it("BuildedCutStep", async() => {
 
 	expect(buildedCutStep.drop).toStrictEqual(["test"]);
 
-	await expect(buildedCutStep.toString(2)).toMatchFileSnapshot("__data__/cut.txt");
+	expect(buildedCutStep.toString(2)).toMatchSnapshot();
 });

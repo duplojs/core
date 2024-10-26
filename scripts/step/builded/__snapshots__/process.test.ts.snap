@@ -1,0 +1,85 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BuildedProcessStep > toString options: function, pickup 1`] = `
+"
+			
+/* step-process-(1)-before */
+/* end_block */
+
+
+			result = this.steps[1].processFunction(
+				request,
+				this.steps[1].params.options(floor.pickup),
+				this.steps[1].params.input(floor.pickup)
+			);
+
+			
+/* step-process-(1)-before-check-result */
+/* end_block */
+
+
+			if(result instanceof this.Response){
+
+break Execution;
+}
+
+			
+/* step-process-(1)-before-drop */
+/* end_block */
+
+
+			floor.drop("rr", result["rr"]);
+floor.drop("tt", result["tt"]);
+
+			
+/* step-process-(1)-after */
+/* end_block */
+
+			"
+`;
+
+exports[`BuildedProcessStep > toString options: object, input, skip 1`] = `
+"
+		
+/* step-skip-(1)-before */
+/* end_block */
+
+
+		if(!this.steps[1].params.skip(floor.pickup)){
+			
+			
+/* step-process-(1)-before */
+/* end_block */
+
+
+			result = this.steps[1].processFunction(
+				request,
+				this.steps[1].params.options,
+				this.steps[1].params.input(floor.pickup)
+			);
+
+			
+/* step-process-(1)-before-check-result */
+/* end_block */
+
+
+			if(result instanceof this.Response){
+
+break Execution;
+}
+
+			
+/* step-process-(1)-before-drop */
+/* end_block */
+
+
+			
+
+			
+/* step-process-(1)-after */
+/* end_block */
+
+			
+		}
+		"
+`;

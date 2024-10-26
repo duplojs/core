@@ -1,0 +1,140 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BuildedExtractStep 1`] = `
+"
+/* setp-extract-(4)-before */
+/* end_block */
+
+
+			
+/* setp-extract-(4)-(query)-(search)-before */
+/* end_block */
+
+		
+			{
+				let temp = this.steps[4]
+					.extractObject["query"]["search"]
+					.safeParse(request["query"]?.["search"])
+		
+				if(!temp.success){
+					result = this.steps[4].catchError(
+						"query",
+						"search",
+						temp.error,
+					);
+					break Execution;
+				}
+		
+				floor.drop(
+					"search",
+					temp.data,
+				);
+			}
+		
+			
+/* setp-extract-(4)-(query)-(search)-after */
+/* end_block */
+
+			
+
+			
+/* setp-extract-(4)-(params)-(userId)-before */
+/* end_block */
+
+		
+			{
+				let temp = await this.steps[4]
+					.extractObject["params"]["userId"].safeParseAsync(request["params"]?.["userId"])
+		
+				if(!temp.success){
+					result = temp.error.issues.at(-1)?.params?.response;
+		
+					if(result instanceof this.Response) {
+						break Execution;
+					}
+		
+					result = this.steps[4].catchError(
+						"params",
+						"userId",
+						temp.error,
+					);
+					break Execution;
+				}
+		
+				floor.drop("presetResult", temp.data)
+			}
+		
+			
+/* setp-extract-(4)-(params)-(userId)-after */
+/* end_block */
+
+			
+
+			
+/* setp-extract-(4)-(host)-before */
+/* end_block */
+
+		
+			{
+				let temp = await this.steps[4]
+					.extractObject["host"].safeParseAsync(request["host"])
+		
+				if(!temp.success){
+					result = temp.error.issues.at(-1)?.params?.response;
+		
+					if(result instanceof this.Response) {
+						break Execution;
+					}
+		
+					result = this.steps[4].catchError(
+						"host",
+						undefined,
+						temp.error,
+					);
+					break Execution;
+				}
+		
+				floor.drop("presetResult", temp.data)
+			}
+		
+			
+/* setp-extract-(4)-(host)-after */
+/* end_block */
+
+			
+
+			
+/* setp-extract-(4)-(body)-before */
+/* end_block */
+
+		
+			{
+				let temp = this.steps[4]
+					.extractObject["body"]
+					.safeParse(request["body"])
+		
+				if(!temp.success){
+					result = this.steps[4].catchError(
+						"body",
+						undefined,
+						temp.error,
+					);
+					break Execution;
+				}
+		
+				floor.drop(
+					"body",
+					temp.data,
+				);
+			}
+		
+			
+/* setp-extract-(4)-(body)-after */
+/* end_block */
+
+			
+
+/* setp-extract-(4)-after */
+/* end_block */
+"
+`;

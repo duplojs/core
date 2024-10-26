@@ -71,7 +71,7 @@ describe("BuildedPreflightStep", () => {
 
 		const buildedProcessStep = new BuildedPreflightStep(duploTest, step, await process.build());
 
-		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/preflight1.txt");
+		expect(buildedProcessStep.toString(1)).toMatchSnapshot();
 	});
 
 	it("toString options: object, input, skip", async() => {
@@ -88,6 +88,6 @@ describe("BuildedPreflightStep", () => {
 
 		const buildedProcessStep = new BuildedPreflightStep(duploTest, step, await process.build());
 
-		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/preflight2.txt");
+		expect(buildedProcessStep.toString(1)).toMatchSnapshot();
 	});
 });

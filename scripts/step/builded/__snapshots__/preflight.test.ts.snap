@@ -1,0 +1,85 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BuildedPreflightStep > toString options: function, pickup 1`] = `
+"
+				
+/* preflight-process-(1)-before */
+/* end_block */
+
+
+				result = this.preflightSteps[1].processFunction(
+					request,
+					this.preflightSteps[1].params.options(floor.pickup),
+					this.preflightSteps[1].params.input(floor.pickup)
+				);
+
+				
+/* preflight-process-(1)-before-check-result */
+/* end_block */
+
+
+				if(result instanceof this.Response){
+
+break Execution;
+}
+
+				
+/* preflight-process-(1)-before-drop */
+/* end_block */
+
+
+				floor.drop("rr", result["rr"]);
+floor.drop("tt", result["tt"]);
+
+				
+/* preflight-process-(1)-after */
+/* end_block */
+
+			"
+`;
+
+exports[`BuildedPreflightStep > toString options: object, input, skip 1`] = `
+"
+		
+/* preflight-skip-(1)-before */
+/* end_block */
+
+
+		if(!this.preflightSteps[1].params.skip(floor.pickup)){
+			
+				
+/* preflight-process-(1)-before */
+/* end_block */
+
+
+				result = this.preflightSteps[1].processFunction(
+					request,
+					this.preflightSteps[1].params.options,
+					this.preflightSteps[1].params.input(floor.pickup)
+				);
+
+				
+/* preflight-process-(1)-before-check-result */
+/* end_block */
+
+
+				if(result instanceof this.Response){
+
+break Execution;
+}
+
+				
+/* preflight-process-(1)-before-drop */
+/* end_block */
+
+
+				
+
+				
+/* preflight-process-(1)-after */
+/* end_block */
+
+			
+		}
+		"
+`;

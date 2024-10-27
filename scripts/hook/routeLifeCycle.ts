@@ -5,7 +5,7 @@ import { Hook, type BuildHooks } from ".";
 import { HooksLifeCycle } from "./lifeCycle";
 
 export class HooksRouteLifeCycle <
-	Request extends CurrentRequestObject,
+	Request extends CurrentRequestObject = CurrentRequestObject,
 > extends HooksLifeCycle {
 	public beforeRouteExecution
 		= new Hook<(request: Request) => PromiseOrNot<boolean | PresetGenericResponse | void>>(1);

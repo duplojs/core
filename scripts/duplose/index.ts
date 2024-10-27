@@ -1,19 +1,16 @@
-import type { PresetGenericResponse, Response } from "@scripts/response";
+import type { Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
 import type { AnyFunction, ObjectKey } from "@utils/types";
-import { zod, type ZodSpace } from "@scripts/parser";
 import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
 import type { makeFloor } from "@scripts/floor";
 import type { BuildedStep } from "@scripts/step/builded";
 import type { PreflightStep } from "@scripts/step/preflight";
 import type { BuildedPreflightStep } from "@scripts/step/builded/preflight";
-import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import type { ContractResponseError } from "@scripts/error/contractResponseError";
 import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
-import { type ZodAcceleratorParser, ZodAccelerator } from "@duplojs/zod-accelerator";
 import { getTypedEntries } from "@utils/getTypedEntries";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 import { StringBuilder } from "@utils/stringBuilder";
@@ -21,7 +18,7 @@ import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKey
 import { Evaler, type EvalerParams } from "@scripts/evaler";
 
 export interface DuploseBuildedFunctionContext<
-	T extends Duplose = Duplose,
+	T extends PresetGenericDuplose = PresetGenericDuplose,
 > {
 	makeFloor: typeof makeFloor;
 	Response: typeof Response;
@@ -55,8 +52,15 @@ export type EditInjectFunction = (
 	result: unknown,
 ) => void;
 
+export interface DuploseDefinition {
+	hooks: HooksRouteLifeCycle;
+	preflightSteps: PreflightStep[];
+	steps: Step[];
+	descriptions: Description[];
+}
+
 export interface DuploseEvalerParams extends EvalerParams {
-	duplose: Duplose;
+	duplose: PresetGenericDuplose;
 }
 
 export class DuploseEvaler extends Evaler<DuploseEvalerParams> {
@@ -64,24 +68,13 @@ export class DuploseEvaler extends Evaler<DuploseEvalerParams> {
 }
 
 export abstract class Duplose<
-	GenericBuildedFunction extends AnyFunction = any,
-	_GenericRequest extends CurrentRequestObject = any,
-	_GenericPreflightStep extends PreflightStep = any,
-	_GenericExtract extends ExtractObject = any,
-	_GenericStep extends Step = any,
-	_GenericFloorData extends object = any,
+	GenericDuploseDefinition extends DuploseDefinition,
+	_GenericRequest extends CurrentRequestObject,
+	_GenericFloorData extends object,
 > {
+	public readonly definiton: GenericDuploseDefinition;
+
 	public instance?: Duplo;
-
-	public hooks = new HooksRouteLifeCycle<CurrentRequestObject>();
-
-	public preflightSteps: PreflightStep[] = [];
-
-	public extract?: ExtractObject;
-
-	public extractError?: ExtractErrorFunction;
-
-	public steps: Step[] = [];
 
 	public editingFunctions: EditingDuploseFunction[] = [];
 
@@ -89,76 +82,29 @@ export abstract class Duplose<
 		injectedFunction: [],
 	};
 
-	public descriptions: Description[] = [];
-
 	public origin?: unknown;
 
 	public evaler?: DuploseEvaler;
 
-	public constructor(descriptions: Description[] = []) {
-		this.descriptions.push(...descriptions);
-	}
-
-	public setExtract(
-		extract: ExtractObject,
-		extractError?: ExtractErrorFunction,
-		descriptions: Description[] = [],
-	) {
-		this.extract = extract;
-		this.extractError = extractError;
-
-		this.descriptions.push(...descriptions);
-	}
-
-	public addPreflightSteps(...preflightSteps: PreflightStep[]) {
-		this.preflightSteps.push(...preflightSteps);
-	}
-
-	public addStep(...steps: Step[]) {
-		this.steps.push(...steps);
+	public constructor(definiton: GenericDuploseDefinition) {
+		this.definiton = definiton;
 	}
 
 	public getAllHooks() {
 		const hooks = new HooksRouteLifeCycle();
 
-		hooks.import(this.hooks);
+		hooks.import(this.definiton.hooks);
 
-		this.steps
+		this.definiton
+			.steps
 			.filter((step): step is ProcessStep => step instanceof ProcessStep)
 			.forEach((step) => void hooks.import(step.parent.getAllHooks()));
 
-		this.preflightSteps.forEach((step) => {
+		this.definiton.preflightSteps.forEach((step) => {
 			hooks.import(step.parent.getAllHooks());
 		});
 
 		return hooks;
-	}
-
-	protected acceleratedExtract() {
-		if (this.extract) {
-			return getTypedEntries(this.extract)
-				.reduce<AcceleratedExtractObject>(
-					(pv, [key, value]) => {
-						if (value instanceof zod.ZodType) {
-							pv[key] = ZodAccelerator.build(value);
-						} else {
-							const deepExtract: Record<string, ZodAcceleratorParser<ZodSpace.ZodType, unknown>> = {};
-
-							getTypedEntries(value)
-								.forEach(
-									([subKey, subValue]) => {
-										deepExtract[subKey] = ZodAccelerator.build(subValue);
-									},
-								);
-
-							pv[key] = deepExtract;
-						}
-
-						return pv;
-					},
-					{},
-				);
-		}
 	}
 
 	protected applyEditingFunctions(content: string) {
@@ -243,20 +189,20 @@ export abstract class Duplose<
 		};
 	}
 
-	public hasDuplose(duplose: Duplose, deep = Infinity) {
+	public hasDuplose(duplose: PresetGenericDuplose, deep = Infinity) {
 		if (deep === 0) {
 			return false;
 		} else if (duplose === this) {
 			return true;
 		}
 
-		for (const preflight of this.preflightSteps) {
+		for (const preflight of this.definiton.preflightSteps) {
 			if (preflight.parent.hasDuplose(duplose, deep - 1)) {
 				return true;
 			}
 		}
 
-		for (const step of this.steps) {
+		for (const step of this.definiton.steps) {
 			if (
 				step.parent instanceof Duplose
 				&& step.parent.hasDuplose(duplose, deep - 1)
@@ -268,7 +214,13 @@ export abstract class Duplose<
 		return false;
 	}
 
-	public abstract build(): Promise<GenericBuildedFunction>;
+	public abstract build(): Promise<AnyFunction>;
 
 	public static readonly defaultEvaler = new DuploseEvaler();
 }
+
+export type PresetGenericDuplose = Duplose<
+	DuploseDefinition,
+	CurrentRequestObject,
+	object
+>;

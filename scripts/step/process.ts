@@ -1,5 +1,5 @@
 import type { Description } from "@scripts/description";
-import type { GetProcessGeneric, Process, ProcessBuildedFunction } from "@scripts/duplose/process";
+import type { GetProcessGeneric, PresetGenericProcess } from "@scripts/duplose/process";
 import { Step } from ".";
 import type { Floor } from "@scripts/floor";
 import { BuildedProcessStep } from "./builded/process";
@@ -18,13 +18,13 @@ export interface ProcessStepParams<
 }
 
 export class ProcessStep<
-	CurrentProcess extends Process = Process,
-	_StepNumber extends number = number,
-> extends Step<CurrentProcess, _StepNumber> {
+	GenericProcess extends PresetGenericProcess = PresetGenericProcess,
+	_GenericStepNumber extends number = number,
+> extends Step<GenericProcess, _GenericStepNumber> {
 	public params: ProcessStepParams;
 
 	public constructor(
-		process: CurrentProcess,
+		process: GenericProcess,
 		params: ProcessStepParams = {},
 		descriptions: Description[] = [],
 	) {
@@ -33,7 +33,7 @@ export class ProcessStep<
 	}
 
 	public async build(instance: Duplo) {
-		const processFunction: ProcessBuildedFunction = await this.parent.build();
+		const processFunction = await this.parent.build();
 
 		return new BuildedProcessStep(
 			instance,

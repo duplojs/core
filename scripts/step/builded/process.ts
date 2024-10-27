@@ -11,7 +11,7 @@ export class BuildedProcessStep extends BuildedStep<ProcessStep> {
 	public constructor(
 		instance: Duplo,
 		step: ProcessStep,
-		public processFunction: ProcessBuildedFunction,
+		public processFunction: ProcessBuildedFunction<any>,
 	) {
 		super(instance, step);
 		this.params = simpleClone(step.params);
@@ -19,21 +19,21 @@ export class BuildedProcessStep extends BuildedStep<ProcessStep> {
 		if (typeof this.params.options === "function") {
 			const originalOptions = this.params.options;
 			this.params.options = (pickup) => ({
-				...step.parent.options,
+				...step.parent.definiton.options,
 				...originalOptions(pickup),
 			});
 		} else if (this.params.options) {
 			this.params.options = {
-				...step.parent.options,
+				...step.parent.definiton.options,
 				...this.params.options,
 			};
 		} else {
-			this.params.options = step.parent.options;
+			this.params.options = step.parent.definiton.options;
 		}
 
 		if (!this.params.input) {
-			this.params.input = step.parent.input
-				? () => step.parent.input
+			this.params.input = step.parent.definiton.input
+				? () => step.parent.definiton.input
 				: undefined;
 		}
 	}

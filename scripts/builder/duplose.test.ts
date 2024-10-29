@@ -98,8 +98,8 @@ describe("useBuilder", () => {
 				return new OkHttpResponse("test", undefined);
 			});
 
-		expect(route.preflightSteps[0].parent).toBe(manualProcess);
-		expect(route.descriptions[0]).toBe(description1);
+		expect(route.definiton.preflightSteps[0].parent).toBe(manualProcess);
+		expect(route.definiton.descriptions[0]).toBe(description1);
 
 		useBuilder()
 			.createRoute("GET", "/")
@@ -132,8 +132,8 @@ describe("useBuilder", () => {
 			})
 			.exportation();
 
-		expect(process.preflightSteps[0].parent).toBe(manualProcess);
-		expect(process.descriptions[0]).toBe(description1);
+		expect(process.definiton.preflightSteps[0].parent).toBe(manualProcess);
+		expect(process.definiton.descriptions[0]).toBe(description1);
 
 		useBuilder()
 			.createProcess("test")
@@ -149,7 +149,7 @@ describe("useBuilder", () => {
 		useBuilder.resetCreatedDuploses();
 		function arrayDuploseToProcessName(duploses: Duplose[]) {
 			return duploses
-				.map((duplose) => duplose instanceof Process ? duplose.name : null)
+				.map((duplose) => duplose instanceof Process ? duplose.definiton.name : null)
 				.filter((name): name is string => typeof name === "string");
 		}
 

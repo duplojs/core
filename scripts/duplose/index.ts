@@ -18,7 +18,7 @@ import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKey
 import { Evaler, type EvalerParams } from "@scripts/evaler";
 
 export interface DuploseBuildedFunctionContext<
-	T extends PresetGenericDuplose = PresetGenericDuplose,
+	T extends Duplose = Duplose,
 > {
 	makeFloor: typeof makeFloor;
 	Response: typeof Response;
@@ -53,14 +53,13 @@ export type EditInjectFunction = (
 ) => void;
 
 export interface DuploseDefinition {
-	hooks: HooksRouteLifeCycle;
 	preflightSteps: PreflightStep[];
 	steps: Step[];
 	descriptions: Description[];
 }
 
 export interface DuploseEvalerParams extends EvalerParams {
-	duplose: PresetGenericDuplose;
+	duplose: Duplose;
 }
 
 export class DuploseEvaler extends Evaler<DuploseEvalerParams> {
@@ -68,11 +67,13 @@ export class DuploseEvaler extends Evaler<DuploseEvalerParams> {
 }
 
 export abstract class Duplose<
-	GenericDuploseDefinition extends DuploseDefinition,
-	_GenericRequest extends CurrentRequestObject,
-	_GenericFloorData extends object,
+	GenericDuploseDefinition extends DuploseDefinition = DuploseDefinition,
+	_GenericRequest extends CurrentRequestObject = any,
+	_GenericFloorData extends object = any,
 > {
 	public readonly definiton: GenericDuploseDefinition;
+
+	public hooks = new HooksRouteLifeCycle<_GenericRequest>();
 
 	public instance?: Duplo;
 
@@ -91,9 +92,9 @@ export abstract class Duplose<
 	}
 
 	public getAllHooks() {
-		const hooks = new HooksRouteLifeCycle();
+		const hooks = new HooksRouteLifeCycle<_GenericRequest>();
 
-		hooks.import(this.definiton.hooks);
+		hooks.import(this.hooks);
 
 		this.definiton
 			.steps
@@ -189,7 +190,7 @@ export abstract class Duplose<
 		};
 	}
 
-	public hasDuplose(duplose: PresetGenericDuplose, deep = Infinity) {
+	public hasDuplose(duplose: Duplose<any, any, any>, deep = Infinity) {
 		if (deep === 0) {
 			return false;
 		} else if (duplose === this) {
@@ -214,13 +215,15 @@ export abstract class Duplose<
 		return false;
 	}
 
+	public hook<
+		T extends keyof BuildedHooksRouteLifeCycle<_GenericRequest>,
+	>(hookName: T, subscriber: BuildedHooksRouteLifeCycle<_GenericRequest>[T]) {
+		this.hooks[hookName].addSubscriber(subscriber as AnyFunction);
+
+		return this;
+	}
+
 	public abstract build(): Promise<AnyFunction>;
 
 	public static readonly defaultEvaler = new DuploseEvaler();
 }
-
-export type PresetGenericDuplose = Duplose<
-	DuploseDefinition,
-	CurrentRequestObject,
-	object
->;

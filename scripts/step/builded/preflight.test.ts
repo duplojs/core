@@ -4,15 +4,17 @@ import { makeFloor } from "@scripts/floor";
 import { BuildedPreflightStep } from "./preflight";
 import { PreflightStep } from "../preflight";
 import { duploTest } from "@test/utils/duploTest";
+import { createProcessDefinition } from "@test/utils/manualDuplose";
 
 describe("BuildedPreflightStep", () => {
-	const process = new Process("test");
+	const process = new Process(createProcessDefinition({
+		options: {
+			toto: 1,
+			test: "",
+		},
+		input: 22,
+	}));
 	process.instance = duploTest;
-	process.setOptions({
-		toto: 1,
-		test: "",
-	});
-	process.setInput(22);
 
 	it("merge object options", async() => {
 		const params: ProcessStepParams = {

@@ -7,82 +7,81 @@ describe("life cycle hooks", async() => {
 
 	const deepPreflight1 = useBuilder()
 		.createProcess("deepPreflight1")
+		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("deepPreflight1 beforeRouteExecution"))
 		.hook("parsingBody", () => void checkPoint.addPoint("deepPreflight1 parsingBody"))
 		.hook("onError", () => void checkPoint.addPoint("deepPreflight1 onError"))
 		.hook("beforeSend", () => void checkPoint.addPoint("deepPreflight1 beforeSend"))
 		.hook("serializeBody", () => void checkPoint.addPoint("deepPreflight1 serializeBody"))
-		.hook("afterSend", () => void checkPoint.addPoint("deepPreflight1 afterSend"))
-		.exportation();
+		.hook("afterSend", () => void checkPoint.addPoint("deepPreflight1 afterSend"));
 
 	const deepProcess1 = useBuilder()
 		.createProcess("deepProcess")
+		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("deepProcess1 beforeRouteExecution"))
 		.hook("parsingBody", () => void checkPoint.addPoint("deepProcess1 parsingBody"))
 		.hook("onError", () => void checkPoint.addPoint("deepProcess1 onError"))
 		.hook("beforeSend", () => void checkPoint.addPoint("deepProcess1 beforeSend"))
 		.hook("serializeBody", () => void checkPoint.addPoint("deepProcess1 serializeBody"))
-		.hook("afterSend", () => void checkPoint.addPoint("deepProcess1 afterSend"))
-		.exportation();
+		.hook("afterSend", () => void checkPoint.addPoint("deepProcess1 afterSend"));
 
 	const preflight = useBuilder()
 		.preflight(deepPreflight1)
 		.createProcess("process")
+		.execute(deepProcess1)
+		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("preflight beforeRouteExecution"))
 		.hook("parsingBody", () => void checkPoint.addPoint("preflight parsingBody"))
 		.hook("onError", () => void checkPoint.addPoint("preflight onError"))
 		.hook("beforeSend", () => void checkPoint.addPoint("preflight beforeSend"))
 		.hook("serializeBody", () => void checkPoint.addPoint("preflight serializeBody"))
-		.hook("afterSend", () => void checkPoint.addPoint("preflight afterSend"))
-		.execute(deepProcess1)
-		.exportation();
+		.hook("afterSend", () => void checkPoint.addPoint("preflight afterSend"));
 
 	const deepPreflight2 = useBuilder()
 		.createProcess("deepPreflight2")
+		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("deepPreflight2 beforeRouteExecution"))
 		.hook("parsingBody", () => void checkPoint.addPoint("deepPreflight2 parsingBody"))
 		.hook("onError", () => void checkPoint.addPoint("deepPreflight2 onError"))
 		.hook("beforeSend", () => void checkPoint.addPoint("deepPreflight2 beforeSend"))
 		.hook("serializeBody", () => void checkPoint.addPoint("deepPreflight2 serializeBody"))
-		.hook("afterSend", () => void checkPoint.addPoint("deepPreflight2 afterSend"))
-		.exportation();
+		.hook("afterSend", () => void checkPoint.addPoint("deepPreflight2 afterSend"));
 
 	const deepProcess2 = useBuilder()
 		.createProcess("deepProcess2")
+		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("deepProcess2 beforeRouteExecution"))
 		.hook("parsingBody", () => void checkPoint.addPoint("deepProcess2 parsingBody"))
 		.hook("onError", () => void checkPoint.addPoint("deepProcess2 onError"))
 		.hook("beforeSend", () => void checkPoint.addPoint("deepProcess2 beforeSend"))
 		.hook("serializeBody", () => void checkPoint.addPoint("deepProcess2 serializeBody"))
-		.hook("afterSend", () => void checkPoint.addPoint("deepProcess2 afterSend"))
-		.exportation();
+		.hook("afterSend", () => void checkPoint.addPoint("deepProcess2 afterSend"));
 
 	const process = useBuilder()
 		.preflight(deepPreflight2)
 		.createProcess("process")
+		.execute(deepProcess2)
+		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("process beforeRouteExecution"))
 		.hook("parsingBody", () => void checkPoint.addPoint("process parsingBody"))
 		.hook("onError", () => void checkPoint.addPoint("process onError"))
 		.hook("beforeSend", () => void checkPoint.addPoint("process beforeSend"))
 		.hook("serializeBody", () => void checkPoint.addPoint("process serializeBody"))
-		.hook("afterSend", () => void checkPoint.addPoint("process afterSend"))
-		.execute(deepProcess2)
-		.exportation();
+		.hook("afterSend", () => void checkPoint.addPoint("process afterSend"));
 
 	const route = useBuilder()
 		.preflight(preflight)
-		.createRoute("GET", "/")
+		.createRoute("POST", "/")
+		.execute(process)
+		.handler(() => {
+			throw new Error();
+		})
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("route beforeRouteExecution"))
 		.hook("parsingBody", () => void checkPoint.addPoint("route parsingBody"))
 		.hook("onError", () => void checkPoint.addPoint("route onError"))
 		.hook("beforeSend", () => void checkPoint.addPoint("route beforeSend"))
 		.hook("serializeBody", () => void checkPoint.addPoint("route serializeBody"))
-		.hook("afterSend", () => void checkPoint.addPoint("route afterSend"))
-		.extract({ body: zod.any() })
-		.execute(process)
-		.handler(() => {
-			throw new Error();
-		});
+		.hook("afterSend", () => void checkPoint.addPoint("route afterSend"));
 
 	const duplo = new Duplo({ environment: "TEST" });
 	duplo.hooksRouteLifeCycle.beforeSend.subscribers = [];
@@ -158,15 +157,14 @@ describe("life cycle hooks", async() => {
 	it("correct return response", async() => {
 		const route = useBuilder()
 			.preflight(preflight)
-			.createRoute("GET", "/")
-			.hook("beforeRouteExecution", (request) => request.params.type === "beforeRouteExecution" ? new OkHttpResponse(undefined, "beforeRouteExecution") : undefined)
-			.hook("parsingBody", (request) => request.params.type === "parsingBody" ? new OkHttpResponse(undefined, "parsingBody") : undefined)
-			.hook("onError", (request) => request.params.type === "onError" ? new OkHttpResponse(undefined, "onError") : undefined)
-			.extract({ body: zod.any() })
+			.createRoute("POST", "/")
 			.execute(process)
 			.handler(() => {
 				throw new Error();
-			});
+			})
+			.hook("beforeRouteExecution", (request) => request.params.type === "beforeRouteExecution" ? new OkHttpResponse(undefined, "beforeRouteExecution") : undefined)
+			.hook("parsingBody", (request) => request.params.type === "parsingBody" ? new OkHttpResponse(undefined, "parsingBody") : undefined)
+			.hook("onError", (request) => request.params.type === "onError" ? new OkHttpResponse(undefined, "onError") : undefined);
 
 		duplo.register(route);
 

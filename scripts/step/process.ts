@@ -1,5 +1,5 @@
 import type { Description } from "@scripts/description";
-import type { GetProcessGeneric, PresetGenericProcess } from "@scripts/duplose/process";
+import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
 import { Step } from ".";
 import type { Floor } from "@scripts/floor";
 import { BuildedProcessStep } from "./builded/process";
@@ -12,13 +12,13 @@ export interface ProcessStepParams<
 	Skip extends ((floor: any) => boolean) | undefined = ((floor: any) => boolean) | undefined,
 > {
 	options?: Partial<ProcessGeneric["options"]> | ((pickup: Floor<FloorData>["pickup"]) => Partial<ProcessGeneric["options"]>);
-	pickup?: ProcessGeneric["drop"][] & Pickup[];
+	pickup?: ProcessGeneric["drop"] & Pickup[];
 	input?(pickup: Floor<FloorData>["pickup"]): ProcessGeneric["input"];
 	skip?: Skip;
 }
 
 export class ProcessStep<
-	GenericProcess extends PresetGenericProcess = PresetGenericProcess,
+	GenericProcess extends Process = Process,
 	_GenericStepNumber extends number = number,
 > extends Step<GenericProcess, _GenericStepNumber> {
 	public params: ProcessStepParams;

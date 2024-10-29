@@ -1,5 +1,5 @@
 import type { CurrentRequestObject } from "@scripts/request";
-import { Response } from "@scripts/response";
+import { type PresetGenericResponse, Response } from "@scripts/response";
 import { Duplose, type DuploseBuildedFunctionContext, type DuploseDefinition } from ".";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
 import { insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
@@ -13,14 +13,14 @@ export interface ProcessBuildedFunction<
 > {
 	(
 		request: CurrentRequestObject,
-		options: GenericProcess["definiton"]["options"],
-		input: GenericProcess["definiton"]["input"]
-	): PromiseOrNot<unknown>;
+		options: undefined | object,
+		input: unknown
+	): PromiseOrNot<object | PresetGenericResponse>;
 	context: DuploseBuildedFunctionContext<GenericProcess>;
 }
 
 export type GetProcessGeneric<
-	T extends PresetGenericProcess = PresetGenericProcess,
+	T extends Process = Process,
 > = T extends Process<
 	infer InferedProcessDefinition,
 	infer inferedRequest,
@@ -37,19 +37,17 @@ export type GetProcessGeneric<
 	}
 	: never;
 
-interface ProcessDefinition extends DuploseDefinition {
+export interface ProcessDefinition extends DuploseDefinition {
 	name: string;
 	options?: object;
 	input?: unknown;
 	drop: string[];
 }
 
-export type PresetGenericProcess = Process<ProcessDefinition, CurrentRequestObject, object>;
-
 export class Process<
-	GenericProcessDefinition extends ProcessDefinition,
-	_GenericRequest extends CurrentRequestObject,
-	_GenericFloorData extends object,
+	GenericProcessDefinition extends ProcessDefinition = ProcessDefinition,
+	_GenericRequest extends CurrentRequestObject = any,
+	_GenericFloorData extends object = any,
 > extends Duplose<
 		GenericProcessDefinition,
 		_GenericRequest,

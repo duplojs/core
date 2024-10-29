@@ -1,9 +1,7 @@
-/* eslint-disable func-style */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Description } from "@scripts/description";
-import type { DefineHooksRouteLifeCycle, ExtractErrorFunction, ExtractObject } from "@scripts/duplose";
-import type { Route } from "@scripts/duplose/route";
+import { type HttpMethod, Route, type RouteDefinition } from "@scripts/duplose/route";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
 import type { PreflightStep } from "@scripts/step/preflight";
@@ -17,278 +15,268 @@ import { ProcessStep, type ProcessStepParams } from "@scripts/step/process";
 import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
 import { type Cut, CutStep } from "@scripts/step/cut";
 import { HandlerStep, type Handler } from "@scripts/step/handler";
-import type { AnyFunction } from "@utils/types";
+import { ExtractStep, type ExtractErrorFunction, type ExtractObject } from "@scripts/step/extract";
+import { simpleClone } from "@utils/simpleClone";
+import { useBuilder } from "./duplose";
 
 export interface RouteBuilder<
-	Request extends CurrentRequestObject = CurrentRequestObject,
-	Preflights extends PreflightStep = never,
-	Extracted extends ExtractObject = ExtractObject,
-	Steps extends Step = never,
-	StepsCount extends number = 0,
-	FloorData extends object = object,
+	GenericRequest extends CurrentRequestObject = CurrentRequestObject,
+	GenericPreflightSteps extends PreflightStep = PreflightStep,
+	GenericSteps extends Step = Step,
+	GenericStepsCount extends number = 0,
+	GenericFloorData extends object = object,
 > {
-	hook: DefineHooksRouteLifeCycle<
-		Request,
-		this
-	>;
-
 	extract<
-		E extends ExtractObject<Request>,
-		F extends FlatExtract<E>,
+		GenericExtract extends ExtractObject<GenericRequest>,
+		GenericFlatExtract extends FlatExtract<GenericExtract>,
 	>(
-		extract: E,
-		error?: ExtractErrorFunction,
+		extract: GenericExtract,
+		catchError?: ExtractErrorFunction,
 		...desc: Description[]
-	): Omit<
-		RouteBuilder<
-			Request,
-			Preflights,
-			E,
-			Steps,
-			StepsCount,
-			Omit<FloorData, keyof F> & NoInfer<F>
-		>,
-		"extract" | "hook"
+	): RouteBuilder<
+		GenericRequest,
+		GenericPreflightSteps,
+		GenericSteps,
+		AddOne<GenericStepsCount>,
+		Omit<GenericFloorData, keyof GenericFlatExtract> & NoInfer<GenericFlatExtract>
 	>;
 
 	check<
-		C extends Checker,
-		I extends string,
-		K extends string,
-		F extends ((floor: Floor<FloorData>["pickup"]) => boolean) | undefined,
-		R extends ContractResponse,
-		CR extends ContractToResponse<R> = ContractToResponse<R>,
-		GCG extends GetCheckerGeneric<C> = GetCheckerGeneric<C>,
+		GenericChecker extends Checker,
+		GenericInfo extends string,
+		GenericKey extends string,
+		GenericSkip extends ((floor: Floor<GenericFloorData>["pickup"]) => boolean) | undefined,
+		GenericContractResponse extends ContractResponse,
+		GenericResponse extends ContractToResponse<GenericContractResponse>,
+		GenericCheckerValue extends GetCheckerGeneric<GenericChecker>,
 	>(
-		checker: C,
+		checker: GenericChecker,
 		params: CheckerStepParams<
-			GCG,
-			I,
-			K,
-			CR,
-			FloorData,
-			F
+			GenericCheckerValue,
+			GenericInfo,
+			GenericKey,
+			GenericResponse,
+			GenericFloorData,
+			GenericSkip
 		>,
-		responses?: R | R[],
+		responses?: GenericContractResponse | GenericContractResponse[],
 		...desc: Description[]
-	): Omit<
-		RouteBuilder<
-			Request,
-			Preflights,
-			Extracted,
-			Steps | CheckerStep<C, R, StepsCount>,
-			AddOne<StepsCount>,
-			(
-				string extends K
-					? object
-					: { [P in K]: Extract<GCG["output"], { info: I }>["data"] | (undefined extends F ? never : undefined) }
-			) & (
-				string extends I
-					? FloorData
-					: Omit<FloorData, I>
-			)
-		>,
-		"extract" | "hook"
+	): RouteBuilder<
+		GenericRequest,
+		GenericPreflightSteps,
+		GenericSteps | CheckerStep<GenericChecker, GenericContractResponse, GenericStepsCount>,
+		AddOne<GenericStepsCount>,
+		(
+			string extends GenericKey
+				? object
+				: {
+					[P in GenericKey]:
+						| Extract<GenericCheckerValue["output"], { info: GenericInfo }>["data"]
+						| (undefined extends GenericSkip ? never : undefined)
+				}
+		) & (
+			string extends GenericKey
+				? GenericFloorData
+				: Omit<GenericFloorData, GenericKey>
+		)
 	>;
 
 	presetCheck<
-		C extends PresetChecker,
-		GCPG extends GetPresetCheckerGeneric<C> = GetPresetCheckerGeneric<C>,
-		GCG extends GetCheckerGeneric<GCPG["checker"]> = GetCheckerGeneric<GCPG["checker"]>,
+		GenericPresetChecker extends PresetChecker,
+		GenericPresetCheckerValue extends GetPresetCheckerGeneric<GenericPresetChecker>,
+		GenericCheckerValue extends GetCheckerGeneric<GenericPresetCheckerValue["checker"]>,
 	>(
-		presetChecker: C,
-		input: (pickup: Floor<FloorData>["pickup"]) => GCPG["newInput"],
+		presetChecker: GenericPresetChecker,
+		input: (pickup: Floor<GenericFloorData>["pickup"]) => GenericPresetCheckerValue["newInput"],
 		...desc: Description[]
-	): Omit<
-		RouteBuilder<
-			Request,
-			Preflights,
-			Extracted,
-			Steps | CheckerStep<GCPG["checker"], GCPG["response"], StepsCount>,
-			AddOne<StepsCount>,
-			(
-				string extends GCPG["key"]
-					? object
-					: { [P in GCPG["key"]]: Extract<GCG["output"], { info: GCPG["info"] }>["data"] }
-			) & (
-				string extends GCPG["key"]
-					? FloorData
-					: Omit<FloorData, GCPG["key"]>
-			)
+	): RouteBuilder<
+		GenericRequest,
+		GenericPreflightSteps,
+		GenericSteps | CheckerStep<
+			GenericPresetCheckerValue["checker"],
+			GenericPresetCheckerValue["response"],
+			GenericStepsCount
 		>,
-		"extract" | "hook"
+		AddOne<GenericStepsCount>,
+		(
+			string extends GenericPresetCheckerValue["key"]
+				? object
+				: {
+					[P in GenericPresetCheckerValue["key"]]:
+						| Extract<GenericCheckerValue["output"], { info: GenericPresetCheckerValue["info"] }>["data"]
+				}
+		) & (
+			string extends GenericPresetCheckerValue["key"]
+				? GenericFloorData
+				: Omit<GenericFloorData, GenericPresetCheckerValue["key"]>
+		)
 	>;
 
 	execute<
-		P extends Process,
-		T extends string,
-		F extends ((floor: Floor<FloorData>["pickup"]) => boolean) | undefined,
-		GPG extends GetProcessGeneric<P> = GetProcessGeneric<P>,
+		GenericProcess extends Process,
+		GenericPickup extends string,
+		GenericSkip extends ((floor: Floor<GenericFloorData>["pickup"]) => boolean) | undefined,
+		GenericProcessValue extends GetProcessGeneric<GenericProcess>,
 	>(
-		process: P,
+		process: GenericProcess,
 		params?: ProcessStepParams<
-			GPG,
-			T,
-			FloorData,
-			F
+			GenericProcessValue,
+			GenericPickup,
+			GenericFloorData,
+			GenericSkip
 		>,
 		...desc: Description[]
-	): Omit<
-		RouteBuilder<
-			Request & GPG["request"],
-			Preflights,
-			Extracted,
-			Steps | ProcessStep<P, StepsCount>,
-			AddOne<StepsCount>,
-			(
-				undefined extends F
-					? Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>
-					: Partial<Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>>
-			) & (
-				string extends T
-					? FloorData
-					: Omit<FloorData, T>
-			)
-		>,
-		"extract" | "hook"
+	): RouteBuilder<
+		GenericRequest & GenericProcessValue["request"],
+		GenericPreflightSteps,
+		GenericSteps | ProcessStep<GenericProcess, GenericStepsCount>,
+		AddOne<GenericStepsCount>,
+		(
+			undefined extends GenericSkip
+				? Pick<
+					GenericProcessValue["floor"],
+					GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
+				>
+				: Partial<
+					Pick<
+						GenericProcessValue["floor"],
+						GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
+					>
+				>
+		) & (
+			string extends GenericPickup
+				? GenericFloorData
+				: Omit<GenericFloorData, GenericPickup>
+		)
 	>;
 
 	cut<
-		R extends ContractResponse,
-		CR extends ContractToResponse<R>,
-		T extends DroppedValue | CR,
-		O extends Exclude<T, CR>,
-		D extends string,
+		GenericContractResponse extends ContractResponse,
+		GenericResponse extends ContractToResponse<GenericContractResponse>,
+		GenericReturn extends DroppedValue | GenericResponse,
+		GenericDroppedValue extends Exclude<GenericReturn, GenericResponse>,
+		GenericDrop extends string,
 	>(
 		cutFunction: Cut<
-			FloorData,
-			Request,
-			T
+			GenericFloorData,
+			GenericRequest,
+			GenericReturn
 		>,
-		drop?: D[] & NoInfer<keyof O>[],
-		responses?: R | R[],
+		drop?: GenericDrop[] & NoInfer<keyof GenericDroppedValue>[],
+		responses?: GenericContractResponse | GenericContractResponse[],
 		...desc: Description[]
-	): Omit<
-		RouteBuilder<
-			Request,
-			Preflights,
-			Extracted,
-			Steps | CutStep<R, StepsCount>,
-			AddOne<StepsCount>,
-			(
-				string extends D
-					? FloorData
-					: Omit<FloorData, D> & Pick<O, D>
-			)
-		>,
-		"extract" | "hook"
+	): RouteBuilder<
+		GenericRequest,
+		GenericPreflightSteps,
+		GenericSteps | CutStep<GenericContractResponse, GenericStepsCount>,
+		AddOne<GenericStepsCount>,
+		(
+			string extends GenericDrop
+				? GenericFloorData
+				: Omit<GenericFloorData, GenericDrop> & Pick<GenericDroppedValue, GenericDrop>
+		)
 	>;
 
 	handler<
-		R extends ContractResponse,
-		CR extends ContractToResponse<R> = ContractToResponse<R>,
+		GenericContractResponse extends ContractResponse,
+		GenericResponse extends ContractToResponse<GenericContractResponse>,
 	>(
-		handler: Handler<FloorData, Request, CR>,
-		responses?: R | R[],
+		handler: Handler<GenericFloorData, GenericRequest, GenericResponse>,
+		responses?: GenericContractResponse | GenericContractResponse[],
 		...desc: Description[]
 	): Route<
-		Request,
-		Preflights,
-		Extracted,
-		Steps | HandlerStep<R, StepsCount>,
-		FloorData
+		{
+			method: HttpMethod;
+			paths: string[];
+			preflightSteps: GenericPreflightSteps[];
+			steps: GenericSteps[];
+			descriptions: Description[];
+		},
+		GenericRequest,
+		GenericFloorData
 	>;
 }
 
-export type AnyRouteBuilder = RouteBuilder<any, any, any, any, any, any>;
+export type AnyRouteBuilder = RouteBuilder<any, any, any, any, any>;
 
 export function useRouteBuilder<
-	Request extends CurrentRequestObject = CurrentRequestObject,
+	GenericRequest extends CurrentRequestObject,
+	GenericPreflightSteps extends PreflightStep,
 >(
-	route: Route,
-): RouteBuilder<Request> {
-	const hook: AnyRouteBuilder["hook"] = (
-		...[name, subscriber]
-	) => {
-		route.hooks[name].addSubscriber(subscriber as AnyFunction);
-
+	method: HttpMethod,
+	paths: string[],
+	preflightSteps?: GenericPreflightSteps[],
+	desc: Description[] = [],
+): RouteBuilder<GenericRequest> {
+	function returnFunction(routeDefinition: RouteDefinition): AnyRouteBuilder {
 		return {
-			extract,
-			check,
-			presetCheck,
-			execute,
-			cut,
-			handler,
-			hook,
+			extract: (...args) => extract(simpleClone(routeDefinition), args),
+			check: (...args) => check(simpleClone(routeDefinition), args),
+			presetCheck: (...args) => presetCheck(simpleClone(routeDefinition), args),
+			execute: (...args) => execute(simpleClone(routeDefinition), args),
+			cut: (...args) => cut(simpleClone(routeDefinition), args),
+			handler: (...args) => handler(simpleClone(routeDefinition), args),
 		};
-	};
+	}
 
-	const extract: AnyRouteBuilder["extract"] = (
-		extract,
-		error,
-		...desc
-	) => {
-		route.setExtract(extract, error, desc);
+	function extract(
+		routeDefinition: RouteDefinition,
+		[extractObject, catchError, ...desc]: Parameters<AnyRouteBuilder["extract"]>,
+	) {
+		routeDefinition.steps.push(
+			new ExtractStep(
+				extractObject,
+				catchError,
+				desc,
+			),
+		);
 
-		return {
-			check,
-			presetCheck,
-			execute,
-			cut,
-			handler,
-		};
-	};
+		return returnFunction(routeDefinition);
+	}
 
-	const check: AnyRouteBuilder["check"] = (
-		checker,
-		params: CheckerStepParams,
-		responses = [],
-		...desc
-	) => {
-		route.addStep(
+	function check(
+		routeDefinition: RouteDefinition,
+		[checker, params, responses = [], ...desc]: Parameters<AnyRouteBuilder["check"]>,
+	) {
+		routeDefinition.steps.push(
 			new CheckerStep(
 				checker,
-				params,
+				<CheckerStepParams>params,
 				responses instanceof Array ? responses : [responses],
 				desc,
 			),
 		);
 
-		return {
-			check,
-			presetCheck,
-			execute,
-			cut,
-			handler,
-		};
-	};
+		return returnFunction(routeDefinition);
+	}
 
-	const presetCheck: AnyRouteBuilder["presetCheck"] = (
-		presetChecker,
-		input,
-		...desc
-	) => {
+	function presetCheck(
+		routeDefinition: RouteDefinition,
+		[presetChecker, input, ...desc]: Parameters<AnyRouteBuilder["presetCheck"]>,
+	) {
 		const transformInput = presetChecker.params.transformInput;
 
 		return check(
-			presetChecker.checker,
-			{
-				...presetChecker.params,
-				input: transformInput
-					? (pickup) => transformInput(input(pickup))
-					: input,
-			},
-			presetChecker.responses,
-			...desc,
+			routeDefinition,
+			[
+				presetChecker.checker,
+				{
+					...presetChecker.params,
+					input: transformInput
+						? (pickup) => transformInput(input(pickup))
+						: input,
+				},
+				presetChecker.responses,
+				...desc,
+			],
 		);
-	};
+	}
 
-	const execute: AnyRouteBuilder["execute"] = (
-		process,
-		params,
-		...desc
-	) => {
-		route.addStep(
+	function execute(
+		routeDefinition: RouteDefinition,
+		[process, params, ...desc]: Parameters<AnyRouteBuilder["execute"]>,
+	) {
+		routeDefinition.steps.push(
 			new ProcessStep(
 				process,
 				params,
@@ -296,22 +284,14 @@ export function useRouteBuilder<
 			),
 		);
 
-		return {
-			check,
-			presetCheck,
-			execute,
-			cut,
-			handler,
-		};
-	};
+		return returnFunction(routeDefinition);
+	}
 
-	const cut: AnyRouteBuilder["cut"] = (
-		cutFunction: Cut,
-		drop: string | string[] = [],
-		responses: ContractResponse | ContractResponse[] = [],
-		...desc: Description[]
-	) => {
-		route.addStep(
+	function cut(
+		routeDefinition: RouteDefinition,
+		[cutFunction, drop = [], responses = [], ...desc]: Parameters<AnyRouteBuilder["cut"]>,
+	) {
+		routeDefinition.steps.push(
 			new CutStep(
 				cutFunction,
 				drop instanceof Array ? drop : [drop],
@@ -320,21 +300,14 @@ export function useRouteBuilder<
 			),
 		);
 
-		return {
-			check,
-			presetCheck,
-			execute,
-			cut,
-			handler,
-		};
-	};
+		return returnFunction(routeDefinition);
+	}
 
-	const handler: AnyRouteBuilder["handler"] = (
-		handlerFunction: Handler,
-		responses: ContractResponse | ContractResponse[] = [],
-		...desc: Description[]
-	) => {
-		route.addStep(
+	function handler(
+		routeDefinition: RouteDefinition,
+		[handlerFunction, responses = [], ...desc]: Parameters<AnyRouteBuilder["handler"]>,
+	) {
+		routeDefinition.steps.push(
 			new HandlerStep(
 				handlerFunction,
 				responses instanceof Array ? responses : [responses],
@@ -342,16 +315,18 @@ export function useRouteBuilder<
 			),
 		);
 
-		return route;
-	};
+		const route = new Route(routeDefinition);
 
-	return {
-		extract,
-		check,
-		presetCheck,
-		execute,
-		cut,
-		handler,
-		hook,
-	} satisfies AnyRouteBuilder as any;
+		useBuilder.push(route);
+
+		return route;
+	}
+
+	return returnFunction({
+		paths: simpleClone(paths),
+		method,
+		preflightSteps: simpleClone(preflightSteps ?? []),
+		steps: [],
+		descriptions: desc,
+	});
 }

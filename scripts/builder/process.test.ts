@@ -11,15 +11,16 @@ import {
 	Process,
 } from "..";
 import type { ExpectType } from "@test/utils/expectType";
-import { manualChecker, manualPresetChecker, manualProcess } from "@test/utils/manualDuplose";
+import { createProcessDefinition, manualChecker, manualPresetChecker, manualProcess } from "@test/utils/manualDuplose";
 import { useProcessBuilder } from "./process";
+import { ExtractStep } from "@scripts/step/extract";
 
 describe("useProcessBuilder", () => {
 	it("simple Route", () => {
 		const description = new TestDescription();
 
 		const process = useProcessBuilder(
-			new Process("test"),
+			"test",
 			{
 				options: { test1: 3 } satisfies { test1: number },
 				input: 2,
@@ -31,16 +32,16 @@ describe("useProcessBuilder", () => {
 			);
 
 		expect(process).instanceOf(Process);
-		expect(process.descriptions[0]).toBe(description);
-		expect(process.drop).toStrictEqual(["input", "options"]);
-		expect(process.input).toBe(2);
-		expect(process.options).toStrictEqual({ test1: 3 });
+		expect(process.definiton.descriptions[0]).toBe(description);
+		expect(process.definiton.drop).toStrictEqual(["input", "options"]);
+		expect(process.definiton.input).toBe(2);
+		expect(process.definiton.options).toStrictEqual({ test1: 3 });
 	});
 
 	it("extract", () => {
 		const description = new TestDescription();
 
-		const process = useProcessBuilder(new Process("test"))
+		const process = useProcessBuilder("test")
 			.extract(
 				{
 					params: {
@@ -56,16 +57,15 @@ describe("useProcessBuilder", () => {
 			.cut(({ pickup, dropper }) => dropper({ test1: 1 }), ["test1"])
 			.exportation(["body", "userId", "test1"]);
 
-		expect(Object.keys(process.extract ?? {})).toStrictEqual(["params", "body"]);
-		expect(process.extractError).not.toBe(undefined);
-		expect(process.descriptions[0]).toBe(description);
+		expect(process.definiton.steps[0]).instanceOf(ExtractStep);
+		expect(process.definiton.steps[0].descriptions[0]).toBe(description);
 	});
 
 	it("check", () => {
 		const description1 = new TestDescription();
 		const description2 = new TestDescription();
 
-		const process = useProcessBuilder(new Process("test"))
+		const process = useProcessBuilder("test")
 			.extract({
 				params: {
 					userId: zod.coerce.number(),
@@ -120,23 +120,23 @@ describe("useProcessBuilder", () => {
 			)
 			.exportation(["presetResult", "result2", "result1"]);
 
-		expect(process.steps[0]).instanceOf(CheckerStep);
-		expect((process.steps[0] as CheckerStep).descriptions[0]).toBe(description1);
-		expect(process.steps[1]).instanceOf(CheckerStep);
-		expect((process.steps[1] as CheckerStep).descriptions[0]).toBe(description2);
-		expect(process.steps[2]).instanceOf(CheckerStep);
+		expect(process.definiton.steps[1]).instanceOf(CheckerStep);
+		expect(process.definiton.steps[1].descriptions[0]).toBe(description1);
+		expect(process.definiton.steps[2]).instanceOf(CheckerStep);
+		expect(process.definiton.steps[2].descriptions[0]).toBe(description2);
+		expect(process.definiton.steps[3]).instanceOf(CheckerStep);
 
 		const floor = makeFloor<{ result1: string }>();
 		floor.drop("result1", "11");
 
-		expect((process.steps[1] as CheckerStep).params.input(floor.pickup)).toBe(11);
+		expect((process.definiton.steps[2] as CheckerStep).params.input(floor.pickup)).toBe(11);
 	});
 
 	it("execute", () => {
 		const description1 = new TestDescription();
 		const description2 = new TestDescription();
 
-		const process = useProcessBuilder(new Process("test"))
+		const process = useProcessBuilder("test")
 			.execute(
 				manualProcess,
 				{
@@ -165,17 +165,17 @@ describe("useProcessBuilder", () => {
 			)
 			.exportation(["test1", "test2"]);
 
-		expect(process.steps[0]).instanceOf(ProcessStep);
-		expect((process.steps[0] as ProcessStep).descriptions[0]).toBe(description1);
-		expect(process.steps[1]).instanceOf(ProcessStep);
-		expect((process.steps[1] as ProcessStep).descriptions[0]).toBe(description2);
+		expect(process.definiton.steps[0]).instanceOf(ProcessStep);
+		expect((process.definiton.steps[0] as ProcessStep).descriptions[0]).toBe(description1);
+		expect(process.definiton.steps[1]).instanceOf(ProcessStep);
+		expect((process.definiton.steps[1] as ProcessStep).descriptions[0]).toBe(description2);
 	});
 
 	it("cut", () => {
 		const description = new TestDescription();
 
 		const process = useProcessBuilder(
-			new Process("test"),
+			"test",
 			{
 				options: { test1: 3 },
 				input: 2,
@@ -212,13 +212,13 @@ describe("useProcessBuilder", () => {
 			.cut(({ dropper }) => dropper({}), [])
 			.exportation(["input", "options"]);
 
-		expect(process.steps[0]).instanceOf(CutStep);
-		expect((process.steps[0] as CutStep).responses[0]).instanceOf(NotFoundHttpResponse);
-		expect(process.steps[0].descriptions[0]).toBe(description);
+		expect(process.definiton.steps[1]).instanceOf(CutStep);
+		expect((process.definiton.steps[1] as CutStep).responses[0]).instanceOf(NotFoundHttpResponse);
+		expect(process.definiton.steps[1].descriptions[0]).toBe(description);
 
 		useProcessBuilder<
 			CurrentRequestObject & { test: string }
-		>(new Process("test"))
+		>("test")
 			.extract({
 				params: {
 					userId: zod.coerce.number(),
@@ -244,7 +244,8 @@ describe("useProcessBuilder", () => {
 	it("add hook", () => {
 		const process = useProcessBuilder<
 			CurrentRequestObject & { test: string }
-		>(new Process("test"))
+		>("test")
+			.exportation()
 			.hook("afterSend", (request) => {
 				type check = ExpectType<typeof request["test"], string, "strict">;
 			})
@@ -262,8 +263,7 @@ describe("useProcessBuilder", () => {
 			})
 			.hook("serializeBody", (request) => {
 				type check = ExpectType<typeof request["test"], string, "strict">;
-			})
-			.exportation();
+			});
 
 		Object.values(process.hooks).forEach((value) => {
 			expect(value.subscribers[0]).toBeTypeOf("function");

@@ -25,8 +25,8 @@ export interface HttpMethods {
 
 export type HttpMethod = GetPropsWithTrueValue<HttpMethods>;
 
-export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<PresetGenericRoute> {
-	hooks: BuildedHooksRouteLifeCycle<CurrentRequestObject>;
+export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
+	hooks: BuildedHooksRouteLifeCycle<any>;
 	ResultIsNotAResponseError: typeof ResultIsNotAResponseError;
 }
 
@@ -36,7 +36,7 @@ export interface RouteBuildedFunction {
 }
 
 export type GetRouteGeneric<
-	T extends PresetGenericRoute = PresetGenericRoute,
+	T extends Route = Route,
 > = T extends Route<
 	infer InferedRouteDefinition,
 	infer inferedRequest,
@@ -50,21 +50,19 @@ export type GetRouteGeneric<
 	}
 	: never;
 
-interface RouteDefinition extends DuploseDefinition {
+export interface RouteDefinition extends DuploseDefinition {
 	method: HttpMethod;
 	paths: string[];
 }
 
-export type PresetGenericRoute = Route<RouteDefinition, CurrentRequestObject, object>;
-
 export class Route<
-	GenericRouteDefinition extends RouteDefinition,
-	_GenericRequest extends CurrentRequestObject,
-	_GenericFloorData extends object,
+	GenericRouteDefinition extends RouteDefinition = RouteDefinition,
+	GenericRequest extends CurrentRequestObject = any,
+	GenericFloorData extends object = any,
 > extends Duplose<
 		GenericRouteDefinition,
-		_GenericRequest,
-		_GenericFloorData
+		GenericRequest,
+		GenericFloorData
 	> {
 	public constructor(
 		definiton: GenericRouteDefinition,

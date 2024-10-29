@@ -5,7 +5,7 @@ import { zod } from "@scripts/parser";
 import { duploTest } from "@test/utils/duploTest";
 
 it("BuildedCutStep", () => {
-	const cutFunction: Cut = ({ dropper }) => dropper({});
+	const cutFunction: Cut = ({ dropper }) => dropper(null);
 
 	const step = new CutStep(cutFunction, ["test"], [new Response(100, "toto", zod.undefined())]);
 	const buildedCutStep = new BuildedCutStep(duploTest, step);

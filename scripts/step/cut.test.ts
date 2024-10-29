@@ -2,7 +2,7 @@ import { duploTest } from "@test/utils/duploTest";
 import { BuildedCutStep, type Cut, CutStep } from "..";
 
 it("CutStep", async() => {
-	const cutFunction: Cut = ({ dropper }) => dropper({});
+	const cutFunction: Cut = ({ dropper }) => dropper(null);
 
 	const step = new CutStep(cutFunction, ["test"]);
 

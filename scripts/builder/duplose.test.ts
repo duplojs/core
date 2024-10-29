@@ -128,7 +128,7 @@ describe("useBuilder", () => {
 				type check1 = ExpectType<ReturnType<typeof pickup<"test1">>, string, "strict">;
 				type check2 = ExpectType<ReturnType<typeof pickup<"options">>, { test: number }, "strict">;
 
-				return dropper({});
+				return dropper(null);
 			})
 			.exportation();
 
@@ -140,7 +140,7 @@ describe("useBuilder", () => {
 			.cut(({ pickup, dropper }) => {
 				type check2 = ExpectType<ReturnType<typeof pickup<"options">>, undefined, "strict">;
 
-				return dropper({});
+				return dropper(null);
 			})
 			.exportation();
 	});

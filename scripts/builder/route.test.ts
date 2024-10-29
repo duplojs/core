@@ -240,7 +240,7 @@ describe("useRouteBuilder", () => {
 				description,
 			)
 			.cut(({ dropper }) => dropper({ ttt: "eee" }))
-			.cut(({ dropper }) => dropper({}), [])
+			.cut(({ dropper }) => dropper(null), [])
 			.handler(
 				(pickup, request) => {
 					const toto = pickup("toto");

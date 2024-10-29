@@ -209,7 +209,7 @@ describe("useProcessBuilder", () => {
 				description,
 			)
 			.cut(({ dropper }) => dropper({ ttt: "eee" }))
-			.cut(({ dropper }) => dropper({}), [])
+			.cut(({ dropper }) => dropper(null), [])
 			.exportation(["input", "options"]);
 
 		expect(process.definiton.steps[1]).instanceOf(CutStep);

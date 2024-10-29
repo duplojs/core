@@ -10,7 +10,7 @@ const process1 = useBuilder<Request & { test1: string }>()
 			"strict"
 		>;
 
-		return dropper({});
+		return dropper(null);
 	})
 	.exportation();
 
@@ -23,7 +23,7 @@ const process2 = useBuilder()
 			"strict"
 		>;
 
-		return dropper({});
+		return dropper(null);
 	})
 	.exportation();
 
@@ -41,7 +41,7 @@ useBuilder<Request & { test3: string }>()
 			"strict"
 		>;
 
-		return dropper({});
+		return dropper(null);
 	})
 	.execute(process2)
 	.handler((pickup, request) => {

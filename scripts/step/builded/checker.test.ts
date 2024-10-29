@@ -72,7 +72,7 @@ describe("BuildedCheckerStep", () => {
 		});
 	});
 
-	it("toString options: function, result: string, indexing", async() => {
+	it("toString options: function, result: string, indexing", () => {
 		const params: CheckerStepParams = {
 			input: () => ({}),
 			catch: () => new Response(300, "test", 11),
@@ -88,10 +88,10 @@ describe("BuildedCheckerStep", () => {
 
 		const buildedCheckerStep = new BuildedCheckerStep(duploTest, step);
 
-		await expect(buildedCheckerStep.toString(1)).toMatchFileSnapshot("__data__/checker1.txt");
+		expect(buildedCheckerStep.toString(1)).toMatchSnapshot();
 	});
 
-	it("toString options: object, result: array", async() => {
+	it("toString options: object, result: array", () => {
 		const params: CheckerStepParams = {
 			input: () => ({}),
 			catch: () => new Response(300, "test", 11),
@@ -107,6 +107,6 @@ describe("BuildedCheckerStep", () => {
 
 		const buildedCheckerStep = new BuildedCheckerStep(duploTest, step);
 
-		await expect(buildedCheckerStep.toString(1)).toMatchFileSnapshot("__data__/checker2.txt");
+		expect(buildedCheckerStep.toString(1)).toMatchSnapshot();
 	});
 });

@@ -1,4 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Route > build 1`] = `
+"
 		let result = undefined;
 
 		try {
@@ -41,7 +44,7 @@ break Execution;
 				result = this.preflightSteps[0].processFunction(
 					request,
 					this.preflightSteps[0].params.options,
-					
+					this.preflightSteps[0].params.input(floor.pickup)
 				);
 
 				
@@ -73,97 +76,6 @@ break Execution;
 
 
 				
-			if(request.body === undefined){
-				
-/* hook-parsingBody-before */
-/* end_block */
-
-
-				result = await this.hooks.parsingBody(request);
-
-				
-/* hook-parsingBody-before-check-result */
-/* end_block */
-
-
-				if(result instanceof this.Response){
-
-break Execution;
-}
-
-				
-/* hook-parsingBody-after */
-/* end_block */
-
-			}
-			
-
-				
-/* extract-before */
-/* end_block */
-
-
-	
-/* extract-(params)-(userId)-before */
-/* end_block */
-
-
-	{
-		let temp = this.extract["params"]["userId"].safeParse(request["params"]?.["userId"])
-
-		if(!temp.success){
-			result = this.extractError(
-				"params",
-				"userId",
-				temp.error,
-			);
-			break Execution;
-		}
-
-		floor.drop(
-			"userId",
-			temp.data,
-		);
-	}
-
-	
-/* extract-(params)-(userId)-after */
-/* end_block */
-
-	
-
-	
-/* extract-(body)-before */
-/* end_block */
-
-
-	{
-		let temp = this.extract["body"].safeParse(request["body"])
-
-		if(!temp.success){
-			result = this.extractError(
-				"body",
-				undefined,
-				temp.error,
-			);
-			break Execution;
-		}
-
-		floor.drop(
-			"body",
-			temp.data,
-		);
-	}
-
-	
-/* extract-(body)-after */
-/* end_block */
-
-	
-
-/* extract-after */
-/* end_block */
-
 
 				
 /* steps-before */
@@ -171,21 +83,91 @@ break Execution;
 
 
 				
-		
-/* step-cut-(0)-before */
+/* setp-extract-(0)-before */
 /* end_block */
 
 
-		result = this.steps[0].cutFunction(floor, request);
+			
+/* setp-extract-(0)-(params)-(userId)-before */
+/* end_block */
 
 		
-/* step-cut-(0)-before-check-result */
+			{
+				let temp = this.steps[0]
+					.extractObject["params"]["userId"]
+					.safeParse(request["params"]?.["userId"])
+		
+				if(!temp.success){
+					result = this.steps[0].catchError(
+						"params",
+						"userId",
+						temp.error,
+					);
+					break Execution;
+				}
+		
+				floor.drop(
+					"userId",
+					temp.data,
+				);
+			}
+		
+			
+/* setp-extract-(0)-(params)-(userId)-after */
+/* end_block */
+
+			
+
+			
+/* setp-extract-(0)-(body)-before */
+/* end_block */
+
+		
+			{
+				let temp = this.steps[0]
+					.extractObject["body"]
+					.safeParse(request["body"])
+		
+				if(!temp.success){
+					result = this.steps[0].catchError(
+						"body",
+						undefined,
+						temp.error,
+					);
+					break Execution;
+				}
+		
+				floor.drop(
+					"body",
+					temp.data,
+				);
+			}
+		
+			
+/* setp-extract-(0)-(body)-after */
+/* end_block */
+
+			
+
+/* setp-extract-(0)-after */
+/* end_block */
+
+
+		
+/* step-cut-(1)-before */
+/* end_block */
+
+
+		result = this.steps[1].cutFunction(floor, request);
+
+		
+/* step-cut-(1)-before-check-result */
 /* end_block */
 
 
 		if(result instanceof this.Response){
 
-				let temp = this.steps[0].responseZodSchema.safeParse(result);
+				let temp = this.steps[1].responseZodSchema.safeParse(result);
 
 				if(!temp.success){
 					throw new this.ContractResponseError(temp.error, result);
@@ -195,27 +177,27 @@ break Execution;
 }
 
 		
-/* step-cut-(0)-before-drop */
+/* step-cut-(1)-before-drop */
 /* end_block */
 
 
 		floor.drop("toto", result["toto"]);
 
 		
-/* step-cut-(0)-after */
+/* step-cut-(1)-after */
 /* end_block */
 
 		
 
 		
-/* step-handler-(1)-before */
+/* step-handler-(2)-before */
 /* end_block */
 
 
-		result = this.steps[1].handlerFunction(floor.pickup, request);
+		result = this.steps[2].handlerFunction(floor.pickup, request);
 
 		
-/* step-handler-(1)-before-check-result */
+/* step-handler-(2)-before-check-result */
 /* end_block */
 
 
@@ -225,7 +207,7 @@ break Execution;
 }
 
 		
-/* step-handler-(1)-after */
+/* step-handler-(2)-after */
 /* end_block */
 
 		
@@ -271,4 +253,5 @@ break Execution;
 
 
 		return result
-		
+		"
+`;

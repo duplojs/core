@@ -1,86 +1,92 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import type { Description } from "@scripts/description";
-import { Process, type GetProcessGeneric } from "@scripts/duplose/process";
+import type { Process, GetProcessGeneric } from "@scripts/duplose/process";
 import type { Floor } from "@scripts/floor";
 import type { CurrentRequestObject } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import type { ProcessStepParams } from "@scripts/step/process";
 import type { AddOne } from "@utils/incremente";
 import { type AnyRouteBuilder, useRouteBuilder, type RouteBuilder } from "./route";
-import type { Duplose, ExtractObject } from "@scripts/duplose";
-import { type HttpMethod, Route } from "@scripts/duplose/route";
+import type { Duplose } from "@scripts/duplose";
+import { type HttpMethod } from "@scripts/duplose/route";
 import { useProcessBuilder, type ProcessBuilder, type ProcessBuilderParams, type AnyProcessBuilder, type ProcessBuilderParamsToFloorData } from "./process";
+import { simpleClone } from "@utils/simpleClone";
+import type { Step } from "@scripts/step";
 
 export interface Builder<
-	Request extends CurrentRequestObject = CurrentRequestObject,
-	Preflights extends PreflightStep = never,
-	PreflightsCount extends number = 0,
-	FloorData extends object = object,
+	GenericRequest extends CurrentRequestObject = CurrentRequestObject,
+	GenericPreflightSteps extends PreflightStep = PreflightStep,
+	GenericPreflightsCount extends number = 0,
+	GenericFloorData extends object = object,
 > {
 	preflight<
-		P extends Process,
-		T extends string,
-		F extends ((floor: Floor<FloorData>["pickup"]) => boolean) | undefined,
-		GPG extends GetProcessGeneric<P> = GetProcessGeneric<P>,
+		GenericProcess extends Process,
+		GenericPickup extends string,
+		GenericSkip extends ((floor: Floor<GenericFloorData>["pickup"]) => boolean) | undefined,
+		GenericProcessValue extends GetProcessGeneric<GenericProcess>,
 	>(
-		process: P,
+		process: GenericProcess,
 		params?: ProcessStepParams<
-			GPG,
-			T,
-			FloorData,
-			F
+			GenericProcessValue,
+			GenericPickup,
+			GenericFloorData,
+			GenericSkip
 		>,
 		...desc: Description[]
 	): Builder<
-		Request & GPG["request"],
-		| Preflights
-		| PreflightStep<P, PreflightsCount>,
-		AddOne<PreflightsCount>,
+		GenericRequest & GenericProcessValue["request"],
+		| GenericPreflightSteps
+		| PreflightStep<GenericProcess, GenericPreflightsCount>,
+		AddOne<GenericPreflightsCount>,
 		(
-			undefined extends F
-				? Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>
-				: Partial<Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>>
+			undefined extends GenericSkip
+				? Pick<
+					GenericProcessValue["floor"],
+					GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
+				>
+				: Partial<
+					Pick<
+						GenericProcessValue["floor"],
+						GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
+					>
+				>
 		) & (
-			string extends T
-				? FloorData
-				: Omit<FloorData, T>
+			string extends GenericPickup
+				? GenericFloorData
+				: Omit<GenericFloorData, GenericPickup>
 		)
 	>;
 
 	createRoute<
-		R extends CurrentRequestObject = CurrentRequestObject,
+		GenericLocalRequest extends CurrentRequestObject,
 	>(
 		method: HttpMethod,
 		path: string | string[],
 		...desc: Description[]
 	): RouteBuilder<
-		Request & R,
-		Preflights,
-		ExtractObject,
-		never,
+		GenericRequest & GenericLocalRequest,
+		GenericPreflightSteps,
+		Step,
 		0,
-		FloorData
+		GenericFloorData
 	>;
 
 	createProcess<
-		R extends CurrentRequestObject = CurrentRequestObject,
-		P extends ProcessBuilderParams = ProcessBuilderParams,
-		D extends ProcessBuilderParamsToFloorData<P> = ProcessBuilderParamsToFloorData<P>,
+		GenericLocalRequest extends CurrentRequestObject,
+		GenericProcessBuilderParams extends ProcessBuilderParams = ProcessBuilderParams,
 	>(
 		name: string,
-		params?: P,
+		params?: GenericProcessBuilderParams,
 		...desc: Description[]
 	): ProcessBuilder<
-		Request & R,
-		D["options"],
-		D["input"],
-		never,
-		ExtractObject,
-		never,
+		GenericRequest & GenericLocalRequest,
+		GenericPreflightSteps,
+		Step,
 		0,
-		FloorData & D
+		GenericFloorData & ProcessBuilderParamsToFloorData<GenericProcessBuilderParams>
 	>;
 
-	preflightSteps: Preflights[];
+	preflightSteps: GenericPreflightSteps[];
 }
 
 export type AnyBuilder = Builder<any, any, any, any>;
@@ -95,94 +101,50 @@ const createdDuploseSymbol = Symbol("CreatedDuplose");
 export function useBuilder<
 	Request extends CurrentRequestObject = CurrentRequestObject,
 >(): Builder<Request> {
-	function createRoute(
-		method: HttpMethod,
-		path: string | string[],
-		preflightSteps: PreflightStep[],
-		desc: Description[],
-	): AnyRouteBuilder {
-		const route = new Route(
-			method,
-			path instanceof Array ? path : [path],
-			desc,
-		);
-
-		route.addPreflightSteps(...preflightSteps);
-
-		useBuilder[createdDuploseSymbol].add({
-			duplose: route,
-			count: 0,
-		});
-
-		return useRouteBuilder(route);
-	}
-
-	function createProcess(
-		name: string,
-		params: ProcessBuilderParams | undefined,
-		preflightSteps: PreflightStep[],
-		desc: Description[],
-	): AnyProcessBuilder {
-		const process = new Process(
-			name,
-			desc,
-		);
-
-		process.addPreflightSteps(...preflightSteps);
-
-		useBuilder[createdDuploseSymbol].add({
-			duplose: process,
-			count: 0,
-		});
-
-		return useProcessBuilder(process, params);
-	}
-
-	function preflight(
-		process: Process,
-		params?: ProcessStepParams,
-		lastPreflights: PreflightStep[] = [],
-		desc: Description[] = [],
-	): ReturnType<AnyBuilder["preflight"]> {
-		const preflightStep = new PreflightStep(process, params, desc);
-		const preflightSteps = [...lastPreflights, preflightStep];
-
+	function returnFunction(preflightSteps: PreflightStep[]): AnyBuilder {
 		return {
-			preflight(process, params, ...desc) {
-				return preflight(
-					process,
-					params,
-					preflightSteps,
-					desc,
-				);
-			},
-			createRoute(method, path, ...desc) {
-				return createRoute(method, path, preflightSteps, desc);
-			},
-			createProcess(name, params, ...desc) {
-				return createProcess(name, params, preflightSteps, desc);
-			},
+			preflight: (...args) => preflight(simpleClone(preflightSteps), args),
+			createRoute: (...args) => createRoute(simpleClone(preflightSteps), args),
+			createProcess: (...args) => createProcess(simpleClone(preflightSteps), args),
 			preflightSteps,
 		};
 	}
+	function createRoute(
+		preflightSteps: PreflightStep[],
+		[method, paths, ...desc]: Parameters<AnyBuilder["createRoute"]>,
+	): AnyRouteBuilder {
+		return useRouteBuilder(
+			method,
+			paths instanceof Array ? paths : [paths],
+			preflightSteps,
+			desc,
+		);
+	}
 
-	return {
-		preflight(process, params, ...desc) {
-			return preflight(
-				process,
-				params,
-				[],
-				desc,
-			);
-		},
-		createRoute(method, path, ...desc) {
-			return createRoute(method, path, [], desc);
-		},
-		createProcess(name, params, ...desc) {
-			return createProcess(name, params, [], desc);
-		},
-		preflightSteps: [],
-	} satisfies AnyBuilder as any;
+	function createProcess(
+		preflightSteps: PreflightStep[],
+		[name, params, ...desc]: Parameters<AnyBuilder["createProcess"]>,
+	): AnyProcessBuilder {
+		return useProcessBuilder(
+			name,
+			params,
+			preflightSteps,
+			desc,
+		);
+	}
+
+	function preflight(
+		preflightSteps: PreflightStep[],
+		[process, params, ...desc]: Parameters<AnyBuilder["preflight"]>,
+	): ReturnType<AnyBuilder["preflight"]> {
+		preflightSteps.push(
+			new PreflightStep(process, params, desc),
+		);
+
+		return returnFunction(preflightSteps);
+	}
+
+	return returnFunction([]);
 }
 useBuilder[createdDuploseSymbol] = new Set<CreatedDuplose>();
 useBuilder.getAllCreatedDuplose = function *() {
@@ -209,7 +171,14 @@ useBuilder.getFirstCreatedDuploses = function *() {
 		yield createdDuplose.duplose;
 	}
 };
-
 useBuilder.resetCreatedDuploses = function() {
 	useBuilder[createdDuploseSymbol] = new Set<CreatedDuplose>();
+};
+useBuilder.push = function(
+	duplose: Duplose,
+) {
+	useBuilder[createdDuploseSymbol].add({
+		duplose,
+		count: 0,
+	});
 };

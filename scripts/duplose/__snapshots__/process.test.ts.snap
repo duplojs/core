@@ -1,4 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Process > build 1`] = `
+"
 		let floor = this.makeFloor();
 		let result = undefined;
 		floor.drop("options", options);
@@ -18,7 +21,7 @@
 				result = this.preflightSteps[0].processFunction(
 					request,
 					this.preflightSteps[0].params.options,
-					
+					this.preflightSteps[0].params.input(floor.pickup)
 				);
 
 				
@@ -46,44 +49,6 @@ break Execution;
 
 			
 /* preflight-after */
-/* end_block */
-
-			
-			
-/* extract-before */
-/* end_block */
-
-
-	
-/* extract-(params)-(userId)-before */
-/* end_block */
-
-
-	{
-		let temp = this.extract["params"]["userId"].safeParse(request["params"]?.["userId"])
-
-		if(!temp.success){
-			result = this.extractError(
-				"params",
-				"userId",
-				temp.error,
-			);
-			break Execution;
-		}
-
-		floor.drop(
-			"userId",
-			temp.data,
-		);
-	}
-
-	
-/* extract-(params)-(userId)-after */
-/* end_block */
-
-	
-
-/* extract-after */
 /* end_block */
 
 
@@ -129,6 +94,45 @@ break Execution;
 
 		
 
+/* setp-extract-(1)-before */
+/* end_block */
+
+
+			
+/* setp-extract-(1)-(params)-(userId)-before */
+/* end_block */
+
+		
+			{
+				let temp = this.steps[1]
+					.extractObject["params"]["userId"]
+					.safeParse(request["params"]?.["userId"])
+		
+				if(!temp.success){
+					result = this.steps[1].catchError(
+						"params",
+						"userId",
+						temp.error,
+					);
+					break Execution;
+				}
+		
+				floor.drop(
+					"userId",
+					temp.data,
+				);
+			}
+		
+			
+/* setp-extract-(1)-(params)-(userId)-after */
+/* end_block */
+
+			
+
+/* setp-extract-(1)-after */
+/* end_block */
+
+
 			
 /* steps-after */
 /* end_block */
@@ -156,4 +160,5 @@ break Execution;
 "userId": floor.pickup("userId"),
 			};
 		}
-		
+		"
+`;

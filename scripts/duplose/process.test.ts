@@ -5,15 +5,17 @@ import { PreflightStep } from "@scripts/step/preflight";
 import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { DuploTest } from "@test/utils/duploTest";
+import { createProcessDefinition } from "@test/utils/manualDuplose";
+import { ExtractStep } from "@scripts/step/extract";
 
 describe("Process", () => {
 	const checkpointList = new CheckpointList();
 	const duplo = new DuploTest({ environment: "TEST" });
-	const process = new Process("test");
-	process.setExtract({
-		params: { userId: zod.coerce.number() },
-	});
-	const step = new CutStep(
+
+	const preflightProcess = new Process(createProcessDefinition({}));
+	preflightProcess.instance = duplo;
+	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
+	const cutStep = new CutStep(
 		({ dropper }) => {
 			checkpointList.addPoint("cut");
 			return dropper({ toto: "true" });
@@ -21,34 +23,23 @@ describe("Process", () => {
 		["toto"],
 		[new Response(100, "toto", zod.undefined())],
 	);
-	process.addStep(step);
-	const preflightProcess = new Process("preflightProcess");
-	preflightProcess.instance = duplo;
-	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
-	process.addPreflightSteps(preflight);
+	const extractStep = new ExtractStep(
+		{
+			params: {
+				userId: zod.coerce.number(),
+			},
+		},
+	);
+
+	const process = new Process(createProcessDefinition({
+		steps: [cutStep, extractStep],
+		preflightSteps: [preflight],
+		drop: ["toto", "userId"],
+		name: "test",
+	}));
 
 	it("name", () => {
-		expect(process.name).toBe("test");
-	});
-
-	it("setInput", () => {
-		process.setInput(1);
-
-		expect(process.input).toBe(1);
-	});
-
-	it("setOptions", () => {
-		const options = {};
-		process.setOptions(options);
-
-		expect(process.options).toBe(options);
-	});
-
-	it("setDrop", () => {
-		const drop: string[] = ["toto", "userId"];
-		process.setDrop(drop);
-
-		expect(process.drop).toBe(drop);
+		expect(process.definiton.name).toBe("test");
 	});
 
 	it("build", async() => {
@@ -63,8 +54,7 @@ describe("Process", () => {
 
 		expect(spy).toBeCalled();
 
-		await expect(spy.mock.lastCall?.[0].content)
-			.toMatchFileSnapshot("__data__/process.txt");
+		expect(spy.mock.lastCall?.[0].content).toMatchSnapshot();
 
 		const processFunction = await process.build();
 

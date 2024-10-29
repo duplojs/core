@@ -3,14 +3,13 @@ import { getTypedEntries } from "./getTypedEntries";
 export function simpleClone<
 	T extends unknown = unknown,
 >(unknownValue: T): T {
-	if (
-		unknownValue
-		&& typeof unknownValue === "object"
-		&& (
-			unknownValue.constructor?.name === "Object"
-			|| unknownValue.constructor === undefined
-		)
-
+	if (!unknownValue) {
+		return unknownValue;
+	} else if (typeof unknownValue !== "object") {
+		return unknownValue;
+	} else if (
+		unknownValue.constructor?.name === "Object"
+		|| unknownValue.constructor === undefined
 	) {
 		return getTypedEntries(unknownValue).reduce(
 			(pv, [key, value]) => {
@@ -19,9 +18,9 @@ export function simpleClone<
 			},
 			{} as T,
 		);
-	} else if (unknownValue instanceof Array) {
+	} else if (unknownValue instanceof Array && unknownValue.constructor.name === "Array") {
 		return unknownValue.map(simpleClone) as T;
+	} else {
+		return unknownValue;
 	}
-
-	return unknownValue;
 }

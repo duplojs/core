@@ -43,7 +43,7 @@ export const processWithSkipProcess = useBuilder()
 				"strict"
 			>;
 
-			return dropper({});
+			return dropper(null);
 		},
 	)
 	.exportation(["dropInput", "dropOptions"]);

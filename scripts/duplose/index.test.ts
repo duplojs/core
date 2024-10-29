@@ -2,13 +2,11 @@ import { Duplose } from ".";
 import { Process } from "./process";
 import { ProcessStep } from "@scripts/step/process";
 import { getTypedEntries } from "@utils/getTypedEntries";
-import { Response } from "@scripts/response";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Hook } from "@scripts/hook";
-import { zod } from "@scripts/parser";
-import { ZodAcceleratorParser } from "@duplojs/zod-accelerator";
 import { insertBlock } from "@utils/stringBuilder";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
+import { createProcessDefinition } from "@test/utils/manualDuplose";
 
 describe("Duplose", () => {
 	class SubDuplo extends Duplose {
@@ -20,46 +18,22 @@ describe("Duplose", () => {
 			return this.applyEditingFunctions;
 		}
 
-		public get ae() {
-			return this.acceleratedExtract;
-		}
-
 		public resetEditingFunction() {
 			this.editingFunctions = [];
 		}
 	}
 
-	const duplose = new SubDuplo();
-	const process1 = new Process("test1");
-	const process2 = new Process("test2");
+	const duplose = new SubDuplo({
+		preflightSteps: [],
+		steps: [],
+		descriptions: [],
+	});
+	const process1 = new Process(createProcessDefinition());
+	const process2 = new Process(createProcessDefinition());
 	const preflight = new PreflightStep(process1);
 	const step = new ProcessStep(process2);
-
-	it("setExtract", () => {
-		const errorHandler = () => new Response(300, "test", 11);
-		const extract = {
-			body: zod.string(),
-			params: {
-				userId: zod.number(),
-			},
-		};
-		duplose.setExtract(extract, errorHandler);
-
-		expect(duplose.extractError).toBe(errorHandler);
-		expect(duplose.extract).toBe(extract);
-	});
-
-	it("addPreflight", () => {
-		duplose.addPreflightSteps(preflight);
-
-		expect(duplose.preflightSteps[0]).toBe(preflight);
-	});
-
-	it("addStep", () => {
-		duplose.addStep(step);
-
-		expect(duplose.steps[0]).toBe(step);
-	});
+	duplose.definiton.preflightSteps.push(preflight);
+	duplose.definiton.steps.push(step);
 
 	it("getAllHooks", () => {
 		const hooks = duplose.getAllHooks();
@@ -81,15 +55,7 @@ describe("Duplose", () => {
 			});
 	});
 
-	it("acceleratedExtract", () => {
-		const acceleratedExtact: any = duplose.ae();
-
-		expect(acceleratedExtact).not.toBe(undefined);
-		expect(acceleratedExtact.body).instanceOf(ZodAcceleratorParser);
-		expect(acceleratedExtact.params.userId).instanceOf(ZodAcceleratorParser);
-	});
-
-	it("injectCode", async() => {
+	it("injectCode", () => {
 		duplose.edition.injectCode(
 			"(ttt)",
 			"let toto = 1;",
@@ -124,17 +90,17 @@ describe("Duplose", () => {
 			"bottom",
 		);
 
-		await expect(duplose.aef(insertBlock("test"))).toMatchFileSnapshot("__data__/injectCode.txt");
+		expect(duplose.aef(insertBlock("test"))).toMatchSnapshot();
 	});
 
-	it("injectFunction", async() => {
+	it("injectFunction", () => {
 		duplose.edition.injectFunction(
 			"test",
 			() => void "",
 			"top",
 		);
 
-		await expect(duplose.aef(insertBlock("test"))).toMatchFileSnapshot("__data__/injectFunction.txt");
+		expect(duplose.aef(insertBlock("test"))).toMatchSnapshot();
 	});
 
 	it("addExtensions", () => {
@@ -148,8 +114,8 @@ describe("Duplose", () => {
 	});
 
 	it("hasDuplose", () => {
-		expect(duplose.hasDuplose(new Process("process"))).toBe(false);
-		expect(duplose.hasDuplose(new Process("process"), 0)).toBe(false);
+		expect(duplose.hasDuplose(new Process(createProcessDefinition()))).toBe(false);
+		expect(duplose.hasDuplose(new Process(createProcessDefinition()), 0)).toBe(false);
 		expect(duplose.hasDuplose(process1)).toBe(true);
 		expect(duplose.hasDuplose(process2)).toBe(true);
 	});

@@ -1,127 +1,83 @@
 import type { CurrentRequestObject } from "@scripts/request";
-import { Response } from "@scripts/response";
-import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext, type AcceleratedExtractObject } from ".";
-import type { Step } from "@scripts/step";
-import type { Description } from "@scripts/description";
+import { type PresetGenericResponse, Response } from "@scripts/response";
+import { Duplose, type DuploseBuildedFunctionContext, type DuploseDefinition } from ".";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
-import { extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
+import { insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { simpleClone } from "@utils/simpleClone";
 import { makeFloor } from "@scripts/floor";
-import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import type { PromiseOrNot } from "@utils/types";
 
 export interface ProcessBuildedFunction<
-	O extends object | undefined = object | undefined,
-	I extends unknown = unknown,
+	GenericProcess extends Process<any, any, any> = Process<any, any, any>,
 > {
 	(
 		request: CurrentRequestObject,
-		options: O,
-		input: I
-	): PromiseOrNot<unknown>;
-	context: DuploseBuildedFunctionContext<Process>;
+		options: undefined | object,
+		input: unknown
+	): PromiseOrNot<object | PresetGenericResponse>;
+	context: DuploseBuildedFunctionContext<GenericProcess>;
 }
 
 export type GetProcessGeneric<
 	T extends Process = Process,
 > = T extends Process<
-	infer Request,
-	infer Options,
-	infer Input,
-	infer Drop,
-	infer PreflightStep,
-	infer Extract,
-	infer Steps,
-	infer Floor
+	infer InferedProcessDefinition,
+	infer inferedRequest,
+	infer inferedFloorData
 >
 	? {
-		request: Request;
-		options: Options;
-		input: Input;
-		drop: Drop;
-		preflightStep: PreflightStep;
-		extract: Extract;
-		steps: Steps;
-		floor: Floor;
+		options: InferedProcessDefinition["options"];
+		input: InferedProcessDefinition["input"];
+		drop: InferedProcessDefinition["drop"];
+		preflightStep: InferedProcessDefinition["preflightSteps"];
+		steps: InferedProcessDefinition["steps"];
+		request: inferedRequest;
+		floor: inferedFloorData;
 	}
 	: never;
 
+export interface ProcessDefinition extends DuploseDefinition {
+	name: string;
+	options?: object;
+	input?: unknown;
+	drop: string[];
+}
+
 export class Process<
-	Request extends CurrentRequestObject = any,
-	_Options extends object | undefined = any,
-	_Input extends unknown = any,
-	_Drop extends string = any,
-	_PreflightStep extends PreflightStep = any,
-	_Extract extends ExtractObject = any,
-	_Step extends Step = any,
-	_FloorData extends object = any,
+	GenericProcessDefinition extends ProcessDefinition = ProcessDefinition,
+	_GenericRequest extends CurrentRequestObject = any,
+	_GenericFloorData extends object = any,
 > extends Duplose<
-		ProcessBuildedFunction<_Options, _Input>,
-		Request,
-		_PreflightStep,
-		_Extract,
-		_Step,
-		_FloorData
+		GenericProcessDefinition,
+		_GenericRequest,
+		_GenericFloorData
 	> {
-	public name: string;
-
-	public options?: object;
-
-	public input?: unknown;
-
-	public drop?: string[];
-
 	public constructor(
-		name: string,
-		descriptions: Description[] = [],
+		definiton: GenericProcessDefinition,
 	) {
-		super(descriptions);
-
-		this.name = name;
+		super(definiton);
 	}
 
-	public setInput(input: unknown) {
-		this.input = input;
-	}
-
-	public setOptions(options: object) {
-		this.options = options;
-	}
-
-	public setDrop(
-		drop: string[],
-		descriptions: Description[] = [],
-	) {
-		this.drop = drop;
-		this.descriptions.push(...descriptions);
-	}
-
-	public async build(): Promise<ProcessBuildedFunction<_Options, _Input>> {
+	public async build() {
 		if (!this.instance) {
 			throw new BuildNoRegisteredDuploseError(this);
 		}
 
 		const buildedPreflight = await Promise.all(
-			this.preflightSteps.map(
+			this.definiton.preflightSteps.map(
 				(step) => step.build(this.instance!),
 			),
 		);
 
-		let extract: ExtractObject | AcceleratedExtractObject | undefined = simpleClone(this.extract);
-
-		if (!this.instance.config.disabledZodAccelerator) {
-			extract = this.acceleratedExtract();
-		}
-
 		const buildedStep = await Promise.all(
-			this.steps.map(
+			this.definiton.steps.map(
 				(step) => step.build(this.instance!),
 			),
 		);
 
 		const drop = mapped(
-			this.drop ?? [],
+			this.definiton.drop ?? [],
 			(key) => /* js */`"${key}": floor.pickup("${key}"),`,
 		);
 
@@ -136,8 +92,6 @@ export class Process<
 			${mapped(buildedPreflight, (value, index) => value.toString(index))}
 
 			${insertBlock("preflight-after")}
-			
-			${extractPart(this.extract)}
 
 			${insertBlock("steps-before")}
 
@@ -161,11 +115,9 @@ export class Process<
 
 		content = this.applyEditingFunctions(content);
 
-		const context: DuploseBuildedFunctionContext<Process> = {
+		const context: DuploseBuildedFunctionContext<this> = {
 			makeFloor,
 			Response,
-			extract,
-			extractError: this.extractError ?? this.instance.extractError,
 			preflightSteps: buildedPreflight,
 			steps: buildedStep,
 			extensions: simpleClone(this.extensions),
@@ -176,7 +128,9 @@ export class Process<
 
 		const evaler = this.evaler ?? this.instance.evalers.duplose ?? Duplose.defaultEvaler;
 
-		const buildedFunction = await evaler.makeFunction<ProcessBuildedFunction>({
+		const buildedFunction = await evaler.makeFunction<
+			ProcessBuildedFunction<this>
+		>({
 			duplose: this,
 			args: [StringBuilder.request, StringBuilder.options, StringBuilder.input],
 			content,

@@ -5,12 +5,13 @@ import { Request } from "@scripts/request";
 import { DuploTest } from "@test/utils/duploTest";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { Duplo } from "./duplo";
+import { createProcessDefinition } from "@test/utils/manualDuplose";
 
 describe("duplo", () => {
 	const duplo = new DuploTest({ environment: "TEST" });
 
 	it("register duplo", () => {
-		const process = new Process("test");
+		const process = new Process(createProcessDefinition());
 		duplo.register(process);
 
 		expect(process.instance).toBe(duplo);
@@ -58,8 +59,8 @@ describe("duplo", () => {
 	it("create router", async() => {
 		const router = await duplo.start();
 		const buildedRouter = await router.build();
-		expect(router.notfoundRoutes.paths[0]).toBe("/*");
-		expect(router.notfoundRoutes.method).toBe("GET");
+		expect(router.notfoundRoutes.definiton.paths[0]).toBe("/*");
+		expect(router.notfoundRoutes.definiton.method).toBe("GET");
 
 		const response = await buildedRouter.buildedNotfoundRoutes(new Request({} as any));
 

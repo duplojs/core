@@ -3,7 +3,7 @@ import { Duplo, Route, Router, useRouteBuilder, type PromiseOrNot } from "@scrip
 export class DuploTest extends Duplo {
 	public async start(onStart?: (duplo: Duplo) => PromiseOrNot<void>) {
 		const notfoundHandler = this.notfoundHandler;
-		const notfoundRoute = useRouteBuilder(new Route("GET", ["/*"])).handler((pickup, request) => notfoundHandler(request));
+		const notfoundRoute = useRouteBuilder("GET", ["/*"]).handler((pickup, request) => notfoundHandler(request));
 		this.register(notfoundRoute);
 
 		await this.hooksInstanceLifeCycle.beforeBuildRouter.launchSubscriber(this);

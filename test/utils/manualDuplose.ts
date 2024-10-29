@@ -4,6 +4,8 @@ import { zod, type ZodSpace } from "@scripts/parser";
 import { PresetChecker } from "@scripts/builder/checker";
 import { BadRequestHttpResponse } from "@scripts/response/simplePreset";
 import type { CurrentRequestObject } from "@scripts/request";
+import type { Step } from "@scripts/step";
+import type { Description, PreflightStep, ProcessDefinition, RouteDefinition } from "@scripts/index";
 
 export const manualChecker = new Checker<
 	{ test1: number },
@@ -33,16 +35,53 @@ export const manualPresetChecker = new PresetChecker<
 	[new BadRequestHttpResponse("bad", zod.undefined())],
 );
 
+interface ManualProcessDefiniton {
+	name: string;
+	options: { test1: number };
+	input: string;
+	drop: ("test1" | "test2")[];
+	preflightSteps: PreflightStep[];
+	steps: Step[];
+	descriptions: Description[];
+}
+
 export const manualProcess = new Process<
+	ManualProcessDefiniton,
 	CurrentRequestObject & { test?: string },
-	{ test1: number },
-	string,
-	"test1" | "test2",
-	never,
-	{ params: ZodSpace.ZodString },
-	never,
 	{
 		test1: string;
 		test2: number;
 	}
->("manualProcess");
+>({
+	preflightSteps: [],
+	steps: [],
+	descriptions: [],
+	name: "manualProcess",
+	options: { test1: 1 },
+	input: "test",
+	drop: ["test1", "test2"],
+});
+
+export function createProcessDefinition(processDefinition?: Partial<ProcessDefinition>): ProcessDefinition {
+	return {
+		name: "manualProcessDefiniton",
+		options: { test1: 1 },
+		input: "test",
+		drop: ["test1", "test2"],
+		preflightSteps: [],
+		steps: [],
+		descriptions: [],
+		...processDefinition,
+	};
+}
+
+export function createRouteDefinition(routeDefinition?: Partial<RouteDefinition>): RouteDefinition {
+	return {
+		paths: ["/"],
+		method: "GET",
+		preflightSteps: [],
+		steps: [],
+		descriptions: [],
+		...routeDefinition,
+	};
+}

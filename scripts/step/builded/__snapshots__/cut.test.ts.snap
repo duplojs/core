@@ -1,4 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`BuildedCutStep 1`] = `
+"
 		
 /* step-cut-(2)-before */
 /* end_block */
@@ -33,4 +36,5 @@ break Execution;
 /* step-cut-(2)-after */
 /* end_block */
 
-		
+		"
+`;

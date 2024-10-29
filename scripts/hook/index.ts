@@ -25,10 +25,9 @@ export class Hook<
 	}
 
 	public addSubscriber(
-		subscriber: subscriber | Hook<subscriber>,
 		...subscribers: (subscriber | Hook<subscriber>)[]
 	) {
-		this.subscribers.push(subscriber, ...subscribers);
+		this.subscribers.push(...subscribers);
 	}
 
 	public removeSubscriber(subscriber: subscriber | Hook<subscriber>) {

@@ -72,7 +72,7 @@ export const loginUser = useBuilder()
 				"strict"
 			>;
 
-			return dropper({});
+			return dropper(null);
 		},
 		undefined,
 		makeResponseContract(ForbiddenHttpResponse, "wrongPassword"),

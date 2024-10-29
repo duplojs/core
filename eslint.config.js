@@ -13,6 +13,7 @@ export default [
 			"@typescript-eslint/no-unsafe-member-access": "off",
 			"@typescript-eslint/no-unsafe-argument": "off",
 			"no-useless-assignment": "off",
+			"@typescript-eslint/no-empty-object-type": "off",
 		},
 		files: ["**/*.test.ts", "test/**/*.ts"],
 		ignores: ["**/*.d.ts"]
@@ -25,6 +26,7 @@ export default [
 			"no-useless-assignment": "off",
 			"@typescript-eslint/no-namespace": "off",
 			"@typescript-eslint/use-unknown-in-catch-callback-variable": "off",
+			"@typescript-eslint/no-empty-object-type": "off",
 		},
 		files: ["**/*.ts"],
 		ignores: ["**/*.test.ts", "test/**/*.ts", "**/*.d.ts"],

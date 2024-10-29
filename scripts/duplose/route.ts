@@ -1,15 +1,12 @@
 import type { CurrentRequestObject } from "@scripts/request";
 import { type PresetGenericResponse, Response } from "@scripts/response";
-import { Duplose, type ExtractObject, type DuploseBuildedFunctionContext, type AcceleratedExtractObject } from ".";
-import type { Step } from "@scripts/step";
-import type { Description } from "@scripts/description";
-import { checkResult, condition, extractPart, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
+import { type DuploseDefinition, type DuploseBuildedFunctionContext, Duplose } from ".";
+import { checkResult, condition, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { makeFloor } from "@scripts/floor";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
 import { simpleClone } from "@utils/simpleClone";
 import { HandlerStep } from "@scripts/step/handler";
 import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
-import type { PreflightStep } from "@scripts/step/preflight";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { ResultIsNotAResponseError } from "@scripts/error/resultIsNotAResponseError";
 import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
@@ -29,7 +26,7 @@ export interface HttpMethods {
 export type HttpMethod = GetPropsWithTrueValue<HttpMethods>;
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
-	hooks: BuildedHooksRouteLifeCycle<CurrentRequestObject>;
+	hooks: BuildedHooksRouteLifeCycle<any>;
 	ResultIsNotAResponseError: typeof ResultIsNotAResponseError;
 }
 
@@ -41,47 +38,36 @@ export interface RouteBuildedFunction {
 export type GetRouteGeneric<
 	T extends Route = Route,
 > = T extends Route<
-	infer Request,
-	infer PreflightSteps,
-	infer Extract,
-	infer Step,
-	infer Floor
+	infer InferedRouteDefinition,
+	infer inferedRequest,
+	infer inferedFloorData
 >
 	? {
-		request: Request;
-		preflightSteps: PreflightSteps;
-		extract: Extract;
-		step: Step;
-		floor: Floor;
+		preflightSteps: InferedRouteDefinition["preflightSteps"];
+		step: InferedRouteDefinition["steps"];
+		request: inferedRequest;
+		floor: inferedFloorData;
 	}
 	: never;
 
+export interface RouteDefinition extends DuploseDefinition {
+	method: HttpMethod;
+	paths: string[];
+}
+
 export class Route<
+	GenericRouteDefinition extends RouteDefinition = RouteDefinition,
 	GenericRequest extends CurrentRequestObject = any,
-	_GenericPreflightStep extends PreflightStep = any,
-	_GenericExtract extends ExtractObject = any,
-	_GenericStep extends Step = any,
-	_GenericFloorData extends object = any,
+	GenericFloorData extends object = any,
 > extends Duplose<
-		RouteBuildedFunction,
+		GenericRouteDefinition,
 		GenericRequest,
-		_GenericPreflightStep,
-		_GenericExtract,
-		_GenericStep,
-		_GenericFloorData
+		GenericFloorData
 	> {
-	public method: HttpMethod;
-
-	public paths: string[];
-
 	public constructor(
-		method: HttpMethod,
-		paths: string[],
-		descriptions: Description[] = [],
+		definiton: GenericRouteDefinition,
 	) {
-		super(descriptions);
-		this.method = method;
-		this.paths = paths;
+		super(definiton);
 	}
 
 	public async build() {
@@ -89,7 +75,7 @@ export class Route<
 			throw new BuildNoRegisteredDuploseError(this);
 		}
 
-		if (!(this.steps.at(-1) instanceof HandlerStep)) {
+		if (!(this.definiton.steps.at(-1) instanceof HandlerStep)) {
 			throw new LastStepMustBeHandlerError(this);
 		}
 
@@ -101,19 +87,15 @@ export class Route<
 		hooks.onError.addSubscriber(hookRouteError);
 
 		const buildedPreflight = await Promise.all(
-			this.preflightSteps.map(
+			this.definiton.preflightSteps.map(
 				(step) => step.build(this.instance!),
 			),
 		);
 
-		let extract: ExtractObject | AcceleratedExtractObject | undefined = simpleClone(this.extract);
-
-		if (!this.instance.config.disabledZodAccelerator) {
-			extract = this.acceleratedExtract();
-		}
-
 		const bodyTreat = condition(
-			!!this.extract?.body,
+			Route.methodsWithBody.includes(
+				this.definiton.method,
+			),
 			() => /* js */`
 			if(request.body === undefined){
 				${insertBlock("hook-parsingBody-before")}
@@ -130,7 +112,7 @@ export class Route<
 		);
 
 		const buildedStep = await Promise.all(
-			this.steps.map(
+			this.definiton.steps.map(
 				(step) => step.build(this.instance!),
 			),
 		);
@@ -159,8 +141,6 @@ export class Route<
 				${insertBlock("preflight-after")}
 
 				${bodyTreat}
-
-				${extractPart(this.extract)}
 
 				${insertBlock("steps-before")}
 
@@ -204,8 +184,6 @@ export class Route<
 			},
 			makeFloor,
 			Response,
-			extract,
-			extractError: this.extractError ?? this.instance.extractError,
 			preflightSteps: buildedPreflight,
 			steps: buildedStep,
 			extensions: simpleClone(this.extensions),
@@ -229,4 +207,6 @@ export class Route<
 
 		return buildedFunction;
 	}
+
+	public static methodsWithBody: HttpMethod[] = ["POST", "PUT", "PATCH"];
 }

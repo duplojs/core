@@ -3,15 +3,17 @@ import { ProcessStep, type ProcessStepParams } from "../process";
 import { BuildedProcessStep } from "./process";
 import { makeFloor } from "@scripts/floor";
 import { duploTest } from "@test/utils/duploTest";
+import { createProcessDefinition } from "@test/utils/manualDuplose";
 
 describe("BuildedProcessStep", () => {
-	const process = new Process("test");
+	const process = new Process(createProcessDefinition({
+		options: {
+			toto: 1,
+			test: "",
+		},
+		input: 22,
+	}));
 	process.instance = duploTest;
-	process.setOptions({
-		toto: 1,
-		test: "",
-	});
-	process.setInput(22);
 
 	it("merge object options", async() => {
 		const params: ProcessStepParams = {
@@ -70,7 +72,7 @@ describe("BuildedProcessStep", () => {
 
 		const buildedProcessStep = new BuildedProcessStep(duploTest, step, await process.build());
 
-		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/process1.txt");
+		expect(buildedProcessStep.toString(1)).toMatchSnapshot();
 	});
 
 	it("toString options: object, input, skip", async() => {
@@ -87,6 +89,6 @@ describe("BuildedProcessStep", () => {
 
 		const buildedProcessStep = new BuildedProcessStep(duploTest, step, await process.build());
 
-		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/process2.txt");
+		expect(buildedProcessStep.toString(1)).toMatchSnapshot();
 	});
 });

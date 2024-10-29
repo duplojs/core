@@ -11,8 +11,8 @@ export interface Floor<
 	pickup<Key extends keyof Data>(index: Key): Data[Key];
 	drop<Key extends keyof Data>(index: Key, value: Data[Key]): void;
 	dropper<
-		T extends Record<string, unknown>,
-	>(droppedValue: T): DroppedValue<T>;
+		T extends Record<string, unknown> | null,
+	>(droppedValue: T): DroppedValue<T extends null ? {} : T>;
 }
 
 export function makeFloor<
@@ -37,6 +37,6 @@ export function makeFloor<
 		drop: (index, value) => {
 			data.set(index, value);
 		},
-		dropper: (values) => values as never,
+		dropper: (values) => (values === null ? {} : values) as never,
 	};
 }

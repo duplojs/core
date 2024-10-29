@@ -4,15 +4,17 @@ import { makeFloor } from "@scripts/floor";
 import { BuildedPreflightStep } from "./preflight";
 import { PreflightStep } from "../preflight";
 import { duploTest } from "@test/utils/duploTest";
+import { createProcessDefinition } from "@test/utils/manualDuplose";
 
 describe("BuildedPreflightStep", () => {
-	const process = new Process("test");
+	const process = new Process(createProcessDefinition({
+		options: {
+			toto: 1,
+			test: "",
+		},
+		input: 22,
+	}));
 	process.instance = duploTest;
-	process.setOptions({
-		toto: 1,
-		test: "",
-	});
-	process.setInput(22);
 
 	it("merge object options", async() => {
 		const params: ProcessStepParams = {
@@ -71,7 +73,7 @@ describe("BuildedPreflightStep", () => {
 
 		const buildedProcessStep = new BuildedPreflightStep(duploTest, step, await process.build());
 
-		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/preflight1.txt");
+		expect(buildedProcessStep.toString(1)).toMatchSnapshot();
 	});
 
 	it("toString options: object, input, skip", async() => {
@@ -88,6 +90,6 @@ describe("BuildedPreflightStep", () => {
 
 		const buildedProcessStep = new BuildedPreflightStep(duploTest, step, await process.build());
 
-		await expect(buildedProcessStep.toString(1)).toMatchFileSnapshot("__data__/preflight2.txt");
+		expect(buildedProcessStep.toString(1)).toMatchSnapshot();
 	});
 });

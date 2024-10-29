@@ -71,14 +71,14 @@ export const mustBeConnected = useBuilder()
 			>;
 
 			if (currentUser.role === "ADMIN") {
-				return dropper({});
+				return dropper(null);
 			}
 
 			if (currentUser.role !== options.role) {
 				return new UnauthorizedHttpResponse("wrongRole");
 			}
 
-			return dropper({});
+			return dropper(null);
 		},
 		[],
 		makeResponseContract(UnauthorizedHttpResponse, "wrongRole"),

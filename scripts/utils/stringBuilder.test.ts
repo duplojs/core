@@ -1,6 +1,4 @@
-import { checkResult, condition, extractLevelOne, extractLevelOnePresetCheck, extractLevelTwo, extractLevelTwoPresetCheck, extractPart, insertBlock, mapped, maybeAwait, skipPreflight, skipStep, spread } from "./stringBuilder";
-import { zod } from "..";
-import { manualPresetChecker } from "@test/utils/manualDuplose";
+import { checkResult, condition, insertBlock, mapped, maybeAwait, skipPreflight, skipStep, spread } from "./stringBuilder";
 
 describe("stringBuilder", () => {
 	it("mapped", () => {
@@ -33,55 +31,15 @@ describe("stringBuilder", () => {
 		expect(maybeAwait(false)).toBe("");
 	});
 
-	it("skipStep", async() => {
-		await expect(skipStep(true, 1, "")).toMatchFileSnapshot("__data__/skipStep.txt");
+	it("skipStep", () => {
+		expect(skipStep(true, 1, "")).toMatchSnapshot();
 
 		expect(skipStep(false, 1, "")).toBe("");
 	});
 
-	it("skipPreflight", async() => {
-		await expect(skipPreflight(true, 1, "")).toMatchFileSnapshot("__data__/skipPreflight.txt");
+	it("skipPreflight", () => {
+		expect(skipPreflight(true, 1, "")).toMatchSnapshot();
 
 		expect(skipPreflight(false, 1, "")).toBe("");
-	});
-
-	it("extractLevelOne", async() => {
-		await expect(extractLevelOne("body", false)).toMatchFileSnapshot("__data__/extractLevelOne.txt");
-
-		await expect(extractLevelOne("body", true)).toMatchFileSnapshot("__data__/extractLevelOneAcync.txt");
-	});
-
-	it("extractLevelTwo", async() => {
-		await expect(extractLevelTwo("params", "userId", false)).toMatchFileSnapshot("__data__/extractLevelTwo.txt");
-
-		await expect(extractLevelTwo("params", "userId", true)).toMatchFileSnapshot("__data__/extractLevelTwoAsync.txt");
-	});
-
-	it("extractLevelOnePresetCheck", async() => {
-		await expect(extractLevelOnePresetCheck("body", undefined)).toMatchFileSnapshot("__data__/extractLevelOnePresetCheck.txt");
-
-		await expect(extractLevelOnePresetCheck("body", "user")).toMatchFileSnapshot("__data__/extractLevelOnePresetCheckWithIndexing.txt");
-	});
-
-	it("extractLevelTwoPresetCheck", async() => {
-		await expect(extractLevelTwoPresetCheck("params", "userId", undefined)).toMatchFileSnapshot("__data__/extractLevelTwoPresetCheck.txt");
-
-		await expect(extractLevelTwoPresetCheck("params", "userId", "user")).toMatchFileSnapshot("__data__/extractLevelTwoPresetCheckWithIndexing.txt");
-	});
-
-	it("extractPart", async() => {
-		await expect(
-			extractPart({
-				body: zod.string(),
-				params: { userId: zod.string() },
-			}),
-		).toMatchFileSnapshot("__data__/extractPart.txt");
-
-		await expect(
-			extractPart({
-				body: zod.string().presetCheck(manualPresetChecker),
-				params: { userId: zod.string().presetCheck(manualPresetChecker) },
-			}),
-		).toMatchFileSnapshot("__data__/extractPartWithPreset.txt");
 	});
 });

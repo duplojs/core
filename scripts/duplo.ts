@@ -1,5 +1,5 @@
 import { hasKey } from "@utils/hasKey";
-import type { Duplose, ExtractErrorFunction, DuploseEvaler } from "./duplose";
+import type { Duplose, DuploseEvaler } from "./duplose";
 import { NotFoundHttpResponse, UnprocessableEntityHttpResponse } from "./response/simplePreset";
 import type { AnyFunction } from "@utils/types";
 import type { CurrentRequestObject } from "./request";
@@ -15,6 +15,7 @@ import type { RequiredKeys } from "@utils/requiredKeys";
 import type { HookEvaler } from "./hook";
 import type { BuildedRouter, RouterEvaler } from "./router";
 import { makeHookInformation } from "./hook/default";
+import type { ExtractErrorFunction } from "./step/extract";
 
 export interface Environments {
 	DEV: true;

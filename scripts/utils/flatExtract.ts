@@ -1,8 +1,8 @@
-import type { ExtractObject } from "@scripts/duplose";
 import type { ZodSpace, ZodPresetChecker } from "@scripts/parser";
 import type { ObjectKey } from "./types";
 import type { GetPresetCheckerGeneric } from "@scripts/builder/checker";
 import type { SimplifyType } from "./simplifyType";
+import type { ExtractObject } from "@scripts/step/extract";
 
 export interface KeyAndValue<
 	GenericObjectKey extends ObjectKey = ObjectKey,
@@ -23,7 +23,6 @@ export type ZodTypeToKeyAndValue<
 				GetPresetCheckerGeneric<inferedPresetChecker>["key"],
 				ZodSpace.infer<GenericZodType>
 			>
-
 	)
 	: KeyAndValue<GenericObjectKey, ZodSpace.infer<GenericZodType>>;
 

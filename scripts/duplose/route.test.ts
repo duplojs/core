@@ -16,19 +16,25 @@ import { HandlerStep } from "@scripts/step/handler";
 import { Response } from "@scripts/response";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { DuploTest } from "@test/utils/duploTest";
+import { createProcessDefinition, createRouteDefinition } from "@test/utils/manualDuplose";
+import { ExtractStep } from "@scripts/step/extract";
 
 describe("Route", () => {
 	const checkpointList = new CheckpointList();
 	const duplo = new DuploTest({ environment: "TEST" });
 
-	const route = new Route("GET", ["/"]);
-	route.setExtract({
-		params: { userId: zod.coerce.number() },
-		body: zod.object({
-			test: zod.string(),
-		}).optional(),
-	});
-	const step = new CutStep(
+	const preflightProcess = new Process(createProcessDefinition());
+	preflightProcess.instance = duplo;
+	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
+	const extractStep = new ExtractStep(
+		{
+			params: { userId: zod.coerce.number() },
+			body: zod.object({
+				test: zod.string(),
+			}).optional(),
+		},
+	);
+	const cutStep = new CutStep(
 		({ dropper }) => {
 			checkpointList.addPoint("cut");
 			return dropper({ toto: "true" });
@@ -36,16 +42,11 @@ describe("Route", () => {
 		["toto"],
 		[new Response(100, "toto", zod.undefined())],
 	);
-	route.addStep(step);
-	const preflightProcess = new Process("preflightProcess");
-	preflightProcess.instance = duplo;
-	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
-	route.addPreflightSteps(preflight);
 
-	it("constructor props", () => {
-		expect(route.method).toBe("GET");
-		expect(route.paths).toStrictEqual(["/"]);
-	});
+	const route = new Route(createRouteDefinition({
+		preflightSteps: [preflight],
+		steps: [extractStep, cutStep],
+	}));
 
 	it("build", async() => {
 		const spy = vi.spyOn(Duplose.defaultEvaler, "makeFunction");
@@ -67,14 +68,13 @@ describe("Route", () => {
 				) => new OkHttpResponse(pickup("toto"), pickup("userId"))
 			) as AnyFunction,
 		);
-		route.addStep(handlerStep);
+		route.definiton.steps.push(handlerStep);
 
 		await route.build();
 
 		expect(spy).toBeCalled();
 
-		await expect(spy.mock.lastCall?.[0].content)
-			.toMatchFileSnapshot("__data__/route.txt");
+		expect(spy.mock.lastCall?.[0].content).toMatchSnapshot();
 
 		route.hooks.onError.addSubscriber((_request, error) => {
 			checkpointList.addPoint("onError");

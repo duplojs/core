@@ -1,8 +1,7 @@
-/* eslint-disable func-style */
+
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Description } from "@scripts/description";
-import type { DefineHooksRouteLifeCycle, ExtractErrorFunction, ExtractObject } from "@scripts/duplose";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
 import type { PreflightStep } from "@scripts/step/preflight";
@@ -13,203 +12,191 @@ import type { AddOne } from "@utils/incremente";
 import { CheckerStep, type CheckerStepParams } from "@scripts/step/checker";
 import type { DroppedValue, Floor } from "@scripts/floor";
 import { ProcessStep, type ProcessStepParams } from "@scripts/step/process";
-import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
+import { type GetProcessGeneric, Process, type ProcessDefinition } from "@scripts/duplose/process";
 import { type Cut, CutStep } from "@scripts/step/cut";
-import type { AnyFunction } from "@utils/types";
+import { ExtractStep, type ExtractErrorFunction, type ExtractObject } from "@scripts/step/extract";
+import { simpleClone } from "@utils/simpleClone";
+import { useBuilder } from "./duplose";
 
 export interface ProcessBuilder<
-	Request extends CurrentRequestObject = CurrentRequestObject,
-	Options extends object | undefined = undefined,
-	Input extends unknown = undefined,
-	Preflights extends PreflightStep = never,
-	Extracted extends ExtractObject = ExtractObject,
-	Steps extends Step = never,
-	StepsCount extends number = 0,
-	FloorData extends object = object,
+	GenericRequest extends CurrentRequestObject = CurrentRequestObject,
+	GenericPreflightSteps extends PreflightStep = PreflightStep,
+	GenericSteps extends Step = Step,
+	GenericStepsCount extends number = 0,
+	GenericFloorData extends object & { options?: object } = object & { options?: object },
 > {
-	hook: DefineHooksRouteLifeCycle<
-		Request,
-		this
-	>;
-
 	extract<
-		E extends ExtractObject<Request>,
-		F extends FlatExtract<E>,
+		GenericExtract extends ExtractObject<GenericRequest>,
+		GenericFlatExtract extends FlatExtract<GenericExtract>,
 	>(
-		extract: E,
-		error?: ExtractErrorFunction,
+		extract: GenericExtract,
+		catchError?: ExtractErrorFunction,
 		...desc: Description[]
-	): Omit<
-		ProcessBuilder<
-			Request,
-			Options,
-			Input,
-			Preflights,
-			E,
-			Steps,
-			StepsCount,
-			Omit<FloorData, keyof F> & NoInfer<F>
-		>,
-		"extract" | "hook"
+	): ProcessBuilder<
+		GenericRequest,
+		GenericPreflightSteps,
+		GenericSteps | ExtractStep<GenericExtract, GenericStepsCount>,
+		AddOne<GenericStepsCount>,
+		Omit<GenericFloorData, keyof GenericFlatExtract> & NoInfer<GenericFlatExtract>
 	>;
 
 	check<
-		C extends Checker,
-		I extends string,
-		K extends string,
-		F extends ((floor: Floor<FloorData>["pickup"]) => boolean) | undefined,
-		R extends ContractResponse,
-		CR extends ContractToResponse<R> = ContractToResponse<R>,
-		GCG extends GetCheckerGeneric<C> = GetCheckerGeneric<C>,
+		GenericChecker extends Checker,
+		GenericInfo extends string,
+		GenericKey extends string,
+		GenericSkip extends ((floor: Floor<GenericFloorData>["pickup"]) => boolean) | undefined,
+		GenericContractResponse extends ContractResponse,
+		GenericResponse extends ContractToResponse<GenericContractResponse>,
+		GenericCheckerValue extends GetCheckerGeneric<GenericChecker>,
 	>(
-		checker: C,
+		checker: GenericChecker,
 		params: CheckerStepParams<
-			GCG,
-			I,
-			K,
-			CR,
-			FloorData,
-			F
+			GenericCheckerValue,
+			GenericInfo,
+			GenericKey,
+			GenericResponse,
+			GenericFloorData,
+			GenericSkip
 		>,
-		responses?: R | R[],
+		responses?: GenericContractResponse | GenericContractResponse[],
 		...desc: Description[]
-	): Omit<
-		ProcessBuilder<
-			Request,
-			Options,
-			Input,
-			Preflights,
-			Extracted,
-			Steps | CheckerStep<C, R, StepsCount>,
-			AddOne<StepsCount>,
-			(
-				string extends K
-					? object
-					: { [P in K]: Extract<GCG["output"], { info: I }>["data"] | (undefined extends F ? never : undefined) }
-			) & (
-				string extends I
-					? FloorData
-					: Omit<FloorData, I>
-			)
-		>,
-		"extract" | "hook"
+	): ProcessBuilder<
+		GenericRequest,
+		GenericPreflightSteps,
+		GenericSteps | CheckerStep<GenericChecker, GenericContractResponse, GenericStepsCount>,
+		AddOne<GenericStepsCount>,
+		(
+			string extends GenericKey
+				? object
+				: {
+					[P in GenericKey]:
+						| Extract<GenericCheckerValue["output"], { info: GenericInfo }>["data"]
+						| (undefined extends GenericSkip ? never : undefined)
+				}
+		) & (
+			string extends GenericKey
+				? GenericFloorData
+				: Omit<GenericFloorData, GenericKey>
+		)
 	>;
 
 	presetCheck<
-		C extends PresetChecker,
-		GCPG extends GetPresetCheckerGeneric<C> = GetPresetCheckerGeneric<C>,
-		GCG extends GetCheckerGeneric<GCPG["checker"]> = GetCheckerGeneric<GCPG["checker"]>,
+		GenericPresetChecker extends PresetChecker,
+		GenericPresetCheckerValue extends GetPresetCheckerGeneric<GenericPresetChecker>,
+		GenericCheckerValue extends GetCheckerGeneric<GenericPresetCheckerValue["checker"]>,
 	>(
-		presetChecker: C,
-		input: (pickup: Floor<FloorData>["pickup"]) => GCPG["newInput"],
+		presetChecker: GenericPresetChecker,
+		input: (pickup: Floor<GenericFloorData>["pickup"]) => GenericPresetCheckerValue["newInput"],
 		...desc: Description[]
-	): Omit<
-		ProcessBuilder<
-			Request,
-			Options,
-			Input,
-			Preflights,
-			Extracted,
-			Steps | CheckerStep<GCPG["checker"], GCPG["response"], StepsCount>,
-			AddOne<StepsCount>,
-			(
-				string extends GCPG["key"]
-					? object
-					: { [P in GCPG["key"]]: Extract<GCG["output"], { info: GCPG["info"] }>["data"] }
-			) & (
-				string extends GCPG["key"]
-					? FloorData
-					: Omit<FloorData, GCPG["key"]>
-			)
+	): ProcessBuilder<
+		GenericRequest,
+		GenericPreflightSteps,
+		GenericSteps | CheckerStep<
+			GenericPresetCheckerValue["checker"],
+			GenericPresetCheckerValue["response"],
+			GenericStepsCount
 		>,
-		"extract" | "hook"
+		AddOne<GenericStepsCount>,
+		(
+			string extends GenericPresetCheckerValue["key"]
+				? object
+				: {
+					[P in GenericPresetCheckerValue["key"]]:
+						| Extract<GenericCheckerValue["output"], { info: GenericPresetCheckerValue["info"] }>["data"]
+				}
+		) & (
+			string extends GenericPresetCheckerValue["key"]
+				? GenericFloorData
+				: Omit<GenericFloorData, GenericPresetCheckerValue["key"]>
+		)
 	>;
 
 	execute<
-		P extends Process,
-		T extends string,
-		F extends ((floor: Floor<FloorData>["pickup"]) => boolean) | undefined,
-		GPG extends GetProcessGeneric<P> = GetProcessGeneric<P>,
+		GenericProcess extends Process,
+		GenericPickup extends string,
+		GenericSkip extends ((floor: Floor<GenericFloorData>["pickup"]) => boolean) | undefined,
+		GenericProcessValue extends GetProcessGeneric<GenericProcess>,
 	>(
-		process: P,
+		process: GenericProcess,
 		params?: ProcessStepParams<
-			GPG,
-			T,
-			FloorData,
-			F
+			GenericProcessValue,
+			GenericPickup,
+			GenericFloorData,
+			GenericSkip
 		>,
 		...desc: Description[]
-	): Omit<
-		ProcessBuilder<
-			Request & GPG["request"],
-			Options,
-			Input,
-			Preflights,
-			Extracted,
-			Steps | ProcessStep<P, StepsCount>,
-			AddOne<StepsCount>,
-			(
-				undefined extends F
-					? Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>
-					: Partial<Pick<GPG["floor"], T extends keyof GPG["floor"] ? T : never>>
-			) & (
-				string extends T
-					? FloorData
-					: Omit<FloorData, T>
-			)
-		>,
-		"extract" | "hook"
+	): ProcessBuilder<
+		GenericRequest & GenericProcessValue["request"],
+		GenericPreflightSteps,
+		GenericSteps | ProcessStep<GenericProcess, GenericStepsCount>,
+		AddOne<GenericStepsCount>,
+		(
+			undefined extends GenericSkip
+				? Pick<
+					GenericProcessValue["floor"],
+					GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
+				>
+				: Partial<
+					Pick<
+						GenericProcessValue["floor"],
+						GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
+					>
+				>
+		) & (
+			string extends GenericPickup
+				? GenericFloorData
+				: Omit<GenericFloorData, GenericPickup>
+		)
 	>;
 
 	cut<
-		R extends ContractResponse,
-		CR extends ContractToResponse<R>,
-		T extends DroppedValue | CR,
-		O extends Exclude<T, CR>,
-		D extends string,
+		GenericContractResponse extends ContractResponse,
+		GenericResponse extends ContractToResponse<GenericContractResponse>,
+		GenericReturn extends DroppedValue | GenericResponse,
+		GenericDroppedValue extends Exclude<GenericReturn, GenericResponse>,
+		GenericDrop extends string,
 	>(
 		cutFunction: Cut<
-			FloorData,
-			Request,
-			T
+			GenericFloorData,
+			GenericRequest,
+			GenericReturn
 		>,
-		drop?: D[] & NoInfer<keyof O>[],
-		responses?: R | R[],
+		drop?: GenericDrop[] & NoInfer<keyof GenericDroppedValue>[],
+		responses?: GenericContractResponse | GenericContractResponse[],
 		...desc: Description[]
-	): Omit<
-		ProcessBuilder<
-			Request,
-			Options,
-			Input,
-			Preflights,
-			Extracted,
-			Steps | CutStep<R, StepsCount>,
-			AddOne<StepsCount>,
-			(
-				string extends D
-					? FloorData
-					: Omit<FloorData, D> & Pick<O, D>
-			)
-		>,
-		"extract" | "hook"
+	): ProcessBuilder<
+		GenericRequest,
+		GenericPreflightSteps,
+		GenericSteps | CutStep<GenericContractResponse, GenericStepsCount>,
+		AddOne<GenericStepsCount>,
+		(
+			string extends GenericDrop
+				? GenericFloorData
+				: Omit<GenericFloorData, GenericDrop> & Pick<GenericDroppedValue, GenericDrop>
+		)
 	>;
 
 	exportation<
-		D extends string,
+		GenericDrop extends string,
 	>(
-		drop?: D[] & (keyof FloorData)[],
+		drop?: GenericDrop[] & (keyof GenericFloorData)[],
 		...desc: Description[]
 	): Process<
-		Request,
-		Options,
-		Input,
-		D extends keyof FloorData
-			? D
-			: never,
-		Preflights,
-		Extracted,
-		Steps,
-		FloorData
+		{
+			name: string;
+			options: "options" extends keyof GenericFloorData
+				? GenericFloorData["options"]
+				: undefined;
+			input: "input" extends keyof GenericFloorData
+				? GenericFloorData["input"]
+				: undefined;
+			drop: GenericDrop[];
+			preflightSteps: GenericPreflightSteps[];
+			steps: GenericSteps[];
+			descriptions: Description[];
+		},
+		GenericRequest,
+		GenericFloorData
 	>;
 }
 
@@ -230,138 +217,108 @@ export interface ProcessBuilderParamsToFloorData<P extends ProcessBuilderParams>
 		: P["input"];
 }
 
-export type AnyProcessBuilder = ProcessBuilder<any, any, any, any, any, any, any, any>;
+export type AnyProcessBuilder = ProcessBuilder<any, any, any, any, any>;
 
 export function useProcessBuilder<
-	Request extends CurrentRequestObject,
-	Params extends ProcessBuilderParams = ProcessBuilderParams,
-	FloorData extends ProcessBuilderParamsToFloorData<Params> = ProcessBuilderParamsToFloorData<Params>,
+	GenericRequest extends CurrentRequestObject,
+	GenericParams extends ProcessBuilderParams = ProcessBuilderParams,
+	GenericPreflightSteps extends PreflightStep = PreflightStep,
 >(
-	process: Process,
-	params?: Params,
+	name: string,
+	params?: GenericParams,
+	preflightSteps?: GenericPreflightSteps[],
+	desc: Description[] = [],
 ): ProcessBuilder<
-		Request,
-		FloorData["options"],
-		FloorData["input"],
-		never,
-		ExtractObject,
-		never,
+		GenericRequest,
+		GenericPreflightSteps,
+		PreflightStep,
 		0,
-		FloorData
+		ProcessBuilderParamsToFloorData<GenericParams>
 	> {
-	if (params?.options) {
-		process.setOptions(params?.options);
+	function returnFunction(processDefinition: ProcessDefinition): AnyProcessBuilder {
+		return {
+			extract: (...args) => extract(simpleClone(processDefinition), args),
+			check: (...args) => check(simpleClone(processDefinition), args),
+			presetCheck: (...args) => presetCheck(simpleClone(processDefinition), args),
+			execute: (...args) => execute(simpleClone(processDefinition), args),
+			cut: (...args) => cut(simpleClone(processDefinition), args),
+			exportation: (...args) => exportation(simpleClone(processDefinition), args),
+		};
 	}
 
-	if (params?.input) {
-		process.setInput(params?.input);
-	}
-
-	const hook: AnyProcessBuilder["hook"] = (
-		...[name, subscriber]
-	) => {
-		process.hooks[name].addSubscriber(subscriber as AnyFunction);
-
-		return {
-			extract,
-			check,
-			presetCheck,
-			execute,
-			cut,
-			hook,
-			exportation,
-		};
-	};
-
-	const extract: AnyProcessBuilder["extract"] = (
-		extract,
-		error,
-		...desc
-	) => {
-		process.setExtract(extract, error, desc);
-
-		return {
-			check,
-			presetCheck,
-			execute,
-			cut,
-			exportation,
-		};
-	};
-
-	const check: AnyProcessBuilder["check"] = (
-		checker,
-		params: CheckerStepParams,
-		responses = [],
-		...desc
-	) => {
-		process.addStep(
-			new CheckerStep(
-				checker,
-				params,
-				responses instanceof Array ? responses : [responses],
+	function extract(
+		processDefinition: ProcessDefinition,
+		[extractObject, catchError, ...desc]: Parameters<AnyProcessBuilder["extract"]>,
+	) {
+		processDefinition.steps.push(
+			new ExtractStep(
+				extractObject,
+				catchError,
 				desc,
 			),
 		);
 
-		return {
-			check,
-			presetCheck,
-			execute,
-			cut,
-			exportation,
-		};
-	};
+		return returnFunction(processDefinition);
+	}
 
-	const presetCheck: AnyProcessBuilder["presetCheck"] = (
-		presetChecker,
-		input,
-		...desc
-	) => {
+	function check(
+		processDefinition: ProcessDefinition,
+		[checker, params, responses = [], ...desc]: Parameters<AnyProcessBuilder["check"]>,
+	) {
+		processDefinition.steps.push(
+			new CheckerStep(
+				checker,
+					<CheckerStepParams>params,
+					responses instanceof Array ? responses : [responses],
+					desc,
+			),
+		);
+
+		return returnFunction(processDefinition);
+	}
+
+	function presetCheck(
+		processDefinition: ProcessDefinition,
+		[presetChecker, input, ...desc]: Parameters<AnyProcessBuilder["presetCheck"]>,
+	) {
 		const transformInput = presetChecker.params.transformInput;
 
 		return check(
-			presetChecker.checker,
-			{
-				...presetChecker.params,
-				input: transformInput
-					? (pickup) => transformInput(input(pickup))
-					: input,
-			},
-			presetChecker.responses,
-			...desc,
+			processDefinition,
+			[
+				presetChecker.checker,
+				{
+					...presetChecker.params,
+					input: transformInput
+						? (pickup) => transformInput(input(pickup))
+						: input,
+				},
+				presetChecker.responses,
+				...desc,
+			],
 		);
-	};
+	}
 
-	const execute: AnyProcessBuilder["execute"] = (
-		currentProcess,
-		params,
-		...desc
-	) => {
-		process.addStep(
+	function execute(
+		processDefinition: ProcessDefinition,
+		[process, params, ...desc]: Parameters<AnyProcessBuilder["execute"]>,
+	) {
+		processDefinition.steps.push(
 			new ProcessStep(
-				currentProcess,
+				process,
 				params,
 				desc,
 			),
 		);
 
-		return {
-			check,
-			presetCheck,
-			execute,
-			cut,
-			exportation,
-		};
-	};
+		return returnFunction(processDefinition);
+	}
 
-	const cut: AnyProcessBuilder["cut"] = (
-		cutFunction,
-		drop = [],
-		responses = [],
-		...desc
-	) => {
-		process.addStep(
+	function cut(
+		processDefinition: ProcessDefinition,
+		[cutFunction, drop = [], responses = [], ...desc]: Parameters<AnyProcessBuilder["cut"]>,
+	) {
+		processDefinition.steps.push(
 			new CutStep(
 				cutFunction,
 				drop instanceof Array ? drop : [drop],
@@ -370,31 +327,30 @@ export function useProcessBuilder<
 			),
 		);
 
-		return {
-			check,
-			presetCheck,
-			execute,
-			cut,
-			exportation,
-		};
-	};
+		return returnFunction(processDefinition);
+	}
 
-	const exportation: AnyProcessBuilder["exportation"] = (
-		drop: string[] = [],
-		...desc: Description[]
-	) => {
-		process.setDrop(drop, desc);
+	function exportation(
+		processDefinition: ProcessDefinition,
+		[drop = [], ...desc]: Parameters<AnyProcessBuilder["exportation"]>,
+	) {
+		const process = new Process<any>({
+			...processDefinition,
+			drop: <string[]>drop,
+			descriptions: [...processDefinition.descriptions, ...desc],
+		});
+
+		useBuilder.push(process);
 
 		return process;
-	};
+	}
 
-	return {
-		extract,
-		check,
-		presetCheck,
-		execute,
-		cut,
-		exportation,
-		hook,
-	} satisfies AnyProcessBuilder as any;
+	return returnFunction({
+		name,
+		preflightSteps: simpleClone(preflightSteps ?? []),
+		steps: [],
+		drop: [],
+		descriptions: desc,
+		...params,
+	});
 }

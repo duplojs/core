@@ -31,7 +31,7 @@ export const processWithOptionsAndInput = useBuilder()
 				"strict"
 			>;
 
-			return dropper({});
+			return dropper(null);
 		},
 	)
 	.exportation(["input", "options"]);

@@ -41,7 +41,7 @@ export const processWithExtract = useBuilder()
 				"strict"
 			>;
 
-			return dropper({});
+			return dropper(null);
 		},
 	)
 	.exportation(["body", "userId"]);

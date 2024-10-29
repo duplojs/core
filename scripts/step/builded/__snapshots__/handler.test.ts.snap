@@ -1,4 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`BuildedHandlerStep 1`] = `
+"
 		
 /* step-handler-(4)-before */
 /* end_block */
@@ -26,4 +29,5 @@ break Execution;
 /* step-handler-(4)-after */
 /* end_block */
 
-		
+		"
+`;

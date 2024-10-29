@@ -29,7 +29,7 @@ export const processWithCut = useBuilder()
 				"strict"
 			>;
 
-			return dropper({});
+			return dropper(null);
 		},
 	)
 	.exportation(["value"]);

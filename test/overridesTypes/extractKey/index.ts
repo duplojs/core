@@ -1,7 +1,7 @@
-import type { ExtractKey } from "@scripts/duplose";
+import type { ExtractKey } from "@scripts/step/extract";
 import type { ExpectType } from "@test/utils/expectType";
 
-declare module "@scripts/duplose" {
+declare module "@scripts/step/extract" {
 	interface DisabledExtractKey {
 		path: true;
 		host: true;

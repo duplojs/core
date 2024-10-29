@@ -4,7 +4,7 @@ import { Response } from "@scripts/response";
 import { zod } from "@scripts/parser";
 import { duploTest } from "@test/utils/duploTest";
 
-it("BuildedHandlerStep", async() => {
+it("BuildedHandlerStep", () => {
 	const handlerFunction = () => new Response(300, "test", 11);
 
 	const step = new HandlerStep(handlerFunction, [new Response(100, "toto", zod.undefined())]);
@@ -14,5 +14,5 @@ it("BuildedHandlerStep", async() => {
 
 	expect(buildedCutStep.handlerFunction).toBe(handlerFunction);
 
-	await expect(buildedCutStep.toString(4)).toMatchFileSnapshot("__data__/handler.txt");
+	expect(buildedCutStep.toString(4)).toMatchSnapshot();
 });

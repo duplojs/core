@@ -201,7 +201,7 @@ export type AnyRouteBuilder = RouteBuilder<any, any, any, any, any>;
 
 export function useRouteBuilder<
 	GenericRequest extends CurrentRequestObject,
-	GenericPreflightSteps extends PreflightStep,
+	GenericPreflightSteps extends PreflightStep = PreflightStep,
 >(
 	method: HttpMethod,
 	paths: string[],

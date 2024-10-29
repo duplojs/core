@@ -1,0 +1,257 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Route > build 1`] = `
+"
+		let result = undefined;
+
+		try {
+			let floor = this.makeFloor();
+
+			Execution: {
+				
+/* hook-beforeRouteExecution-before */
+/* end_block */
+
+
+				result = await this.hooks.beforeRouteExecution(request)
+				
+				
+/* hook-beforeRouteExecution-before-check-result */
+/* end_block */
+
+
+				if(result instanceof this.Response){
+
+break Execution;
+}
+
+				
+/* hook-beforeRouteExecution-after */
+/* end_block */
+
+
+				
+/* preflight-before */
+/* end_block */
+
+
+				
+				
+/* preflight-process-(0)-before */
+/* end_block */
+
+
+				result = this.preflightSteps[0].processFunction(
+					request,
+					this.preflightSteps[0].params.options,
+					this.preflightSteps[0].params.input(floor.pickup)
+				);
+
+				
+/* preflight-process-(0)-before-check-result */
+/* end_block */
+
+
+				if(result instanceof this.Response){
+
+break Execution;
+}
+
+				
+/* preflight-process-(0)-before-drop */
+/* end_block */
+
+
+				floor.drop("flute", result["flute"]);
+
+				
+/* preflight-process-(0)-after */
+/* end_block */
+
+			
+
+				
+/* preflight-after */
+/* end_block */
+
+
+				
+
+				
+/* steps-before */
+/* end_block */
+
+
+				
+/* setp-extract-(0)-before */
+/* end_block */
+
+
+			
+/* setp-extract-(0)-(params)-(userId)-before */
+/* end_block */
+
+		
+			{
+				let temp = this.steps[0]
+					.extractObject["params"]["userId"]
+					.safeParse(request["params"]?.["userId"])
+		
+				if(!temp.success){
+					result = this.steps[0].catchError(
+						"params",
+						"userId",
+						temp.error,
+					);
+					break Execution;
+				}
+		
+				floor.drop(
+					"userId",
+					temp.data,
+				);
+			}
+		
+			
+/* setp-extract-(0)-(params)-(userId)-after */
+/* end_block */
+
+			
+
+			
+/* setp-extract-(0)-(body)-before */
+/* end_block */
+
+		
+			{
+				let temp = this.steps[0]
+					.extractObject["body"]
+					.safeParse(request["body"])
+		
+				if(!temp.success){
+					result = this.steps[0].catchError(
+						"body",
+						undefined,
+						temp.error,
+					);
+					break Execution;
+				}
+		
+				floor.drop(
+					"body",
+					temp.data,
+				);
+			}
+		
+			
+/* setp-extract-(0)-(body)-after */
+/* end_block */
+
+			
+
+/* setp-extract-(0)-after */
+/* end_block */
+
+
+		
+/* step-cut-(1)-before */
+/* end_block */
+
+
+		result = this.steps[1].cutFunction(floor, request);
+
+		
+/* step-cut-(1)-before-check-result */
+/* end_block */
+
+
+		if(result instanceof this.Response){
+
+				let temp = this.steps[1].responseZodSchema.safeParse(result);
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, result);
+				}
+			
+break Execution;
+}
+
+		
+/* step-cut-(1)-before-drop */
+/* end_block */
+
+
+		floor.drop("toto", result["toto"]);
+
+		
+/* step-cut-(1)-after */
+/* end_block */
+
+		
+
+		
+/* step-handler-(2)-before */
+/* end_block */
+
+
+		result = this.steps[2].handlerFunction(floor.pickup, request);
+
+		
+/* step-handler-(2)-before-check-result */
+/* end_block */
+
+
+		if(result instanceof this.Response){
+
+break Execution;
+}
+
+		
+/* step-handler-(2)-after */
+/* end_block */
+
+		
+
+				
+/* steps-after */
+/* end_block */
+
+
+				
+/* defaultResponse-before */
+/* end_block */
+
+
+				result = new this.Response(503, "NO_RESPONSE_SENT", undefined);
+			}
+		} catch (error) {
+			
+/* hook-onError-before */
+/* end_block */
+
+
+			result = await this.hooks.onError(request, error) 
+
+			
+/* hook-onError-after */
+/* end_block */
+
+		}
+
+		
+/* check-result-before */
+/* end_block */
+
+
+		if(!(result instanceof this.Response)){
+			throw new this.ResultIsNotAResponseError(result)
+		}
+
+		
+/* check-result-after */
+/* end_block */
+
+
+		return result
+		"
+`;

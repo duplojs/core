@@ -5,7 +5,7 @@ import { PresetChecker } from "@scripts/builder/checker";
 import { BadRequestHttpResponse } from "@scripts/response/simplePreset";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
-import type { Description, PreflightStep, ProcessDefinition } from "@scripts/index";
+import type { Description, PreflightStep, ProcessDefinition, RouteDefinition } from "@scripts/index";
 
 export const manualChecker = new Checker<
 	{ test1: number },
@@ -72,5 +72,16 @@ export function createProcessDefinition(processDefinition?: Partial<ProcessDefin
 		steps: [],
 		descriptions: [],
 		...processDefinition,
+	};
+}
+
+export function createRouteDefinition(routeDefinition?: Partial<RouteDefinition>): RouteDefinition {
+	return {
+		paths: ["/"],
+		method: "GET",
+		preflightSteps: [],
+		steps: [],
+		descriptions: [],
+		...routeDefinition,
 	};
 }

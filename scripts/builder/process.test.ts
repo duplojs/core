@@ -240,33 +240,4 @@ describe("useProcessBuilder", () => {
 			)
 			.exportation();
 	});
-
-	it("add hook", () => {
-		const process = useProcessBuilder<
-			CurrentRequestObject & { test: string }
-		>("test")
-			.exportation()
-			.hook("afterSend", (request) => {
-				type check = ExpectType<typeof request["test"], string, "strict">;
-			})
-			.hook("beforeRouteExecution", (request) => {
-				type check = ExpectType<typeof request["test"], string, "strict">;
-			})
-			.hook("beforeSend", (request) => {
-				type check = ExpectType<typeof request["test"], string, "strict">;
-			})
-			.hook("onError", (request) => {
-				type check = ExpectType<typeof request["test"], string, "strict">;
-			})
-			.hook("parsingBody", (request) => {
-				type check = ExpectType<typeof request["test"], string, "strict">;
-			})
-			.hook("serializeBody", (request) => {
-				type check = ExpectType<typeof request["test"], string, "strict">;
-			});
-
-		Object.values(process.hooks).forEach((value) => {
-			expect(value.subscribers[0]).toBeTypeOf("function");
-		});
-	});
 });

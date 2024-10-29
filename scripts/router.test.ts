@@ -4,27 +4,44 @@ import { Route } from "./duplose/route";
 import { HandlerStep } from "./step/handler";
 import type { AnyFunction } from "@utils/types";
 import { DuploTest } from "@test/utils/duploTest";
+import { createRouteDefinition } from "@test/utils/manualDuplose";
 
 describe("Router", () => {
 	const duplo = new DuploTest({ environment: "TEST" });
 
 	const routes = [
-		new Route("GET", ["/users", "/users/{userId}"]),
-		new Route("GET", ["/posts", "/posts/{postId}"]),
-		new Route("POST", ["/users"]),
-		new Route("POST", ["/posts"]),
-		new Route("PATCH", ["/users/{userId}"]),
-		new Route("PATCH", ["/posts/{postId}"]),
+		new Route(createRouteDefinition({
+			method: "GET",
+			paths: ["/users", "/users/{userId}"],
+		})),
+		new Route(createRouteDefinition({
+			method: "GET",
+			paths: ["/posts", "/posts/{postId}"],
+		})),
+		new Route(createRouteDefinition({
+			method: "POST",
+			paths: ["/users"],
+		})),
+		new Route(createRouteDefinition({
+			method: "POST",
+			paths: ["/posts"],
+		})),
+		new Route(createRouteDefinition({
+			method: "PATCH",
+			paths: ["/users/{userId}"],
+		})),
+		new Route(createRouteDefinition({
+			method: "PATCH",
+			paths: ["/posts/{postId}"],
+		})),
 	];
 
-	const notfoundRoute = new Route("GET", ["/*"]);
-	notfoundRoute.addStep(
-		new HandlerStep((() => ({})) as AnyFunction),
-	);
+	const notfoundRoute = new Route(createRouteDefinition({
+		steps: [new HandlerStep((() => ({})) as AnyFunction)],
+	}));
 	duplo.register(notfoundRoute);
-
 	routes.forEach((route) => {
-		route.addStep(
+		route.definiton.steps.push(
 			new HandlerStep((() => ({})) as AnyFunction),
 		);
 

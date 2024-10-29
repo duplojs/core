@@ -36,7 +36,7 @@ export interface RouteBuilder<
 	): RouteBuilder<
 		GenericRequest,
 		GenericPreflightSteps,
-		GenericSteps,
+		GenericSteps | ExtractStep<GenericExtract, GenericStepsCount>,
 		AddOne<GenericStepsCount>,
 		Omit<GenericFloorData, keyof GenericFlatExtract> & NoInfer<GenericFlatExtract>
 	>;

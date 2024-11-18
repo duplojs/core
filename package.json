@@ -2,7 +2,7 @@
   "name": "@duplojs/core",
   "version": "0.0.0",
   "author": "mathcovax",
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "repository": "https://github.com/duplojs/core",
   "scripts": {
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
-    "@duplojs/eslint": "0.2.3",
+    "@duplojs/eslint": "0.3.0",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "22.1.0",
     "@vitest/coverage-istanbul": "2.0.5",

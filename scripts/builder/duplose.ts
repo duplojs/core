@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import type { Description } from "@scripts/description";
 import type { Process, GetProcessGeneric } from "@scripts/duplose/process";
 import type { Floor } from "@scripts/floor";

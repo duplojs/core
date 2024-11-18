@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-invalid-void-type */
 import type { CurrentRequestObject } from "@scripts/request";
 import { type BuildHooks, Hook } from ".";
 import type { Duplo } from "@scripts/duplo";

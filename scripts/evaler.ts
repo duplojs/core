@@ -1,6 +1,5 @@
 import type { AnyFunction } from "./utils/types";
 
-// eslint-disable-next-line no-eval
 const shadowEval = eval;
 
 export interface EvalerParams {

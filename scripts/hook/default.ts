@@ -20,7 +20,7 @@ export function hookRouteRangeError(request: CurrentRequestObject, error: unknow
 }
 
 export function makeHookInformation(keyToInformationInHeaders: string) {
-	return function hookInformation(request: CurrentRequestObject, response: PresetGenericResponse) {
+	return function hookInformation(request: CurrentRequestObject, response: PresetGenericResponse): undefined {
 		if (response.information) {
 			response.headers[keyToInformationInHeaders] = response.information;
 		}

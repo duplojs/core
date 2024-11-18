@@ -64,24 +64,24 @@ export class File {
 		return File.exist(this.path);
 	}
 
-	public static delete(path: string) {
-		return Promise.reject<void>(new NeedOverrideError());
+	public static delete(path: string): Promise<void> {
+		return Promise.reject(new NeedOverrideError());
 	}
 
-	public static move(path: string, newPath: string) {
-		return Promise.reject<void>(new NeedOverrideError());
+	public static move(path: string, newPath: string): Promise<void> {
+		return Promise.reject(new NeedOverrideError());
 	}
 
-	public static rename(path: string, newPath: string) {
-		return Promise.reject<void>(new NeedOverrideError());
+	public static rename(path: string, newPath: string): Promise<void> {
+		return Promise.reject(new NeedOverrideError());
 	}
 
-	public static deplace(path: string, newPath: string) {
-		return Promise.reject<void>(new NeedOverrideError());
+	public static deplace(path: string, newPath: string): Promise<void> {
+		return Promise.reject(new NeedOverrideError());
 	}
 
-	public static exist(path: string) {
-		return Promise.reject<boolean>(new NeedOverrideError());
+	public static exist(path: string): Promise<boolean> {
+		return Promise.reject(new NeedOverrideError());
 	}
 
 	public static getExtension(path: string) {

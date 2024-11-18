@@ -1,5 +1,4 @@
 
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Description } from "@scripts/description";
 import type { CurrentRequestObject } from "@scripts/request";

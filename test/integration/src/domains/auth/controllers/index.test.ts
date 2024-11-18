@@ -46,6 +46,20 @@ describe("login", async() => {
 	duplo.register(loginUser);
 	const buildedRoute = await loginUser.build();
 
+	it("user not found", async() => {
+		const result = await buildedRoute(
+			makeFakeRequest({
+				body: {
+					email: "melon@example.com",
+					password: "toto",
+				},
+			}),
+		);
+
+		expect(result).instanceof(ForbiddenHttpResponse);
+		expect(result.information).toBe("wrongUser");
+	});
+
 	it("wrong password", async() => {
 		const result = await buildedRoute(
 			makeFakeRequest({

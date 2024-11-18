@@ -1,7 +1,7 @@
 import { Checker, type CheckerOutput, type GetCheckerGeneric } from "@scripts/checker";
 import { PresetChecker, createChecker, createPresetChecker, type GetPresetCheckerGeneric } from "./checker";
 import type { ExpectType } from "@test/utils/expectType";
-import { OkHttpResponse, UnprocessableEntityHttpResponse } from "@scripts/response/simplePreset";
+import { ForbiddenHttpResponse, OkHttpResponse, UnprocessableEntityHttpResponse } from "@scripts/response/simplePreset";
 import { zod, type Response } from "..";
 import type { ZodUndefined } from "zod";
 
@@ -176,6 +176,32 @@ describe("checker builder", () => {
 						| Response<200, "odd", ZodUndefined>
 						| Response<422, "notOdd", ZodUndefined>;
 					newInput: string;
+					outputData: number;
+					checkerGeneric: GetCheckerGeneric<typeof isOdd>;
+				},
+				"strict"
+			>;
+		});
+
+		it("redefine catch", () => {
+			const catchError = () => new ForbiddenHttpResponse("test");
+
+			const newPreset = preset.redefineCatch(
+				catchError,
+				new ForbiddenHttpResponse("test", zod.undefined()),
+			);
+
+			expect(newPreset).instanceOf(PresetChecker);
+			expect(newPreset.params.catch).toBe(catchError);
+
+			type check1 = ExpectType<
+				GetPresetCheckerGeneric<typeof newPreset>,
+				{
+					checker: typeof isOdd;
+					info: "odd";
+					key: "number";
+					response: Response<403, "test", ZodUndefined>;
+					newInput: number;
 					outputData: number;
 					checkerGeneric: GetCheckerGeneric<typeof isOdd>;
 				},

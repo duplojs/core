@@ -106,6 +106,34 @@ export class PresetChecker<
 			this.responses,
 		);
 	}
+
+	public redefineCatch<
+		GenericContractResponse extends ContractResponse = ContractResponse,
+	>(
+		catchError: PresetCheckerParams<
+			GetCheckerGeneric<GenericChecker>,
+			GenericInfo,
+			GenericKey,
+			ContractToResponse<GenericContractResponse>,
+			GenericNewInput
+		>["catch"],
+		responses: GenericContractResponse | GenericContractResponse[] = [],
+	) {
+		return new PresetChecker<
+			GenericChecker,
+			GenericInfo,
+			GenericKey,
+			GenericContractResponse,
+			GenericNewInput
+		>(
+			this.checker,
+			{
+				...this.params,
+				catch: catchError,
+			},
+			responses instanceof Array ? responses : [responses],
+		);
+	}
 }
 
 export function createPresetChecker<

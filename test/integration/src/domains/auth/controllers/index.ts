@@ -48,8 +48,13 @@ export const loginUser = useBuilder()
 		}),
 	})
 	.presetCheck(
-		iWantUserExist,
-		(pickup) => inputUserExist.email(pickup("body").email),
+		iWantUserExist
+			.transformInput(inputUserExist.email)
+			.redefineCatch(
+				() => new ForbiddenHttpResponse("wrongUser"),
+				makeResponseContract(ForbiddenHttpResponse, "wrongUser"),
+			),
+		(pickup) => pickup("body").email,
 	)
 	.cut(
 		({ pickup, dropper }) => {

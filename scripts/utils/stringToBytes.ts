@@ -1,6 +1,4 @@
-/* eslint-disable no-bitwise */
 /* eslint-disable id-length */
-
 import { hasKey } from "./hasKey";
 
 export class InvalidBytesInStringError extends Error {

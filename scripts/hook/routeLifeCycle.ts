@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-invalid-void-type */
 import type { CurrentRequestObject } from "@scripts/request";
 import type { PresetGenericResponse } from "@scripts/response";
 import type { PromiseOrNot } from "@utils/types";

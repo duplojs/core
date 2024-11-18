@@ -5,6 +5,7 @@ import { ZodPresetChecker } from "./presetCheck";
 import { booleanInString } from "./booleanInString";
 export * from "./presetCheck";
 export * from "./receiveFormData";
+export { ZodAccelerator, zodSchemaIsAsync, ZodAcceleratorParser, ZodAcceleratorError } from "@duplojs/zod-accelerator";
 import "./toArray";
 
 const zod = {

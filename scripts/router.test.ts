@@ -1,4 +1,3 @@
-/* eslint-disable no-eval */
 import { Router } from "./router";
 import { Route } from "./duplose/route";
 import { HandlerStep } from "./step/handler";

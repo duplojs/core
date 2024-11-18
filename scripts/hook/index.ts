@@ -41,7 +41,7 @@ export class Hook<
 		this.subscribers = [];
 	}
 
-	public launchSubscriber(...args: Parameters<subscriber>): Awaited<ReturnType<subscriber>> | void {
+	public launchSubscriber(...args: Parameters<subscriber>): Awaited<ReturnType<subscriber>> | undefined {
 		for (const subscriber of this.subscribers) {
 			const result = subscriber instanceof Hook
 				? subscriber.launchSubscriber(...args)
@@ -55,7 +55,7 @@ export class Hook<
 
 	public async launchSubscriberAsync(
 		...args: Parameters<subscriber>
-	): Promise<Awaited<ReturnType<subscriber>> | void> {
+	): Promise<Awaited<ReturnType<subscriber>> | undefined> {
 		for (const subscriber of this.subscribers) {
 			const result = subscriber instanceof Hook
 				? await subscriber.launchSubscriberAsync(...args)

@@ -1,4 +1,4 @@
-import { Duplo, type Request, type globalValues } from "@duplojs/core";
+import { Duplo, Route, type Request, type globalValues } from "@duplojs/core";
 import type { ExpectType } from "@test/expectType";
 
 export const duplo = new Duplo({

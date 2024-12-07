@@ -58,5 +58,6 @@ it("global values", () => {
 		"createChecker",
 		"createPresetChecker",
 		"createTypeInput",
+		"makeResponseContract",
 	]);
 });

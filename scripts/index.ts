@@ -60,6 +60,7 @@ export * from "@utils/getTypedEntries";
 export * from "@utils/getTypedKeys";
 export * from "@utils/hasKey";
 export * from "@utils/incremente";
+export * from "@utils/instanceDuplose";
 export * from "@utils/isAny";
 export * from "@utils/overrideInterface";
 export * from "@utils/partialKeys";

@@ -39,9 +39,9 @@
     "test/integration"
   ],
   "dependencies": {
-    "@duplojs/zod-accelerator": ">=2.4.0 <3.0.0",
-    "mime": "^4.0.4",
-    "zod": ">=3.23.8 <4.0.0"
+    "@duplojs/zod-accelerator": "2.5.3",
+    "mime": "4.0.4",
+    "zod": "3.23.8"
   },
   "devDependencies": {
     "@commitlint/cli": "19.4.0",

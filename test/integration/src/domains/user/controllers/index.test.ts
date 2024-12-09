@@ -1,10 +1,22 @@
 import { duplo } from "@src/main";
-import { getSelf, uploadPicture } from ".";
+import { getPicture, getSelf, makeErrorContractRoute, uploadPicture } from ".";
 import { makeFakeRequest } from "@test/request";
-import { OkHttpResponse, ReceiveFormData, ReceiveFormDataIssue, UnprocessableEntityHttpResponse, useBuilder, File } from "@duplojs/core";
-import { promise, type ZodError } from "zod";
+import {
+	OkHttpResponse,
+	ReceiveFormData,
+	ReceiveFormDataIssue,
+	UnprocessableEntityHttpResponse,
+	useBuilder,
+	File,
+	DownloadFileHttpResponse,
+	Response,
+	type PresetGenericResponse,
+	ContractResponseError,
+	ZodAcceleratorError,
+} from "@duplojs/core";
+import { type ZodError } from "zod";
 
-describe("self", async() => {
+describe("getSelf", async() => {
 	duplo.register(...useBuilder.getAllCreatedDuplose());
 	const buildedRoute = await getSelf.build();
 
@@ -87,5 +99,103 @@ describe("uploadPicture", async() => {
 
 		expect(result).instanceOf(OkHttpResponse);
 		expect(result.information).toBe("pictureUploded");
+	});
+});
+
+describe("getPicture", async() => {
+	duplo.register(...useBuilder.getAllCreatedDuplose());
+	getPicture.hooks.onError.addSubscriber(
+		(request, error) => {
+			throw error;
+		},
+	);
+	const buildedRoute = await getPicture.build();
+
+	it("getPicture", async() => {
+		const result = await buildedRoute(
+			makeFakeRequest({ headers: { authorization: "valide-USER-1" } }),
+		) as DownloadFileHttpResponse;
+
+		expect(result).instanceOf(DownloadFileHttpResponse);
+		expect(result.information).toBe("sendPicture");
+	});
+});
+
+describe("Error Contract Route", async() => {
+	duplo.register(...useBuilder.getAllCreatedDuplose());
+	const buildedRoute = await makeErrorContractRoute.build();
+
+	it("no error", async() => {
+		const result = await buildedRoute(
+			makeFakeRequest({
+				query: {
+					code: "200",
+					information: "maSuperInformation",
+					body: undefined,
+				},
+			}),
+		) as PresetGenericResponse;
+
+		expect(result).instanceOf(Response);
+		expect(result.code).toBe(200);
+		expect(result.information).toBe("maSuperInformation");
+		expect(result.body).toBe(undefined);
+	});
+
+	it("error code", async() => {
+		const result = await buildedRoute(
+			makeFakeRequest({
+				query: {
+					code: "300",
+					information: "maSuperInformation",
+					body: undefined,
+				},
+			}),
+		) as PresetGenericResponse;
+
+		expect(result).instanceOf(Response);
+		expect(result.code).toBe(503);
+		expect(result.information).toBe("WRONG_RESPONSE_CONTRACT");
+		expect(result.body).toMatchObject({
+			zodError: new ZodAcceleratorError(".", "Input has no correspondence in union."),
+		});
+	});
+
+	it("error information", async() => {
+		const result = await buildedRoute(
+			makeFakeRequest({
+				query: {
+					code: "200",
+					information: "toto",
+					body: undefined,
+				},
+			}),
+		) as PresetGenericResponse;
+
+		expect(result).instanceOf(Response);
+		expect(result.code).toBe(503);
+		expect(result.information).toBe("WRONG_RESPONSE_CONTRACT");
+		expect(result.body).toMatchObject({
+			zodError: new ZodAcceleratorError(".", "Input has no correspondence in union."),
+		});
+	});
+
+	it("error body", async() => {
+		const result = await buildedRoute(
+			makeFakeRequest({
+				query: {
+					code: "200",
+					information: "maSuperInformation",
+					body: "undefined",
+				},
+			}),
+		) as PresetGenericResponse;
+
+		expect(result).instanceOf(Response);
+		expect(result.code).toBe(503);
+		expect(result.information).toBe("WRONG_RESPONSE_CONTRACT");
+		expect(result.body).toMatchObject({
+			zodError: new ZodAcceleratorError(".", "Input has no correspondence in union."),
+		});
 	});
 });

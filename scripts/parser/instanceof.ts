@@ -29,7 +29,7 @@ export class ZodInstanceof<
 			addIssueToContext(ctx, {
 				code: ZodIssueCode.custom,
 				params: {
-					message: `Input not instance of ${constructor.name}`,
+					message: `Input not instance of ${constructor.name}.`,
 				},
 			});
 			return INVALID;

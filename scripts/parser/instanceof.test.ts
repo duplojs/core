@@ -24,7 +24,7 @@ describe("instanceof", () => {
 				{
 					code: "custom",
 					params: {
-						message: "Input not instance of Test",
+						message: "Input not instance of Test.",
 					},
 					path: [],
 					message: "Invalid input",
@@ -61,7 +61,7 @@ describe("instanceof", () => {
 				{
 					code: "custom",
 					params: {
-						message: "Input not instance of Test",
+						message: "Input not instance of Test.",
 					},
 					path: ["test"],
 					message: "Invalid input",

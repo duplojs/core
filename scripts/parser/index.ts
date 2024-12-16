@@ -1,5 +1,5 @@
 import ZodAccelerator from "@duplojs/zod-accelerator";
-import { z } from "zod";
+import { z as ZodSpace } from "zod";
 import { receiveFormData, ZodReceiveFormData } from "./receiveFormData";
 import { instanceOfType, ZodInstanceof } from "./instanceof";
 import { ZodPresetChecker } from "./presetCheck";
@@ -11,7 +11,7 @@ export { ZodAccelerator, zodSchemaIsAsync, ZodAcceleratorParser, ZodAcceleratorE
 import "./toArray";
 
 const zod = {
-	...z,
+	...ZodSpace,
 	receiveFormData,
 	ZodPresetChecker,
 	ZodReceiveFormData,
@@ -22,10 +22,10 @@ const zod = {
 
 const zoderce = zod.coerce;
 
-ZodAccelerator.injectZod(z);
+ZodAccelerator.injectZod(ZodSpace);
 
 export {
 	zod,
 	zoderce,
-	type z as ZodSpace,
+	ZodSpace,
 };

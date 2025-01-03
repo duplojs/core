@@ -4,4 +4,6 @@ export type ObjectEntry = [ObjectKey, any];
 
 export type AnyFunction = (..._args: any) => any;
 
+export type AnyConstructor = new(..._args: any) => any;
+
 export type PromiseOrNot<T> = T | Promise<T>;

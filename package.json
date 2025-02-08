@@ -38,28 +38,30 @@
   "workspaces": [
     "test/integration"
   ],
+  "peerDependencies": {
+    "zod": ">=3.23.8 <4.0.0"
+  },
   "dependencies": {
     "@duplojs/zod-accelerator": "2.5.3",
-    "mime": "4.0.4",
-    "zod": "3.23.8"
+    "mime": "4.0.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "19.4.0",
+    "@commitlint/cli": "19.7.1",
     "@commitlint/config-conventional": "19.2.2",
-    "@duplojs/eslint": "0.3.0",
+    "@duplojs/eslint": "0.4.0",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "22.1.0",
-    "@vitest/coverage-istanbul": "2.0.5",
+    "@vitest/coverage-istanbul": "3.0.5",
     "eslint": "9.9.0",
-    "husky": "9.1.4",
+    "husky": "9.1.7",
     "rollup": "^4.24.0",
     "rollup-plugin-esbuild": "6.1.1",
     "tsc-alias": "^1.8.10",
     "tslib": "^2.6.3",
     "tsx": "^4.19.1",
-    "typescript": "5.5.4",
+    "typescript": "5.7.3",
     "vite-tsconfig-paths": "^5.0.1",
-    "vitest": "2.0.5"
+    "vitest": "3.0.5"
   },
   "keywords": []
 }

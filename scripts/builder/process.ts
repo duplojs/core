@@ -199,21 +199,18 @@ export interface ProcessBuilder<
 	>;
 }
 
-export interface ProcessBuilderParams<
-	Options extends object = object,
-	Input extends unknown = unknown,
-> {
-	options?: Options;
-	input?: Input;
+export interface ProcessBuilderParams {
+	options?: object;
+	input?: unknown;
 }
 
-export interface ProcessBuilderParamsToFloorData<P extends ProcessBuilderParams> {
-	options: object extends P["options"]
+export interface ProcessBuilderParamsToFloorData<GenericProcessBuilderParams extends ProcessBuilderParams> {
+	options: undefined extends GenericProcessBuilderParams["options"]
 		? undefined
-		: P["options"];
-	input: unknown extends P["input"]
+		: GenericProcessBuilderParams["options"];
+	input: undefined extends GenericProcessBuilderParams["input"]
 		? undefined
-		: P["input"];
+		: GenericProcessBuilderParams["input"];
 }
 
 export type AnyProcessBuilder = ProcessBuilder<any, any, any, any, any>;

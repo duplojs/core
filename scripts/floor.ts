@@ -1,8 +1,12 @@
 declare const unique: unique symbol;
 
+export type UniqueObjectDroppedValue = {
+	[unique]: typeof unique;
+} & {};
+
 export type DroppedValue<
 	T extends Record<string, unknown> = Record<string, unknown>,
-> = T & { [unique]: typeof unique };
+> = T & UniqueObjectDroppedValue;
 
 export interface Floor<
 	Data extends object = object,

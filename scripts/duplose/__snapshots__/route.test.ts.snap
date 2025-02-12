@@ -76,6 +76,30 @@ break Execution;
 
 
 				
+			if(request.body === undefined){
+				
+/* hook-parsingBody-before */
+/* end_block */
+
+
+				result = await this.hooks.parsingBody(request);
+
+				
+/* hook-parsingBody-before-check-result */
+/* end_block */
+
+
+				if(result instanceof this.Response){
+
+break Execution;
+}
+
+				
+/* hook-parsingBody-after */
+/* end_block */
+
+			}
+			
 
 				
 /* steps-before */

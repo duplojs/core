@@ -1,5 +1,5 @@
 import { Process } from "./process";
-import { BuildNoRegisteredDuploseError, CutStep, Duplose, zod } from "..";
+import { BuildNoRegisteredDuploseError, CutStep, Duplose, getTypedEntries, Hook, zod } from "..";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Response } from "@scripts/response";
@@ -40,6 +40,29 @@ describe("Process", () => {
 
 	it("name", () => {
 		expect(process.definiton.name).toBe("test");
+	});
+
+	it("getAllHooks", () => {
+		const hooks = process.getAllHooks();
+
+		getTypedEntries(hooks)
+			.forEach(([key, value]) => {
+				if (!(value instanceof Hook)) {
+					return;
+				}
+
+				expect(value.subscribers[0])
+					.toBe(process.hooks[key]);
+
+				expect((value.subscribers[1] as Hook).subscribers[0])
+					.toBe(preflightProcess.hooks[key]);
+			});
+	});
+
+	it("hasDuplose", () => {
+		expect(process.hasDuplose(new Process(createProcessDefinition()))).toBe(false);
+		expect(process.hasDuplose(process)).toBe(true);
+		expect(process.hasDuplose(preflightProcess)).toBe(true);
 	});
 
 	it("build", async() => {

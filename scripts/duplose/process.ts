@@ -8,7 +8,6 @@ import { makeFloor } from "@scripts/floor";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import type { PromiseOrNot } from "@utils/types";
 import { type PreflightStep } from "@scripts/step/preflight";
-import { HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 
 export interface ProcessBuildedFunction<
 	GenericProcess extends Process<any, any, any> = Process<any, any, any>,

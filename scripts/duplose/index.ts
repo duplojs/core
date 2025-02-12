@@ -7,7 +7,6 @@ import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
 import type { makeFloor } from "@scripts/floor";
 import type { BuildedStep } from "@scripts/step/builded";
-import type { PreflightStep } from "@scripts/step/preflight";
 import type { BuildedPreflightStep } from "@scripts/step/builded/preflight";
 import type { ContractResponseError } from "@scripts/error/contractResponseError";
 import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";

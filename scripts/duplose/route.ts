@@ -9,7 +9,7 @@ import { HandlerStep } from "@scripts/step/handler";
 import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { ResultIsNotAResponseError } from "@scripts/error/resultIsNotAResponseError";
-import { type HooksRouteLifeCycle, type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
+import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 import { hookRouteContractResponseError, hookRouteError, hookRouteRangeError } from "@scripts/hook/default";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import { type PreflightStep } from "@scripts/step/preflight";

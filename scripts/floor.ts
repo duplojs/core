@@ -8,26 +8,34 @@ export type DroppedValue<
 	T extends Record<string, unknown> = Record<string, unknown>,
 > = T & UniqueObjectDroppedValue;
 
-export interface Floor<
-	Data extends object = object,
+export interface InjectFloorValues {
+
+}
+
+export type Floor<
+	GenericValues extends object = object,
+> = FloorMethods<GenericValues & InjectFloorValues>;
+
+export interface FloorMethods<
+	GenericValues extends object = object,
 > {
-	pickup<Key extends keyof Data>(index: Key[]): { [P in Key]: Data[P] };
-	pickup<Key extends keyof Data>(index: Key): Data[Key];
-	drop<Key extends keyof Data>(index: Key, value: Data[Key]): void;
+	pickup<GenericKey extends keyof GenericValues>(index: GenericKey[]): { [P in GenericKey]: GenericValues[P] };
+	pickup<GenericKey extends keyof GenericValues>(index: GenericKey): GenericValues[GenericKey];
+	drop<GenericKey extends keyof GenericValues>(index: GenericKey, value: GenericValues[GenericKey]): void;
 	dropper<
 		T extends Record<string, unknown> | null,
 	>(droppedValue: T): DroppedValue<T extends null ? {} : T>;
 }
 
 export function makeFloor<
-	Data extends object = object,
->(): Floor<Data> {
+	GenericValues extends object = object,
+>(): Floor<GenericValues> {
 	const data = new Map();
 
 	return {
 		pickup: (index) => {
 			if (index instanceof Array) {
-				return index.reduce<Partial<Data>>(
+				return index.reduce<Partial<GenericValues & InjectFloorValues>>(
 					(pv, cv) => {
 						pv[cv] = data.get(cv);
 						return pv;

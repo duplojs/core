@@ -9,9 +9,10 @@ import { HandlerStep } from "@scripts/step/handler";
 import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { ResultIsNotAResponseError } from "@scripts/error/resultIsNotAResponseError";
-import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
+import { type HooksRouteLifeCycle, type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 import { hookRouteContractResponseError, hookRouteError, hookRouteRangeError } from "@scripts/hook/default";
 import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
+import { type PreflightStep } from "@scripts/step/preflight";
 
 export interface HttpMethods {
 	DELETE: true;
@@ -51,6 +52,7 @@ export type GetRouteGeneric<
 	: never;
 
 export interface RouteDefinition extends DuploseDefinition {
+	preflightSteps: PreflightStep[];
 	method: HttpMethod;
 	paths: string[];
 }
@@ -68,6 +70,30 @@ export class Route<
 		definiton: GenericRouteDefinition,
 	) {
 		super(definiton);
+	}
+
+	public override getAllHooks() {
+		const hooks = super.getAllHooks();
+
+		this.definiton.preflightSteps.forEach((step) => {
+			hooks.import(step.parent.getAllHooks());
+		});
+
+		return hooks;
+	}
+
+	public override hasDuplose(duplose: Duplose<any, any, any>, deep = Infinity) {
+		if (super.hasDuplose(duplose, deep)) {
+			return true;
+		}
+
+		for (const preflight of this.definiton.preflightSteps) {
+			if (preflight.parent.hasDuplose(duplose, deep - 1)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public async build() {

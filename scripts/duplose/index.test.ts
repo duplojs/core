@@ -2,7 +2,6 @@ import { Duplose } from ".";
 import { Process } from "./process";
 import { ProcessStep } from "@scripts/step/process";
 import { getTypedEntries } from "@utils/getTypedEntries";
-import { PreflightStep } from "@scripts/step/preflight";
 import { Hook } from "@scripts/hook";
 import { insertBlock } from "@utils/stringBuilder";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
@@ -24,15 +23,11 @@ describe("Duplose", () => {
 	}
 
 	const duplose = new SubDuplo({
-		preflightSteps: [],
 		steps: [],
 		descriptions: [],
 	});
-	const process1 = new Process(createProcessDefinition());
 	const process2 = new Process(createProcessDefinition());
-	const preflight = new PreflightStep(process1);
 	const step = new ProcessStep(process2);
-	duplose.definiton.preflightSteps.push(preflight);
 	duplose.definiton.steps.push(step);
 
 	it("getAllHooks", () => {
@@ -49,9 +44,6 @@ describe("Duplose", () => {
 
 				expect((value.subscribers[1] as Hook).subscribers[0])
 					.toBe(process2.hooks[key]);
-
-				expect((value.subscribers[2] as Hook).subscribers[0])
-					.toBe(process1.hooks[key]);
 			});
 	});
 
@@ -116,7 +108,14 @@ describe("Duplose", () => {
 	it("hasDuplose", () => {
 		expect(duplose.hasDuplose(new Process(createProcessDefinition()))).toBe(false);
 		expect(duplose.hasDuplose(new Process(createProcessDefinition()), 0)).toBe(false);
-		expect(duplose.hasDuplose(process1)).toBe(true);
 		expect(duplose.hasDuplose(process2)).toBe(true);
+	});
+
+	it("add hook", () => {
+		const fnc = () => void undefined;
+		duplose.hook("afterSend", fnc);
+
+		expect(duplose.hooks.afterSend.subscribers[0])
+			.toBe(fnc);
 	});
 });

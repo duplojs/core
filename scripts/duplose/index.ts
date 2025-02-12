@@ -53,7 +53,6 @@ export type EditInjectFunction = (
 ) => void;
 
 export interface DuploseDefinition {
-	preflightSteps: PreflightStep[];
 	steps: Step[];
 	descriptions: Description[];
 }
@@ -100,10 +99,6 @@ export abstract class Duplose<
 			.steps
 			.filter((step): step is ProcessStep => step instanceof ProcessStep)
 			.forEach((step) => void hooks.import(step.parent.getAllHooks()));
-
-		this.definiton.preflightSteps.forEach((step) => {
-			hooks.import(step.parent.getAllHooks());
-		});
 
 		return hooks;
 	}
@@ -195,12 +190,6 @@ export abstract class Duplose<
 			return false;
 		} else if (duplose === this) {
 			return true;
-		}
-
-		for (const preflight of this.definiton.preflightSteps) {
-			if (preflight.parent.hasDuplose(duplose, deep - 1)) {
-				return true;
-			}
 		}
 
 		for (const step of this.definiton.steps) {

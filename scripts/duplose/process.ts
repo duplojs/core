@@ -7,6 +7,8 @@ import { simpleClone } from "@utils/simpleClone";
 import { makeFloor } from "@scripts/floor";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import type { PromiseOrNot } from "@utils/types";
+import { type PreflightStep } from "@scripts/step/preflight";
+import { HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 
 export interface ProcessBuildedFunction<
 	GenericProcess extends Process<any, any, any> = Process<any, any, any>,
@@ -38,6 +40,7 @@ export type GetProcessGeneric<
 	: never;
 
 export interface ProcessDefinition extends DuploseDefinition {
+	preflightSteps: PreflightStep[];
 	name: string;
 	options?: object;
 	input?: unknown;
@@ -57,6 +60,30 @@ export class Process<
 		definiton: GenericProcessDefinition,
 	) {
 		super(definiton);
+	}
+
+	public override getAllHooks() {
+		const hooks = super.getAllHooks();
+
+		this.definiton.preflightSteps.forEach((step) => {
+			hooks.import(step.parent.getAllHooks());
+		});
+
+		return hooks;
+	}
+
+	public override hasDuplose(duplose: Duplose<any, any, any>, deep = Infinity) {
+		if (super.hasDuplose(duplose, deep)) {
+			return true;
+		}
+
+		for (const preflight of this.definiton.preflightSteps) {
+			if (preflight.parent.hasDuplose(duplose, deep - 1)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public async build() {

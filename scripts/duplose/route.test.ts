@@ -3,6 +3,8 @@ import {
 	BuildNoRegisteredDuploseError,
 	CutStep,
 	Duplose,
+	getTypedEntries,
+	Hook,
 	LastStepMustBeHandlerError,
 	OkHttpResponse,
 	zod,
@@ -44,9 +46,33 @@ describe("Route", () => {
 	);
 
 	const route = new Route(createRouteDefinition({
+		method: "POST",
 		preflightSteps: [preflight],
 		steps: [extractStep, cutStep],
 	}));
+
+	it("getAllHooks", () => {
+		const hooks = route.getAllHooks();
+
+		getTypedEntries(hooks)
+			.forEach(([key, value]) => {
+				if (!(value instanceof Hook)) {
+					return;
+				}
+
+				expect(value.subscribers[0])
+					.toBe(route.hooks[key]);
+
+				expect((value.subscribers[1] as Hook).subscribers[0])
+					.toBe(preflightProcess.hooks[key]);
+			});
+	});
+
+	it("hasDuplose", () => {
+		expect(route.hasDuplose(new Process(createProcessDefinition()))).toBe(false);
+		expect(route.hasDuplose(route)).toBe(true);
+		expect(route.hasDuplose(preflightProcess)).toBe(true);
+	});
 
 	it("build", async() => {
 		const spy = vi.spyOn(Duplose.defaultEvaler, "makeFunction");

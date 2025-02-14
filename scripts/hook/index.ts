@@ -1,7 +1,7 @@
-import type { AnyFunction } from "@utils/types";
 import type { HooksRouteLifeCycle } from "./routeLifeCycle";
 import type { HooksInstanceifeCycle } from "./instanceLifeCycle";
 import { Evaler, type EvalerParams } from "@scripts/evaler";
+import { type AnyFunction } from "@duplojs/utils";
 
 export interface HookEvalerParams extends EvalerParams {
 	hook: Hook;

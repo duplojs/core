@@ -1,4 +1,4 @@
-import type { ExpectType } from "@test/utils/expectType";
+import { type ExpectType } from "@duplojs/utils";
 import { Checker, type GetCheckerGeneric } from "./checker";
 
 describe("checker", () => {

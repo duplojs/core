@@ -1,7 +1,7 @@
+import { type ExpectType } from "@duplojs/utils";
 import { createChecker, createPresetChecker, OkHttpResponse, useBuilder, Response } from "@scripts/index";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { duploTest } from "@test/utils/duploTest";
-import type { ExpectType } from "@test/utils/expectType";
 import { makeFakeRequest } from "@test/utils/request";
 
 it("all execute", async() => {

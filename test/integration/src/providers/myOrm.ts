@@ -1,4 +1,4 @@
-import { getTypedEntries, hasKey } from "@duplojs/core";
+import { getTypedEntries, hasKey } from "@duplojs/utils";
 import myDataBase from "./mydataBase.json";
 
 export class MyOrm {

@@ -1,4 +1,5 @@
-import { Duplo, getTypedEntries, OkHttpResponse, useBuilder, zod } from "@scripts/index";
+import { getTypedEntries } from "@duplojs/utils";
+import { Duplo, OkHttpResponse, useBuilder, zod } from "@scripts/index";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { makeFakeRequest } from "@test/utils/request";
 

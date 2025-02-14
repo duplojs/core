@@ -1,5 +1,5 @@
+import { type ObjectKey } from "@duplojs/utils";
 import type { Duplose } from "@scripts/duplose";
-import type { ObjectKey } from "@utils/types";
 
 export class DuplicateExtentionkeyError extends Error {
 	public constructor(

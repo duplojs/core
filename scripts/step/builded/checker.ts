@@ -1,9 +1,9 @@
 import { condition, insertBlock, maybeAwait, skipStep, StringBuilder } from "@utils/stringBuilder";
 import { BuildedStepWithResponses } from ".";
 import type { CheckerStep, CheckerStepParams } from "../checker";
-import { simpleClone } from "@utils/simpleClone";
 import type { CheckerHandler } from "@scripts/checker";
 import { type Duplo } from "@scripts/duplo";
+import { simpleClone } from "@duplojs/utils";
 
 export class BuildedCheckerStep extends BuildedStepWithResponses<CheckerStep> {
 	public checkerFunction: CheckerHandler;

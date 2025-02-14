@@ -1,7 +1,7 @@
 import { mustBeConnectedBuilder } from "@security/mustBeConnected";
 import { File, makeResponseContract, recieveFiles, zod, OkHttpResponse, DownloadFileHttpResponse, Response, useBuilder } from "@duplojs/core";
 import { userSchema } from "../schemas";
-import type { ExpectType } from "@test/expectType";
+import { type ExpectType } from "@duplojs/utils";
 
 export const getSelf = mustBeConnectedBuilder({ role: "USER" })
 	.createRoute("GET", "/user")

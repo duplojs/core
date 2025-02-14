@@ -1,5 +1,5 @@
+import { type ExpectType } from "@duplojs/utils";
 import { useBuilder, zod, Response } from "@scripts/index";
-import type { ExpectType } from "@test/utils/expectType";
 import { fixtureCheckerWithOptions } from "@test/utils/fixture";
 
 export const processWithChecker = useBuilder()

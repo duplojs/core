@@ -1,8 +1,8 @@
-import { simpleClone } from "@utils/simpleClone";
 import { BuildedStepWithResponses } from ".";
 import type { Cut, CutStep } from "../cut";
 import { checkResult, insertBlock, mapped, maybeAwait, StringBuilder } from "@utils/stringBuilder";
 import { type Duplo } from "@scripts/duplo";
+import { simpleClone } from "@duplojs/utils";
 
 export class BuildedCutStep extends BuildedStepWithResponses<CutStep> {
 	public cutFunction: Cut;

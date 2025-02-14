@@ -3,11 +3,10 @@ import { type PresetGenericResponse, Response } from "@scripts/response";
 import { Duplose, type DuploseBuildedFunctionContext, type DuploseDefinition } from ".";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
 import { insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
-import { simpleClone } from "@utils/simpleClone";
 import { makeFloor } from "@scripts/floor";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
-import type { PromiseOrNot } from "@utils/types";
 import { type PreflightStep } from "@scripts/step/preflight";
+import { simpleClone, type MybePromise } from "@duplojs/utils";
 
 export interface ProcessBuildedFunction<
 	GenericProcess extends Process<any, any, any> = Process<any, any, any>,
@@ -16,7 +15,7 @@ export interface ProcessBuildedFunction<
 		request: CurrentRequestObject,
 		options: undefined | object,
 		input: unknown
-	): PromiseOrNot<object | PresetGenericResponse>;
+	): MybePromise<object | PresetGenericResponse>;
 	context: DuploseBuildedFunctionContext<GenericProcess>;
 }
 

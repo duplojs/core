@@ -1,5 +1,5 @@
+import { type ExpectType } from "@duplojs/utils";
 import { OkHttpResponse, useBuilder, zod } from "@scripts/index";
-import type { ExpectType } from "@test/utils/expectType";
 
 export const routeWithExtract = useBuilder()
 	.createRoute("GET", "/")

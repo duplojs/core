@@ -1,5 +1,5 @@
+import { type ExpectType } from "@duplojs/utils";
 import { useBuilder } from "@scripts/index";
-import type { ExpectType } from "@test/utils/expectType";
 
 export const processWithCut = useBuilder()
 	.createProcess("process")

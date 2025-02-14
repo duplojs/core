@@ -1,9 +1,9 @@
-import { simpleClone } from "@utils/simpleClone";
 import { BuildedStep } from ".";
 import type { ProcessStepParams, ProcessStep } from "../process";
 import { checkResult, condition, insertBlock, mapped, maybeAwait, skipStep, StringBuilder } from "@utils/stringBuilder";
 import type { ProcessBuildedFunction } from "@scripts/duplose/process";
 import { type Duplo } from "@scripts/duplo";
+import { simpleClone } from "@duplojs/utils";
 
 export class BuildedProcessStep extends BuildedStep<ProcessStep> {
 	public params: ProcessStepParams;

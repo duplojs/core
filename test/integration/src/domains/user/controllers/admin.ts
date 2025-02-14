@@ -3,7 +3,7 @@ import { makeResponseContract, OkHttpResponse, zod, zoderce } from "@duplojs/cor
 import { iWantUserExist, iWantUserExistById } from "@checkers/user";
 import { MyOrm } from "@providers/myOrm";
 import { userSchema } from "../schemas";
-import type { ExpectType } from "@test/expectType";
+import { type ExpectType } from "@duplojs/utils";
 
 export const adminEditUser = mustBeConnectedBuilder({ role: "ADMIN" })
 	.createRoute("PATCH", "/users/{userId}")

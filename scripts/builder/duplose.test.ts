@@ -1,11 +1,11 @@
 import { manualProcess } from "@test/utils/manualDuplose";
 import { useBuilder } from "./duplose";
-import type { ExpectType } from "@test/utils/expectType";
 import { TestDescription } from "@test/utils/testDescription";
 import { OkHttpResponse } from "@scripts/response/simplePreset";
 import { Process } from "@scripts/duplose/process";
 import type { Duplose } from "@scripts/duplose";
 import { zod } from "..";
+import { type ExpectType } from "@duplojs/utils";
 
 describe("useBuilder", () => {
 	it("preflight", () => {

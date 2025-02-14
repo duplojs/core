@@ -1,7 +1,7 @@
 import { decodeToken } from "@checkers/token";
 import { inputUserExist, iWantUserExist } from "@checkers/user";
 import { useBuilder, zod, UnauthorizedHttpResponse, makeResponseContract } from "@duplojs/core";
-import type { ExpectType } from "@test/expectType";
+import { type ExpectType } from "@duplojs/utils";
 
 interface MustBeConnectedOptions {
 	role: string;

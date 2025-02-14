@@ -1,4 +1,4 @@
-import type { AnyFunction, ObjectKey } from "./types";
+import { type AnyFunction, type ObjectKey } from "@duplojs/utils";
 
 export interface TypeInput<
 	N extends ObjectKey = ObjectKey,

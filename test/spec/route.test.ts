@@ -1,5 +1,5 @@
 import { duploTest } from "@test/utils/duploTest";
-import { useBuilder, Response, UnprocessableEntityHttpResponse, BadRequestHttpResponse } from "@scripts/index";
+import { useBuilder, UnprocessableEntityHttpResponse, BadRequestHttpResponse } from "@scripts/index";
 import { makeFakeRequest } from "@test/utils/request";
 import { routeWithCut } from "./route/withCut";
 import { routeWithExtract } from "./route/withExtract";

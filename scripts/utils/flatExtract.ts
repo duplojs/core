@@ -1,8 +1,7 @@
 import type { ZodSpace, ZodPresetChecker } from "@scripts/parser";
-import type { ObjectKey } from "./types";
 import type { GetPresetCheckerGeneric } from "@scripts/builder/checker";
-import type { SimplifyType } from "./simplifyType";
 import type { ExtractObject } from "@scripts/step/extract";
+import { type ObjectKey, type SimplifyType } from "@duplojs/utils";
 
 export interface KeyAndValue<
 	GenericObjectKey extends ObjectKey = ObjectKey,

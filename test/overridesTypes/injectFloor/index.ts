@@ -1,5 +1,5 @@
+import { type ExpectType } from "@duplojs/utils";
 import { OkHttpResponse, useBuilder } from "@scripts/index";
-import type { ExpectType } from "@test/utils/expectType";
 
 declare module "@scripts/index" {
 	interface InjectFloorValues {

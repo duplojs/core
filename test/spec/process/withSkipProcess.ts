@@ -1,5 +1,5 @@
+import { type ExpectType } from "@duplojs/utils";
 import { useBuilder, zod } from "@scripts/index";
-import type { ExpectType } from "@test/utils/expectType";
 import { fixtureProcessWichDropValue } from "@test/utils/fixture";
 
 export const processWithSkipProcess = useBuilder()

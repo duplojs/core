@@ -2,11 +2,10 @@ import { type Duplo } from "@scripts/duplo";
 import { BuildedStep } from ".";
 import { type ExtractErrorFunction, type ExtractStep, type ExtractObject, type ExtractKey } from "../extract";
 import { insertBlock, mapped, maybeAwait, spread, StringBuilder } from "@utils/stringBuilder";
-import { getTypedEntries } from "@utils/getTypedEntries";
 import { zod, ZodPresetChecker, type ZodSpace } from "@scripts/parser";
 import ZodAccelerator, { type ZodAcceleratorParser, zodSchemaIsAsync } from "@duplojs/zod-accelerator";
-import { simpleClone } from "@utils/simpleClone";
 import { type CurrentRequestObject } from "@scripts/request";
+import { getTypedEntries, simpleClone } from "@duplojs/utils";
 
 export type AcceleratedExtractObject<
 	T extends object = CurrentRequestObject,

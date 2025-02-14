@@ -2,7 +2,7 @@ import { inputUserExist, iWantUserExist, userExist } from "@checkers/user";
 import { ConflictHttpResponse, CreatedHttpResponse, ForbiddenHttpResponse, makeResponseContract, OkHttpResponse, useBuilder, zod } from "@duplojs/core";
 import { MyOrm } from "@providers/myOrm";
 import { registeredUser } from "../schemas/registeredUser";
-import type { ExpectType } from "@test/expectType";
+import { type ExpectType } from "@duplojs/utils";
 
 export const registerUser = useBuilder()
 	.createRoute("POST", "/users")

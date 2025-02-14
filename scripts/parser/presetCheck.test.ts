@@ -1,11 +1,11 @@
 import { createChecker, createPresetChecker, PresetChecker } from "@scripts/builder/checker";
 import { Response } from "@scripts/response";
 import { zod, zodSchemaHasPresetChecker, type ZodPresetChecker } from ".";
-import type { ExpectType } from "@test/utils/expectType";
 import { type ZodNumber } from "zod";
 import { MissingHandlerCheckerError } from "@scripts/error/missingHandlerCheckerError";
 import { zodSchemaIsAsync } from "@duplojs/zod-accelerator";
 import { Checker } from "@scripts/checker";
+import { type ExpectType } from "@duplojs/utils";
 
 describe("presetCheck", () => {
 	const isOddChecker = createChecker("isOdd")

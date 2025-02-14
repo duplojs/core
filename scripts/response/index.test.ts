@@ -1,4 +1,4 @@
-import type { ExpectType } from "@test/utils/expectType";
+import { type ExpectType } from "@duplojs/utils";
 import { makeResponseContract, Response } from ".";
 import { BadRequestHttpResponse } from "./simplePreset";
 import { zod, type ZodSpace } from "@scripts/parser";

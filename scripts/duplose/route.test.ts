@@ -3,12 +3,10 @@ import {
 	BuildNoRegisteredDuploseError,
 	CutStep,
 	Duplose,
-	getTypedEntries,
 	Hook,
 	LastStepMustBeHandlerError,
 	OkHttpResponse,
 	zod,
-	type AnyFunction,
 	type Floor,
 } from "..";
 import { Route } from "./route";
@@ -20,6 +18,7 @@ import { CheckpointList } from "@test/utils/checkpointList";
 import { DuploTest } from "@test/utils/duploTest";
 import { createProcessDefinition, createRouteDefinition } from "@test/utils/manualDuplose";
 import { ExtractStep } from "@scripts/step/extract";
+import { type AnyFunction, getTypedEntries } from "@duplojs/utils";
 
 describe("Route", () => {
 	const checkpointList = new CheckpointList();

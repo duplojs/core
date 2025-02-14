@@ -4,15 +4,14 @@ import { type DuploseDefinition, type DuploseBuildedFunctionContext, Duplose } f
 import { checkResult, condition, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { makeFloor } from "@scripts/floor";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
-import { simpleClone } from "@utils/simpleClone";
 import { HandlerStep } from "@scripts/step/handler";
 import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { ResultIsNotAResponseError } from "@scripts/error/resultIsNotAResponseError";
 import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 import { hookRouteContractResponseError, hookRouteError, hookRouteRangeError } from "@scripts/hook/default";
-import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import { type PreflightStep } from "@scripts/step/preflight";
+import { type GetPropsWithTrueValue, simpleClone } from "@duplojs/utils";
 
 export interface HttpMethods {
 	DELETE: true;

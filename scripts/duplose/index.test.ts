@@ -1,11 +1,11 @@
 import { Duplose } from ".";
 import { Process } from "./process";
 import { ProcessStep } from "@scripts/step/process";
-import { getTypedEntries } from "@utils/getTypedEntries";
 import { Hook } from "@scripts/hook";
-import { insertBlock } from "@utils/stringBuilder";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 import { createProcessDefinition } from "@test/utils/manualDuplose";
+import { getTypedEntries } from "@duplojs/utils";
+import { insertBlock } from "@utils/stringBuilder";
 
 describe("Duplose", () => {
 	class SubDuplo extends Duplose {

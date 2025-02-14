@@ -1,5 +1,5 @@
 import { Process } from "./process";
-import { BuildNoRegisteredDuploseError, CutStep, Duplose, getTypedEntries, Hook, zod } from "..";
+import { BuildNoRegisteredDuploseError, CutStep, Duplose, Hook, zod } from "..";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Response } from "@scripts/response";
@@ -7,6 +7,7 @@ import { CheckpointList } from "@test/utils/checkpointList";
 import { DuploTest } from "@test/utils/duploTest";
 import { createProcessDefinition } from "@test/utils/manualDuplose";
 import { ExtractStep } from "@scripts/step/extract";
+import { getTypedEntries } from "@duplojs/utils";
 
 describe("Process", () => {
 	const checkpointList = new CheckpointList();

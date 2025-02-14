@@ -10,10 +10,10 @@ import {
 	CutStep,
 	Process,
 } from "..";
-import type { ExpectType } from "@test/utils/expectType";
-import { createProcessDefinition, manualChecker, manualPresetChecker, manualProcess } from "@test/utils/manualDuplose";
+import { manualChecker, manualPresetChecker, manualProcess } from "@test/utils/manualDuplose";
 import { useProcessBuilder } from "./process";
 import { ExtractStep } from "@scripts/step/extract";
+import { type ExpectType } from "@duplojs/utils";
 
 describe("useProcessBuilder", () => {
 	it("simple Route", () => {

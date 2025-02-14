@@ -2,7 +2,6 @@ import type { Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
-import type { AnyFunction, ObjectKey } from "@utils/types";
 import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
 import type { makeFloor } from "@scripts/floor";
@@ -10,11 +9,11 @@ import type { BuildedStep } from "@scripts/step/builded";
 import type { BuildedPreflightStep } from "@scripts/step/builded/preflight";
 import type { ContractResponseError } from "@scripts/error/contractResponseError";
 import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
-import { getTypedEntries } from "@utils/getTypedEntries";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 import { StringBuilder } from "@utils/stringBuilder";
 import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKeyError";
 import { Evaler, type EvalerParams } from "@scripts/evaler";
+import { type AnyFunction, getTypedEntries, type ObjectKey } from "@duplojs/utils";
 
 export interface DuploseBuildedFunctionContext<
 	T extends Duplose = Duplose,

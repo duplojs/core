@@ -5,7 +5,7 @@ import type { ZodSpace } from "@scripts/parser";
 import type { PresetGenericResponse } from "@scripts/response";
 import type { CurrentRequestObject } from "@scripts/request";
 import { BuildedExtractStep } from "./builded/extract";
-import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
+import { type GetPropsWithTrueValue } from "@duplojs/utils";
 
 export interface DisabledExtractKey {
 	method: true;

@@ -1,5 +1,5 @@
+import { type ExpectType } from "@duplojs/utils";
 import { OkHttpResponse, useBuilder, type Request } from "@scripts/index";
-import type { ExpectType } from "@test/utils/expectType";
 
 const process1 = useBuilder<Request & { test1: string }>()
 	.createProcess("process1")

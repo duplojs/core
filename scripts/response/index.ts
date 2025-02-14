@@ -1,7 +1,5 @@
-import { getTypedEntries } from "@utils/getTypedEntries";
+import { getTypedEntries, type UnionToTuple, type UniqueGeneric } from "@duplojs/utils";
 import { zod, type ZodSpace } from "@scripts/parser";
-import type { UniqueGeneric } from "@utils/uniqueGeneric";
-import type { UnionToTuple } from "@utils/unionToTuple";
 
 const unique = Symbol("unique");
 

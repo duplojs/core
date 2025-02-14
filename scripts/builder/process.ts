@@ -7,15 +7,14 @@ import type { PreflightStep } from "@scripts/step/preflight";
 import type { FlatExtract } from "@utils/flatExtract";
 import type { PresetChecker, GetPresetCheckerGeneric } from "./checker";
 import type { ContractResponse, ContractToResponse } from "@scripts/response";
-import type { AddOne } from "@utils/incremente";
 import { CheckerStep, type CheckerStepParams } from "@scripts/step/checker";
 import type { DroppedValue, Floor } from "@scripts/floor";
 import { ProcessStep, type ProcessStepParams } from "@scripts/step/process";
 import { type GetProcessGeneric, Process, type ProcessDefinition } from "@scripts/duplose/process";
 import { type Cut, CutStep } from "@scripts/step/cut";
 import { ExtractStep, type ExtractErrorFunction, type ExtractObject } from "@scripts/step/extract";
-import { simpleClone } from "@utils/simpleClone";
 import { useBuilder } from "./duplose";
+import { type AddOne, simpleClone } from "@duplojs/utils";
 
 export interface ProcessBuilder<
 	GenericRequest extends CurrentRequestObject = CurrentRequestObject,

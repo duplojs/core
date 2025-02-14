@@ -12,10 +12,10 @@ import {
 	CutStep,
 } from "..";
 import { useRouteBuilder } from "./route";
-import type { ExpectType } from "@test/utils/expectType";
 import { HandlerStep } from "@scripts/step/handler";
 import { manualChecker, manualPresetChecker, manualProcess } from "@test/utils/manualDuplose";
 import { ExtractStep } from "@scripts/step/extract";
+import { type ExpectType } from "@duplojs/utils";
 
 describe("useRouteBuilder", () => {
 	it("simple Route", () => {

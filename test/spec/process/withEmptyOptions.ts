@@ -1,5 +1,5 @@
-import { type ProcessBuilder, useBuilder } from "@scripts/index";
-import { type ExpectType } from "@test/utils/expectType";
+import { type ExpectType } from "@duplojs/utils";
+import { useBuilder } from "@scripts/index";
 
 interface Options {
 

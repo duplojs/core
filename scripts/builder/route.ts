@@ -14,7 +14,6 @@ import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
 import { type Cut, CutStep } from "@scripts/step/cut";
 import { HandlerStep, type Handler } from "@scripts/step/handler";
 import { ExtractStep, type ExtractErrorFunction, type ExtractObject } from "@scripts/step/extract";
-import { useBuilder } from "./duplose";
 import { type AddOne, simpleClone } from "@duplojs/utils";
 
 export interface RouteBuilder<
@@ -197,14 +196,16 @@ export interface RouteBuilder<
 
 export type AnyRouteBuilder = RouteBuilder<any, any, any, any, any>;
 
+const createdRouteSymbol = Symbol("CreatedRoute");
+
 export function useRouteBuilder<
 	GenericRequest extends CurrentRequestObject,
 	GenericPreflightSteps extends PreflightStep = PreflightStep,
 >(
 	method: HttpMethod,
 	paths: string[],
-	preflightSteps?: GenericPreflightSteps[],
-	desc: Description[] = [],
+	preflightSteps: GenericPreflightSteps[],
+	desc: Description[],
 ): RouteBuilder<GenericRequest> {
 	function returnFunction(routeDefinition: RouteDefinition): AnyRouteBuilder {
 		return {
@@ -315,7 +316,7 @@ export function useRouteBuilder<
 
 		const route = new Route(routeDefinition);
 
-		useBuilder.push(route);
+		useRouteBuilder[createdRouteSymbol].add(route);
 
 		return route;
 	}
@@ -327,4 +328,33 @@ export function useRouteBuilder<
 		steps: [],
 		descriptions: desc,
 	});
+}
+
+useRouteBuilder[createdRouteSymbol] = new Set<Route>();
+
+useRouteBuilder.getAllCreatedRoute = function *() {
+	yield *useRouteBuilder[createdRouteSymbol];
+};
+
+useRouteBuilder.resetCreatedRoute = function() {
+	useRouteBuilder[createdRouteSymbol] = new Set();
+};
+
+export function createRoute<
+	GenericLocalRequest extends CurrentRequestObject,
+>(
+	method: HttpMethod,
+	paths: string | string[],
+	...desc: Description[]
+) {
+	return useRouteBuilder<
+		GenericLocalRequest
+	>(
+		method,
+		paths instanceof Array
+			? paths
+			: [paths],
+		[],
+		desc,
+	);
 }

@@ -1,5 +1,5 @@
 import { duploTest } from "@test/utils/duploTest";
-import { useBuilder, UnprocessableEntityHttpResponse, BadRequestHttpResponse } from "@scripts/index";
+import { UnprocessableEntityHttpResponse, BadRequestHttpResponse, useProcessBuilder, useRouteBuilder } from "@scripts/index";
 import { makeFakeRequest } from "@test/utils/request";
 import { routeWithCut } from "./route/withCut";
 import { routeWithExtract } from "./route/withExtract";
@@ -11,7 +11,10 @@ import { routeWithProcess } from "./route/withProcess";
 import { routeWithSkipProcess } from "./route/withSkipProcess";
 
 describe("process", () => {
-	duploTest.register(...useBuilder.getAllCreatedDuplose());
+	duploTest.register(
+		...useProcessBuilder.getAllCreatedProcess(),
+		...useRouteBuilder.getAllCreatedRoute(),
+	);
 
 	it("with cut", async() => {
 		const buildedProcess = await routeWithCut.build();

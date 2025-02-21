@@ -1,9 +1,8 @@
 import { type ExpectType } from "@duplojs/utils";
-import { useBuilder, zod } from "@scripts/index";
+import { createProcess, useBuilder, zod } from "@scripts/index";
 import { fixturePresetChecker } from "@test/utils/fixture";
 
-export const processWithPresetChecker = useBuilder()
-	.createProcess("processWithPresetChecker")
+export const processWithPresetChecker = createProcess("processWithPresetChecker")
 	.extract({
 		body: zod.number(),
 	})

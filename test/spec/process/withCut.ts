@@ -1,8 +1,7 @@
 import { type ExpectType } from "@duplojs/utils";
-import { useBuilder } from "@scripts/index";
+import { createProcess, useBuilder } from "@scripts/index";
 
-export const processWithCut = useBuilder()
-	.createProcess("process")
+export const processWithCut = createProcess("process")
 	.cut(
 		({ dropper }) => dropper({ value: "test" }),
 		["value"],

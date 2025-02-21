@@ -1,16 +1,15 @@
-import { createChecker, createPresetChecker, useBuilder, Response, BadRequestHttpResponse } from "@scripts/index";
+import { createChecker, createPresetChecker, BadRequestHttpResponse, createProcess } from "@scripts/index";
 
-export const fixtureProcessWichDropValue = useBuilder()
-	.createProcess(
-		"processWichDropValue",
-		{
-			options: {
-				option1: "test",
-				option2: 12,
-			},
-			input: 22,
+export const fixtureProcessWichDropValue = createProcess(
+	"processWichDropValue",
+	{
+		options: {
+			option1: "test",
+			option2: 12,
 		},
-	)
+		input: 22,
+	},
+)
 	.cut(
 		async({ pickup, dropper }) => {
 			const value = await dropper({

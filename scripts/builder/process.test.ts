@@ -11,7 +11,7 @@ import {
 	Process,
 } from "..";
 import { manualChecker, manualPresetChecker, manualProcess } from "@test/utils/manualDuplose";
-import { useProcessBuilder } from "./process";
+import { createProcess, useProcessBuilder } from "./process";
 import { ExtractStep } from "@scripts/step/extract";
 import { type ExpectType } from "@duplojs/utils";
 
@@ -25,6 +25,7 @@ describe("useProcessBuilder", () => {
 				options: { test1: 3 } satisfies { test1: number },
 				input: 2,
 			},
+			[],
 		)
 			.exportation(
 				["input", "options"],
@@ -41,7 +42,7 @@ describe("useProcessBuilder", () => {
 	it("extract", () => {
 		const description = new TestDescription();
 
-		const process = useProcessBuilder("test")
+		const process = useProcessBuilder("test", undefined, [])
 			.extract(
 				{
 					params: {
@@ -65,7 +66,7 @@ describe("useProcessBuilder", () => {
 		const description1 = new TestDescription();
 		const description2 = new TestDescription();
 
-		const process = useProcessBuilder("test")
+		const process = useProcessBuilder("test", undefined, [])
 			.extract({
 				params: {
 					userId: zod.coerce.number(),
@@ -136,7 +137,7 @@ describe("useProcessBuilder", () => {
 		const description1 = new TestDescription();
 		const description2 = new TestDescription();
 
-		const process = useProcessBuilder("test")
+		const process = createProcess("test")
 			.execute(
 				manualProcess,
 				{
@@ -174,7 +175,7 @@ describe("useProcessBuilder", () => {
 	it("cut", () => {
 		const description = new TestDescription();
 
-		const process = useProcessBuilder(
+		const process = createProcess(
 			"test",
 			{
 				options: { test1: 3 },
@@ -216,7 +217,7 @@ describe("useProcessBuilder", () => {
 		expect((process.definiton.steps[1] as CutStep).responses[0]).instanceOf(NotFoundHttpResponse);
 		expect(process.definiton.steps[1].descriptions[0]).toBe(description);
 
-		useProcessBuilder<
+		createProcess<
 			CurrentRequestObject & { test: string }
 		>("test")
 			.extract({
@@ -239,5 +240,13 @@ describe("useProcessBuilder", () => {
 				},
 			)
 			.exportation();
+	});
+
+	it("generator", () => {
+		expect([...useProcessBuilder.getAllCreatedProcess()]).length(6);
+
+		useProcessBuilder.resetCreatedProcess();
+
+		expect([...useProcessBuilder.getAllCreatedProcess()]).length(0);
 	});
 });

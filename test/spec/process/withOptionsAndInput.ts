@@ -1,17 +1,16 @@
 import { type ExpectType } from "@duplojs/utils";
-import { useBuilder } from "@scripts/index";
+import { createProcess, useBuilder } from "@scripts/index";
 
-export const processWithOptionsAndInput = useBuilder()
-	.createProcess(
-		"processWithOptionsAndInput",
-		{
-			options: {
-				option1: 12,
-				option2: "ee",
-			},
-			input: "test",
+export const processWithOptionsAndInput = createProcess(
+	"processWithOptionsAndInput",
+	{
+		options: {
+			option1: 12,
+			option2: "ee",
 		},
-	)
+		input: "test",
+	},
+)
 	.cut(
 		({ pickup, dropper }) => {
 			const { options, input } = pickup(["options", "input"]);

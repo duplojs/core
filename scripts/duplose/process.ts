@@ -5,7 +5,6 @@ import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredD
 import { insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { makeFloor } from "@scripts/floor";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
-import { type PreflightStep } from "@scripts/step/preflight";
 import { createInterpolation, simpleClone, type MybePromise } from "@duplojs/utils";
 
 export interface ProcessBuildedFunction<
@@ -30,7 +29,6 @@ export type GetProcessGeneric<
 		options: InferedProcessDefinition["options"];
 		input: InferedProcessDefinition["input"];
 		drop: InferedProcessDefinition["drop"];
-		preflightStep: InferedProcessDefinition["preflightSteps"];
 		steps: InferedProcessDefinition["steps"];
 		request: inferedRequest;
 		floor: inferedFloorData;
@@ -38,7 +36,6 @@ export type GetProcessGeneric<
 	: never;
 
 export interface ProcessDefinition extends DuploseDefinition {
-	preflightSteps: PreflightStep[];
 	name: string;
 	options?: object;
 	input?: unknown;
@@ -60,40 +57,10 @@ export class Process<
 		super(definiton);
 	}
 
-	public override getAllHooks() {
-		const hooks = super.getAllHooks();
-
-		this.definiton.preflightSteps.forEach((step) => {
-			hooks.import(step.parent.getAllHooks());
-		});
-
-		return hooks;
-	}
-
-	public override hasDuplose(duplose: Duplose<any, any, any>, deep = Infinity) {
-		if (super.hasDuplose(duplose, deep)) {
-			return true;
-		}
-
-		for (const preflight of this.definiton.preflightSteps) {
-			if (preflight.parent.hasDuplose(duplose, deep - 1)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public async build() {
 		if (!this.instance) {
 			throw new BuildNoRegisteredDuploseError(this);
 		}
-
-		const buildedPreflight = await Promise.all(
-			this.definiton.preflightSteps.map(
-				(step) => step.build(this.instance!),
-			),
-		);
 
 		const buildedStep = await Promise.all(
 			this.definiton.steps.map(
@@ -112,11 +79,6 @@ export class Process<
 		floor.drop("options", ${StringBuilder.options});
 		floor.drop("input", ${StringBuilder.input});
 		${StringBuilder.label}: {
-			${insertBlock(Process.insertBlockName.beforePreflightSteps())}
-
-			${mapped(buildedPreflight, (value, index) => value.toString(index))}
-
-			${insertBlock(Process.insertBlockName.afterPreflightSteps())}
 
 			${insertBlock(Process.insertBlockName.beforeSteps())}
 
@@ -146,7 +108,6 @@ export class Process<
 		const context: DuploseBuildedFunctionContext<this> = {
 			makeFloor,
 			Response,
-			preflightSteps: buildedPreflight,
 			steps: buildedStep,
 			extensions: simpleClone(this.extensions),
 			ContractResponseError,
@@ -171,9 +132,6 @@ export class Process<
 	}
 
 	public static insertBlockName = {
-		beforePreflightSteps: createInterpolation("beforePreflightSteps"),
-		afterPreflightSteps: createInterpolation("afterPreflightSteps"),
-
 		beforeSteps: createInterpolation("beforeSteps"),
 		afterSteps: createInterpolation("afterSteps"),
 

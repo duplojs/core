@@ -12,6 +12,7 @@ import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 import { hookRouteContractResponseError, hookRouteError, hookRouteRangeError } from "@scripts/hook/default";
 import { type PreflightStep } from "@scripts/step/preflight";
 import { createInterpolation, type GetPropsWithTrueValue, simpleClone } from "@duplojs/utils";
+import { type BuildedPreflightStep } from "@scripts/step/builded/preflight";
 
 export interface HttpMethods {
 	DELETE: true;
@@ -27,6 +28,7 @@ export type HttpMethod = GetPropsWithTrueValue<HttpMethods>;
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
 	hooks: BuildedHooksRouteLifeCycle<any>;
+	preflightSteps: BuildedPreflightStep[];
 	ResultIsNotAResponseError: typeof ResultIsNotAResponseError;
 }
 

@@ -1,10 +1,13 @@
-import { OkHttpResponse, UnauthorizedHttpResponse, useBuilder } from "@duplojs/core";
+import { OkHttpResponse, UnauthorizedHttpResponse, useProcessBuilder, useRouteBuilder } from "@duplojs/core";
 import { duplo } from "@src/main";
 import { adminEditUser } from "./admin";
 import { makeFakeRequest } from "@test/request";
 
 describe("adminEditUser", async() => {
-	duplo.register(...useBuilder.getAllCreatedDuplose());
+	duplo.register(
+		...useProcessBuilder.getAllCreatedProcess(),
+		...useRouteBuilder.getAllCreatedRoute(),
+	);
 
 	const buildedRoute = await adminEditUser.build();
 

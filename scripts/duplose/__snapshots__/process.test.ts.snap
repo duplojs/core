@@ -7,48 +7,6 @@ exports[`Process > build 1`] = `
 		floor.drop("options", options);
 		floor.drop("input", input);
 		Execution: {
-			
-/* beforePreflightSteps */
-/* end_block */
-
-
-			
-/* beforePreflightStep(index: 0) */
-/* end_block */
-
-
-				result = this.preflightSteps[0].processFunction(
-					request,
-					this.preflightSteps[0].params.options,
-					this.preflightSteps[0].params.input(floor.pickup)
-				);
-
-				
-/* beforeTreatResultPreflightStep(index: 0) */
-/* end_block */
-
-
-				if(result instanceof this.Response){
-
-break Execution;
-}
-
-				
-/* beforeIndexingResultPreflightStep(index: 0) */
-/* end_block */
-
-
-				floor.drop("flute", result["flute"]);
-				
-
-/* afterPreflightStep(index: 0) */
-/* end_block */
-
-
-			
-/* afterPreflightSteps */
-/* end_block */
-
 
 			
 /* beforeSteps */

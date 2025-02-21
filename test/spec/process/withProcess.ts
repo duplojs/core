@@ -1,9 +1,8 @@
 import { type ExpectType } from "@duplojs/utils";
-import { useBuilder } from "@scripts/index";
+import { createProcess, useBuilder } from "@scripts/index";
 import { fixtureProcessWichDropValue } from "@test/utils/fixture";
 
-export const processWithProcess = useBuilder()
-	.createProcess("processWithProcess")
+export const processWithProcess = createProcess("processWithProcess")
 	.execute(
 		fixtureProcessWichDropValue,
 		{

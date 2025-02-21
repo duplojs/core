@@ -5,9 +5,7 @@ import type { CurrentRequestObject } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import type { ProcessStepParams } from "@scripts/step/process";
 import { type AnyRouteBuilder, useRouteBuilder, type RouteBuilder } from "./route";
-import type { Duplose } from "@scripts/duplose";
 import { type HttpMethod } from "@scripts/duplose/route";
-import { useProcessBuilder, type ProcessBuilder, type ProcessBuilderParams, type AnyProcessBuilder, type ProcessBuilderParamsToFloorData } from "./process";
 import type { Step } from "@scripts/step";
 import { type AddOne, simpleClone } from "@duplojs/utils";
 
@@ -69,32 +67,10 @@ export interface Builder<
 		GenericFloorData
 	>;
 
-	createProcess<
-		GenericLocalRequest extends CurrentRequestObject,
-		GenericProcessBuilderParams extends ProcessBuilderParams = ProcessBuilderParams,
-	>(
-		name: string,
-		params?: GenericProcessBuilderParams,
-		...desc: Description[]
-	): ProcessBuilder<
-		GenericRequest & GenericLocalRequest,
-		GenericPreflightSteps,
-		Step,
-		0,
-		GenericFloorData & ProcessBuilderParamsToFloorData<GenericProcessBuilderParams>
-	>;
-
 	preflightSteps: GenericPreflightSteps[];
 }
 
 export type AnyBuilder = Builder<any, any, any, any>;
-
-export interface CreatedDuplose {
-	duplose: Duplose;
-	count: number;
-}
-
-const createdDuploseSymbol = Symbol("CreatedDuplose");
 
 export function useBuilder<
 	Request extends CurrentRequestObject = CurrentRequestObject,
@@ -103,7 +79,6 @@ export function useBuilder<
 		return {
 			preflight: (...args) => preflight(simpleClone(preflightSteps), args),
 			createRoute: (...args) => createRoute(simpleClone(preflightSteps), args),
-			createProcess: (...args) => createProcess(simpleClone(preflightSteps), args),
 			preflightSteps,
 		};
 	}
@@ -114,18 +89,6 @@ export function useBuilder<
 		return useRouteBuilder(
 			method,
 			paths instanceof Array ? paths : [paths],
-			preflightSteps,
-			desc,
-		);
-	}
-
-	function createProcess(
-		preflightSteps: PreflightStep[],
-		[name, params, ...desc]: Parameters<AnyBuilder["createProcess"]>,
-	): AnyProcessBuilder {
-		return useProcessBuilder(
-			name,
-			params,
 			preflightSteps,
 			desc,
 		);
@@ -144,39 +107,3 @@ export function useBuilder<
 
 	return returnFunction([]);
 }
-useBuilder[createdDuploseSymbol] = new Set<CreatedDuplose>();
-useBuilder.getAllCreatedDuplose = function *() {
-	for (const createdDuplose of useBuilder[createdDuploseSymbol]) {
-		createdDuplose.count++;
-		yield createdDuplose.duplose;
-	}
-};
-useBuilder.getLastCreatedDuploses = function *() {
-	for (const createdDuplose of useBuilder[createdDuploseSymbol]) {
-		if (createdDuplose.count) {
-			continue;
-		}
-		createdDuplose.count++;
-		yield createdDuplose.duplose;
-	}
-};
-useBuilder.getFirstCreatedDuploses = function *() {
-	for (const createdDuplose of useBuilder[createdDuploseSymbol]) {
-		if (!createdDuplose.count) {
-			continue;
-		}
-		createdDuplose.count++;
-		yield createdDuplose.duplose;
-	}
-};
-useBuilder.resetCreatedDuploses = function() {
-	useBuilder[createdDuploseSymbol] = new Set<CreatedDuplose>();
-};
-useBuilder.push = function(
-	duplose: Duplose,
-) {
-	useBuilder[createdDuploseSymbol].add({
-		duplose,
-		count: 0,
-	});
-};

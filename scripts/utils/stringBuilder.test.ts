@@ -1,4 +1,4 @@
-import { checkResult, condition, insertBlock, mapped, maybeAwait, skipPreflight, skipStep, spread } from "./stringBuilder";
+import { checkResult, condition, insertBlock, mapped, maybeAwait, skipStep, spread } from "./stringBuilder";
 
 describe("stringBuilder", () => {
 	it("mapped", () => {
@@ -35,11 +35,5 @@ describe("stringBuilder", () => {
 		expect(skipStep(true, 1, "")).toMatchSnapshot();
 
 		expect(skipStep(false, 1, "")).toBe("");
-	});
-
-	it("skipPreflight", () => {
-		expect(skipPreflight(true, 1, "")).toMatchSnapshot();
-
-		expect(skipPreflight(false, 1, "")).toBe("");
 	});
 });

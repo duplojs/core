@@ -5,7 +5,7 @@ import type { ContractResponse, PresetGenericResponse } from "@scripts/response"
 import { type Duplo } from "@scripts/duplo";
 import type { DroppedValue, Floor } from "@scripts/floor";
 import type { CurrentRequestObject } from "@scripts/request";
-import { type MybePromise } from "@duplojs/utils";
+import { createInterpolation, type MybePromise } from "@duplojs/utils";
 
 export type CutReturnValue = DroppedValue | PresetGenericResponse;
 
@@ -34,4 +34,11 @@ export class CutStep<
 	public build(instance: Duplo) {
 		return Promise.resolve(new BuildedCutStep(instance, this));
 	}
+
+	public static insertBlockName = {
+		before: createInterpolation("beforeCutStep(index: {index})"),
+		beforeTreatResult: createInterpolation("beforeTreatResultCutStep(index: {index})"),
+		beforeIndexingResult: createInterpolation("beforeIndexingResultCutStep(index: {index})"),
+		after: createInterpolation("afterCutStep(index: {index})"),
+	};
 }

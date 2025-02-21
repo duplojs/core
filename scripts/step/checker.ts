@@ -5,6 +5,7 @@ import type { Checker, GetCheckerGeneric } from "@scripts/checker";
 import type { Floor } from "@scripts/floor";
 import { BuildedCheckerStep } from "./builded/checker";
 import { type Duplo } from "@scripts/duplo";
+import { createInterpolation } from "@duplojs/utils";
 
 export interface CheckerStepParams<
 	CheckerGeneric extends GetCheckerGeneric = GetCheckerGeneric,
@@ -50,4 +51,11 @@ export class CheckerStep<
 	public build(instance: Duplo) {
 		return Promise.resolve(new BuildedCheckerStep(instance, this));
 	}
+
+	public static insertBlockName = {
+		before: createInterpolation("beforeCheckerStep(index: {index})"),
+		beforeTreatResult: createInterpolation("beforeTreatResultCheckerStep(index: {index})"),
+		beforeIndexingResult: createInterpolation("beforeIndexingResultCheckerStep(index: {index})"),
+		after: createInterpolation("afterCheckerStep(index: {index})"),
+	};
 }

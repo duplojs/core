@@ -1,6 +1,6 @@
 import { BuildedStep } from ".";
-import type { ProcessStepParams, ProcessStep } from "../process";
-import { checkResult, condition, insertBlock, mapped, maybeAwait, skipStep, StringBuilder } from "@utils/stringBuilder";
+import { type ProcessStepParams, ProcessStep } from "../process";
+import { checkResult, condition, insertBlock, mapped, maybeAwait, skipStep, spread, StringBuilder } from "@utils/stringBuilder";
 import type { ProcessBuildedFunction } from "@scripts/duplose/process";
 import { type Duplo } from "@scripts/duplo";
 import { simpleClone } from "@duplojs/utils";
@@ -55,28 +55,37 @@ export class BuildedProcessStep extends BuildedStep<ProcessStep> {
 			(key) => /* js */`${StringBuilder.floor}.drop("${key}", ${StringBuilder.result}["${key}"]);`,
 		);
 
-		return skipStep(
-			!!this.params.skip,
-			index,
-			/* js */`
-			${insertBlock(`step-process-(${index})-before`)}
+		const insertBlockNameBefore
+			= ProcessStep.insertBlockName.before({ index: index.toString() });
+		const insertBlockNameBeforeTreatResult
+			= ProcessStep.insertBlockName.beforeTreatResult({ index: index.toString() });
+		const insertBlockNameBeforeIndexingResult
+			= ProcessStep.insertBlockName.beforeIndexingResult({ index: index.toString() });
+		const insertBlockNameAfter
+			= ProcessStep.insertBlockName.after({ index: index.toString() });
 
-			${StringBuilder.result} = ${maybeAwait(async)}this.steps[${index}].processFunction(
-				${StringBuilder.request},
-				${options},
-				${input}
-			);
+		return spread(
+			insertBlock(insertBlockNameBefore),
+			skipStep(
+				!!this.params.skip,
+				index,
+				/* js */`
+				${StringBuilder.result} = ${maybeAwait(async)}this.steps[${index}].processFunction(
+					${StringBuilder.request},
+					${options},
+					${input}
+				);
 
-			${insertBlock(`step-process-(${index})-before-check-result`)}
+				${insertBlock(insertBlockNameBeforeTreatResult)}
 
-			${checkResult()}
+				${checkResult()}
 
-			${insertBlock(`step-process-(${index})-before-drop`)}
+				${insertBlock(insertBlockNameBeforeIndexingResult)}
 
-			${drop}
-
-			${insertBlock(`step-process-(${index})-after`)}
-			`,
+				${drop}
+				`,
+			),
+			insertBlock(insertBlockNameAfter),
 		);
 	}
 }

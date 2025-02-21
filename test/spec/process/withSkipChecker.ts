@@ -1,9 +1,8 @@
 import { type ExpectType } from "@duplojs/utils";
-import { useBuilder, zod, Response } from "@scripts/index";
+import { useBuilder, zod, Response, createProcess } from "@scripts/index";
 import { fixtureCheckerWithoutOptions } from "@test/utils/fixture";
 
-export const processWithSkipChecker = useBuilder()
-	.createProcess("processWithSkipStep")
+export const processWithSkipChecker = createProcess("processWithSkipStep")
 	.extract({
 		body: zod.number(),
 	})

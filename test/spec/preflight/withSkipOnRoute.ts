@@ -1,9 +1,8 @@
 import { type ExpectType } from "@duplojs/utils";
-import { OkHttpResponse, useBuilder, zod } from "@scripts/index";
+import { createProcess, OkHttpResponse, useBuilder, zod } from "@scripts/index";
 import { fixtureProcessWichDropValue } from "@test/utils/fixture";
 
-const extractProcess = useBuilder()
-	.createProcess("extractProcess")
+const extractProcess = createProcess("extractProcess")
 	.extract({ body: zod.number() })
 	.exportation(["body"]);
 

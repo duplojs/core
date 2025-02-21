@@ -11,13 +11,17 @@ import {
 	DownloadFileHttpResponse,
 	Response,
 	type PresetGenericResponse,
-	ContractResponseError,
 	ZodAcceleratorError,
+	useProcessBuilder,
+	useRouteBuilder,
 } from "@duplojs/core";
 import { type ZodError } from "zod";
 
 describe("getSelf", async() => {
-	duplo.register(...useBuilder.getAllCreatedDuplose());
+	duplo.register(
+		...useProcessBuilder.getAllCreatedProcess(),
+		...useRouteBuilder.getAllCreatedRoute(),
+	);
 	const buildedRoute = await getSelf.build();
 
 	it("getSelf", async() => {
@@ -31,7 +35,10 @@ describe("getSelf", async() => {
 });
 
 describe("uploadPicture", async() => {
-	duplo.register(...useBuilder.getAllCreatedDuplose());
+	duplo.register(
+		...useProcessBuilder.getAllCreatedProcess(),
+		...useRouteBuilder.getAllCreatedRoute(),
+	);
 	uploadPicture.hooks.onError.addSubscriber(
 		(request, error) => {
 			throw error;
@@ -103,7 +110,10 @@ describe("uploadPicture", async() => {
 });
 
 describe("getPicture", async() => {
-	duplo.register(...useBuilder.getAllCreatedDuplose());
+	duplo.register(
+		...useProcessBuilder.getAllCreatedProcess(),
+		...useRouteBuilder.getAllCreatedRoute(),
+	);
 	getPicture.hooks.onError.addSubscriber(
 		(request, error) => {
 			throw error;
@@ -122,7 +132,10 @@ describe("getPicture", async() => {
 });
 
 describe("Error Contract Route", async() => {
-	duplo.register(...useBuilder.getAllCreatedDuplose());
+	duplo.register(
+		...useProcessBuilder.getAllCreatedProcess(),
+		...useRouteBuilder.getAllCreatedRoute(),
+	);
 	const buildedRoute = await makeErrorContractRoute.build();
 
 	it("no error", async() => {

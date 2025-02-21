@@ -1,9 +1,8 @@
 import { type ExpectType } from "@duplojs/utils";
-import { useBuilder, zod } from "@scripts/index";
+import { createProcess, useBuilder, zod } from "@scripts/index";
 import { fixtureProcessWichDropValue } from "@test/utils/fixture";
 
-export const processWithSkipProcess = useBuilder()
-	.createProcess("processWithProcess")
+export const processWithSkipProcess = createProcess("processWithProcess")
 	.extract({
 		body: zod.number(),
 	})

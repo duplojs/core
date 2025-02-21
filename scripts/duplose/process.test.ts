@@ -12,10 +12,6 @@ import { getTypedEntries } from "@duplojs/utils";
 describe("Process", () => {
 	const checkpointList = new CheckpointList();
 	const duplo = new DuploTest({ environment: "TEST" });
-
-	const preflightProcess = new Process(createProcessDefinition({}));
-	preflightProcess.instance = duplo;
-	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
 	const cutStep = new CutStep(
 		({ dropper }) => {
 			checkpointList.addPoint("cut");
@@ -34,7 +30,6 @@ describe("Process", () => {
 
 	const process = new Process(createProcessDefinition({
 		steps: [cutStep, extractStep],
-		preflightSteps: [preflight],
 		drop: ["toto", "userId"],
 		name: "test",
 	}));
@@ -54,16 +49,12 @@ describe("Process", () => {
 
 				expect(value.subscribers[0])
 					.toBe(process.hooks[key]);
-
-				expect((value.subscribers[1] as Hook).subscribers[0])
-					.toBe(preflightProcess.hooks[key]);
 			});
 	});
 
 	it("hasDuplose", () => {
 		expect(process.hasDuplose(new Process(createProcessDefinition()))).toBe(false);
 		expect(process.hasDuplose(process)).toBe(true);
-		expect(process.hasDuplose(preflightProcess)).toBe(true);
 	});
 
 	it("build", async() => {

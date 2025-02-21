@@ -1,21 +1,20 @@
 import { decodeToken } from "@checkers/token";
 import { inputUserExist, iWantUserExist } from "@checkers/user";
-import { useBuilder, zod, UnauthorizedHttpResponse, makeResponseContract } from "@duplojs/core";
+import { useBuilder, zod, UnauthorizedHttpResponse, makeResponseContract, createProcess } from "@duplojs/core";
 import { type ExpectType } from "@duplojs/utils";
 
 interface MustBeConnectedOptions {
 	role: string;
 }
 
-export const mustBeConnected = useBuilder()
-	.createProcess(
-		"mustBeConnected",
-		{
-			options: <MustBeConnectedOptions>{
-				role: "USER",
-			},
+export const mustBeConnected = createProcess(
+	"mustBeConnected",
+	{
+		options: <MustBeConnectedOptions>{
+			role: "USER",
 		},
-	)
+	},
+)
 	.extract(
 		{
 			headers: {

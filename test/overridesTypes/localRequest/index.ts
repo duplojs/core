@@ -1,8 +1,7 @@
 import { type ExpectType } from "@duplojs/utils";
-import { OkHttpResponse, useBuilder, type Request } from "@scripts/index";
+import { createProcess, OkHttpResponse, useBuilder, type Request } from "@scripts/index";
 
-const process1 = useBuilder<Request & { test1: string }>()
-	.createProcess("process1")
+const process1 = createProcess<Request & { test1: string }>("process1")
 	.cut(({ dropper }, request) => {
 		type check = ExpectType<
 			typeof request,
@@ -14,8 +13,7 @@ const process1 = useBuilder<Request & { test1: string }>()
 	})
 	.exportation();
 
-const process2 = useBuilder()
-	.createProcess<Request & { test2: string }>("process2")
+const process2 = createProcess<Request & { test2: string }>("process2")
 	.cut(({ dropper }, request) => {
 		type check = ExpectType<
 			typeof request,

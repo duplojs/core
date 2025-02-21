@@ -11,7 +11,7 @@ import {
 	ProcessStep,
 	CutStep,
 } from "..";
-import { useRouteBuilder } from "./route";
+import { createRoute, useRouteBuilder } from "./route";
 import { HandlerStep } from "@scripts/step/handler";
 import { manualChecker, manualPresetChecker, manualProcess } from "@test/utils/manualDuplose";
 import { ExtractStep } from "@scripts/step/extract";
@@ -21,7 +21,7 @@ describe("useRouteBuilder", () => {
 	it("simple Route", () => {
 		const description = new TestDescription();
 
-		const route = useRouteBuilder("GET", ["/"])
+		const route = useRouteBuilder("GET", ["/"], [], [])
 			.handler(
 				() => new OkHttpResponse("test", ""),
 				new OkHttpResponse("test", zod.string()),
@@ -37,7 +37,7 @@ describe("useRouteBuilder", () => {
 	it("extract", () => {
 		const description = new TestDescription();
 
-		const route = useRouteBuilder("GET", ["/"])
+		const route = createRoute("GET", ["/"])
 			.extract(
 				{
 					params: {
@@ -78,7 +78,7 @@ describe("useRouteBuilder", () => {
 		const description1 = new TestDescription();
 		const description2 = new TestDescription();
 
-		const route = useRouteBuilder("GET", ["/"])
+		const route = createRoute("GET", ["/"])
 			.extract({
 				params: {
 					userId: zod.coerce.number(),
@@ -162,7 +162,7 @@ describe("useRouteBuilder", () => {
 		const description1 = new TestDescription();
 		const description2 = new TestDescription();
 
-		const route = useRouteBuilder("GET", ["/"])
+		const route = createRoute("GET", ["/"])
 			.execute(
 				manualProcess,
 				{
@@ -209,7 +209,7 @@ describe("useRouteBuilder", () => {
 	it("cut", () => {
 		const description = new TestDescription();
 
-		const route = useRouteBuilder<CurrentRequestObject & { test: string }>("GET", ["/"])
+		const route = createRoute<CurrentRequestObject & { test: string }>("GET", "/")
 			.extract({
 				params: {
 					userId: zod.coerce.number(),
@@ -258,5 +258,13 @@ describe("useRouteBuilder", () => {
 		expect(route.definiton.steps[1]).instanceOf(CutStep);
 		expect((route.definiton.steps[1] as CutStep).responses[0]).instanceOf(NotFoundHttpResponse);
 		expect(route.definiton.steps[1].descriptions[0]).toBe(description);
+	});
+
+	it("generator", () => {
+		expect([...useRouteBuilder.getAllCreatedRoute()]).length(5);
+
+		useRouteBuilder.resetCreatedRoute();
+
+		expect([...useRouteBuilder.getAllCreatedRoute()]).length(0);
 	});
 });

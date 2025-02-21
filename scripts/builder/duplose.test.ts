@@ -2,8 +2,6 @@ import { manualProcess } from "@test/utils/manualDuplose";
 import { useBuilder } from "./duplose";
 import { TestDescription } from "@test/utils/testDescription";
 import { OkHttpResponse } from "@scripts/response/simplePreset";
-import { Process } from "@scripts/duplose/process";
-import type { Duplose } from "@scripts/duplose";
 import { zod } from "..";
 import { type ExpectType } from "@duplojs/utils";
 
@@ -83,7 +81,7 @@ describe("useBuilder", () => {
 		expect(builder.preflightSteps[4].params).keys(["options"]);
 	});
 
-	it("create route", () => {
+	it("create route with preflight", () => {
 		const description1 = new TestDescription();
 
 		const route = useBuilder()
@@ -113,88 +111,5 @@ describe("useBuilder", () => {
 
 				return new OkHttpResponse("test", undefined);
 			});
-	});
-
-	it("create process", () => {
-		const description1 = new TestDescription();
-
-		const process = useBuilder()
-			.preflight(
-				manualProcess,
-				{ pickup: ["test1"] },
-			)
-			.createProcess("test", { options: { test: 1 } }, description1)
-			.cut(({ pickup, dropper }) => {
-				type check1 = ExpectType<ReturnType<typeof pickup<"test1">>, string, "strict">;
-				type check2 = ExpectType<ReturnType<typeof pickup<"options">>, { test: number }, "strict">;
-
-				return dropper(null);
-			})
-			.exportation();
-
-		expect(process.definiton.preflightSteps[0].parent).toBe(manualProcess);
-		expect(process.definiton.descriptions[0]).toBe(description1);
-
-		useBuilder()
-			.createProcess("test")
-			.cut(({ pickup, dropper }) => {
-				type check2 = ExpectType<ReturnType<typeof pickup<"options">>, undefined, "strict">;
-
-				return dropper(null);
-			})
-			.exportation();
-	});
-
-	it("generator", () => {
-		useBuilder.resetCreatedDuploses();
-		function arrayDuploseToProcessName(duploses: Duplose[]) {
-			return duploses
-				.map((duplose) => duplose instanceof Process ? duplose.definiton.name : null)
-				.filter((name): name is string => typeof name === "string");
-		}
-
-		useBuilder()
-			.createProcess("test1")
-			.exportation();
-
-		useBuilder()
-			.createProcess("test2")
-			.exportation();
-
-		expect(
-			arrayDuploseToProcessName([...useBuilder.getFirstCreatedDuploses()]),
-		).toStrictEqual([]);
-		expect(
-			arrayDuploseToProcessName([...useBuilder.getLastCreatedDuploses()]),
-		).toStrictEqual(["test1", "test2"]);
-		expect(
-			arrayDuploseToProcessName([...useBuilder.getAllCreatedDuplose()]),
-		).toStrictEqual(["test1", "test2"]);
-
-		useBuilder()
-			.createProcess("test3")
-			.exportation();
-
-		useBuilder()
-			.createProcess("test4")
-			.exportation();
-
-		expect(
-			arrayDuploseToProcessName([...useBuilder.getFirstCreatedDuploses()]),
-		).toStrictEqual(["test1", "test2"]);
-		expect(
-			arrayDuploseToProcessName([...useBuilder.getLastCreatedDuploses()]),
-		).toStrictEqual(["test3", "test4"]);
-		expect(
-			arrayDuploseToProcessName([...useBuilder.getAllCreatedDuplose()]),
-		).toStrictEqual(["test1", "test2", "test3", "test4"]);
-
-		useBuilder()
-			.createProcess("test5")
-			.exportation();
-
-		expect(
-			arrayDuploseToProcessName([...useBuilder.getAllCreatedDuplose()]),
-		).toStrictEqual(["test1", "test2", "test3", "test4", "test5"]);
 	});
 });

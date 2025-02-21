@@ -1,10 +1,10 @@
 import { type MybePromise } from "@duplojs/utils";
-import { Duplo, Route, Router, useRouteBuilder } from "@scripts/index";
+import { createRoute, Duplo, Route, Router, useRouteBuilder } from "@scripts/index";
 
 export class DuploTest extends Duplo {
 	public async start(onStart?: (duplo: Duplo) => MybePromise<void>) {
 		const notfoundHandler = this.notfoundHandler;
-		const notfoundRoute = useRouteBuilder("GET", ["/*"]).handler((pickup, request) => notfoundHandler(request));
+		const notfoundRoute = createRoute("GET", ["/*"]).handler((pickup, request) => notfoundHandler(request));
 		this.register(notfoundRoute);
 
 		await this.hooksInstanceLifeCycle.beforeBuildRouter.launchSubscriber(this);

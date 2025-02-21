@@ -1,5 +1,5 @@
 import { type ExpectType } from "@duplojs/utils";
-import { createChecker, createPresetChecker, OkHttpResponse, useBuilder, Response } from "@scripts/index";
+import { createChecker, createPresetChecker, OkHttpResponse, useBuilder, Response, createProcess, useRouteBuilder, useProcessBuilder } from "@scripts/index";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { duploTest } from "@test/utils/duploTest";
 import { makeFakeRequest } from "@test/utils/request";
@@ -7,8 +7,7 @@ import { makeFakeRequest } from "@test/utils/request";
 it("all execute", async() => {
 	const checkPoint = new CheckpointList();
 
-	const insertValuepreflight = useBuilder()
-		.createProcess("insertValuepreflight")
+	const insertValuepreflight = createProcess("insertValuepreflight")
 		.cut(
 			({ dropper }) => {
 				checkPoint.addPoint("insertValuepreflight");
@@ -19,8 +18,7 @@ it("all execute", async() => {
 		)
 		.exportation(["value"]);
 
-	const preflight1 = useBuilder()
-		.createProcess("preflight1", { input: null as null | string })
+	const preflight1 = createProcess("preflight1", { input: null as null | string })
 		.cut(
 			({ pickup, dropper }) => {
 				const { input } = pickup(["input"]);
@@ -67,8 +65,7 @@ it("all execute", async() => {
 		},
 	);
 
-	const process1 = useBuilder()
-		.createProcess("process1", { input: null as null | string })
+	const process1 = createProcess("process1", { input: null as null | string })
 		.cut(
 			({ pickup, dropper }) => {
 				const { input } = pickup(["input"]);
@@ -214,7 +211,10 @@ it("all execute", async() => {
 			},
 		);
 
-	duploTest.register(...useBuilder.getAllCreatedDuplose());
+	duploTest.register(
+		...useProcessBuilder.getAllCreatedProcess(),
+		...useRouteBuilder.getAllCreatedRoute(),
+	);
 	const buildedRoute = await route.build();
 	const response = await buildedRoute(makeFakeRequest());
 

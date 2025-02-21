@@ -1,23 +1,12 @@
 import { getTypedEntries } from "@duplojs/utils";
-import { Duplo, OkHttpResponse, useBuilder, zod } from "@scripts/index";
+import { createProcess, Duplo, OkHttpResponse, useBuilder, useProcessBuilder, useRouteBuilder } from "@scripts/index";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { makeFakeRequest } from "@test/utils/request";
 
 describe("life cycle hooks", async() => {
 	const checkPoint = new CheckpointList();
 
-	const deepPreflight1 = useBuilder()
-		.createProcess("deepPreflight1")
-		.exportation()
-		.hook("beforeRouteExecution", () => void checkPoint.addPoint("deepPreflight1 beforeRouteExecution"))
-		.hook("parsingBody", () => void checkPoint.addPoint("deepPreflight1 parsingBody"))
-		.hook("onError", () => void checkPoint.addPoint("deepPreflight1 onError"))
-		.hook("beforeSend", () => void checkPoint.addPoint("deepPreflight1 beforeSend"))
-		.hook("serializeBody", () => void checkPoint.addPoint("deepPreflight1 serializeBody"))
-		.hook("afterSend", () => void checkPoint.addPoint("deepPreflight1 afterSend"));
-
-	const deepProcess1 = useBuilder()
-		.createProcess("deepProcess")
+	const deepProcess1 = createProcess("deepProcess1")
 		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("deepProcess1 beforeRouteExecution"))
 		.hook("parsingBody", () => void checkPoint.addPoint("deepProcess1 parsingBody"))
@@ -26,9 +15,7 @@ describe("life cycle hooks", async() => {
 		.hook("serializeBody", () => void checkPoint.addPoint("deepProcess1 serializeBody"))
 		.hook("afterSend", () => void checkPoint.addPoint("deepProcess1 afterSend"));
 
-	const preflight = useBuilder()
-		.preflight(deepPreflight1)
-		.createProcess("process")
+	const preflight = createProcess("preflight")
 		.execute(deepProcess1)
 		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("preflight beforeRouteExecution"))
@@ -38,18 +25,7 @@ describe("life cycle hooks", async() => {
 		.hook("serializeBody", () => void checkPoint.addPoint("preflight serializeBody"))
 		.hook("afterSend", () => void checkPoint.addPoint("preflight afterSend"));
 
-	const deepPreflight2 = useBuilder()
-		.createProcess("deepPreflight2")
-		.exportation()
-		.hook("beforeRouteExecution", () => void checkPoint.addPoint("deepPreflight2 beforeRouteExecution"))
-		.hook("parsingBody", () => void checkPoint.addPoint("deepPreflight2 parsingBody"))
-		.hook("onError", () => void checkPoint.addPoint("deepPreflight2 onError"))
-		.hook("beforeSend", () => void checkPoint.addPoint("deepPreflight2 beforeSend"))
-		.hook("serializeBody", () => void checkPoint.addPoint("deepPreflight2 serializeBody"))
-		.hook("afterSend", () => void checkPoint.addPoint("deepPreflight2 afterSend"));
-
-	const deepProcess2 = useBuilder()
-		.createProcess("deepProcess2")
+	const deepProcess2 = createProcess("deepProcess2")
 		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("deepProcess2 beforeRouteExecution"))
 		.hook("parsingBody", () => void checkPoint.addPoint("deepProcess2 parsingBody"))
@@ -58,9 +34,7 @@ describe("life cycle hooks", async() => {
 		.hook("serializeBody", () => void checkPoint.addPoint("deepProcess2 serializeBody"))
 		.hook("afterSend", () => void checkPoint.addPoint("deepProcess2 afterSend"));
 
-	const process = useBuilder()
-		.preflight(deepPreflight2)
-		.createProcess("process")
+	const process = createProcess("process")
 		.execute(deepProcess2)
 		.exportation()
 		.hook("beforeRouteExecution", () => void checkPoint.addPoint("process beforeRouteExecution"))
@@ -95,7 +69,10 @@ describe("life cycle hooks", async() => {
 		.hook("serializeBody", () => void checkPoint.addPoint("instance serializeBody"))
 		.hook("afterSend", () => void checkPoint.addPoint("instance afterSend"));
 
-	duplo.register(...useBuilder.getAllCreatedDuplose());
+	duplo.register(
+		...useProcessBuilder.getAllCreatedProcess(),
+		...useRouteBuilder.getAllCreatedRoute(),
+	);
 	const buildedRoute = await route.build();
 
 	beforeEach(() => {
@@ -112,10 +89,8 @@ describe("life cycle hooks", async() => {
 				`route ${name}`,
 				`process ${name}`,
 				`deepProcess2 ${name}`,
-				`deepPreflight2 ${name}`,
 				`preflight ${name}`,
 				`deepProcess1 ${name}`,
-				`deepPreflight1 ${name}`,
 				`instance ${name}`,
 				"end",
 			]);
@@ -130,26 +105,20 @@ describe("life cycle hooks", async() => {
 			"route beforeRouteExecution",
 			"process beforeRouteExecution",
 			"deepProcess2 beforeRouteExecution",
-			"deepPreflight2 beforeRouteExecution",
 			"preflight beforeRouteExecution",
 			"deepProcess1 beforeRouteExecution",
-			"deepPreflight1 beforeRouteExecution",
 			"instance beforeRouteExecution",
 			"route parsingBody",
 			"process parsingBody",
 			"deepProcess2 parsingBody",
-			"deepPreflight2 parsingBody",
 			"preflight parsingBody",
 			"deepProcess1 parsingBody",
-			"deepPreflight1 parsingBody",
 			"instance parsingBody",
 			"route onError",
 			"process onError",
 			"deepProcess2 onError",
-			"deepPreflight2 onError",
 			"preflight onError",
 			"deepProcess1 onError",
-			"deepPreflight1 onError",
 			"instance onError",
 			"end",
 		]);

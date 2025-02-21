@@ -1,17 +1,16 @@
 import { type ExpectType } from "@duplojs/utils";
-import { useBuilder } from "@scripts/index";
+import { createProcess, useBuilder } from "@scripts/index";
 
 interface Options {
 
 }
 
-export const processWithEmptyOptions = useBuilder()
-	.createProcess(
-		"processWithEmptyOptions",
-		{
-			options: <Options>{},
-		},
-	)
+export const processWithEmptyOptions = createProcess(
+	"processWithEmptyOptions",
+	{
+		options: <Options>{},
+	},
+)
 	.cut(
 		({ pickup, dropper }) => {
 			const { options } = pickup(["options"]);

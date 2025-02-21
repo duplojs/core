@@ -5,7 +5,7 @@ import type { ContractResponse, PresetGenericResponse } from "@scripts/response"
 import type { Floor } from "@scripts/floor";
 import { BuildedHandlerStep } from "./builded/handler";
 import { type Duplo } from "@scripts/duplo";
-import { type MybePromise } from "@duplojs/utils";
+import { createInterpolation, type MybePromise } from "@duplojs/utils";
 
 export type Handler<
 	FloorData extends object = object,
@@ -28,4 +28,10 @@ export class HandlerStep<
 	public build(instance: Duplo) {
 		return Promise.resolve(new BuildedHandlerStep(instance, this));
 	}
+
+	public static insertBlockName = {
+		before: createInterpolation("beforeHandlerStep(index: {index})"),
+		beforeTreatResult: createInterpolation("beforeTreatResultHandlerStep(index: {index})"),
+		after: createInterpolation("afterHandlerStep(index: {index})"),
+	};
 }

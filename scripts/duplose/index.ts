@@ -134,17 +134,10 @@ export abstract class Duplose<
 
 						const [insideBlock, afterEndBlock] = afterBlockName.split(regExpEndBlock);
 
-						return `
-							${beforeBlockName}
-							${pos === "top" ? code : ""}
-							/* ${entryPoint} */
-							${pos === "first" ? code : ""}
-							${insideBlock}
-							${pos === "last" ? code : ""}
-							/* end_block */
-							${pos === "bottom" ? code : ""}
-							${afterEndBlock}
-						`;
+						return `${beforeBlockName}${pos === "top" ? `${code}\n` : ""}`
+							+ `/* ${entryPoint} */${pos === "first" ? `\n${code}` : ""}`
+							+ `${insideBlock}${pos === "last" ? `${code}\n` : ""}`
+							+ `/* end_block */${pos === "bottom" ? `\n${code}` : ""}${afterEndBlock}`;
 					},
 				);
 			},
@@ -154,7 +147,7 @@ export abstract class Duplose<
 				pos: EditInjectPos = "last",
 			) => {
 				const index = this.extensions.injectedFunction.length;
-				this.extensions.injectedFunction.push(editInjectFunction as EditInjectFunction);
+				this.extensions.injectedFunction.push(editInjectFunction);
 				this.edition.injectCode(
 					entryPoint,
 					/* js */`

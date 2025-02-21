@@ -1,6 +1,6 @@
-import { condition, insertBlock, maybeAwait, skipStep, StringBuilder } from "@utils/stringBuilder";
+import { condition, insertBlock, maybeAwait, skipStep, spread, StringBuilder } from "@utils/stringBuilder";
 import { BuildedStepWithResponses } from ".";
-import type { CheckerStep, CheckerStepParams } from "../checker";
+import { CheckerStep, type CheckerStepParams } from "../checker";
 import type { CheckerHandler } from "@scripts/checker";
 import { type Duplo } from "@scripts/duplo";
 import { simpleClone } from "@duplojs/utils";
@@ -52,38 +52,47 @@ export class BuildedCheckerStep extends BuildedStepWithResponses<CheckerStep> {
 			() => /* js */`${StringBuilder.floor}.drop(this.steps[${index}].params.indexing, ${StringBuilder.result}.data)`,
 		);
 
-		return skipStep(
-			!!this.params.skip,
-			index,
-			/* js */`
-			${insertBlock(`step-checker-(${index})-before`)}
+		const insertBlockNameBefore
+			= CheckerStep.insertBlockName.before({ index: index.toString() });
+		const insertBlockNameBeforeTreatResult
+			= CheckerStep.insertBlockName.beforeTreatResult({ index: index.toString() });
+		const insertBlockNameBeforeIndexingResult
+			= CheckerStep.insertBlockName.beforeIndexingResult({ index: index.toString() });
+		const insertBlockNameAfter
+			= CheckerStep.insertBlockName.after({ index: index.toString() });
 
-			${StringBuilder.result} = ${maybeAwait(async)}this.steps[${index}].checkerFunction(
-				this.steps[${index}].params.input(${StringBuilder.floor}.pickup),
-				(info, data) => ({info, data}),
-				${options},
-			);
-
-			${insertBlock(`step-checker-(${index})-before-treat-result`)}
-
-			if(${checkResult}){
-				${StringBuilder.result} = this.steps[${index}].params.catch(
-					${StringBuilder.result}.info, 
-					${StringBuilder.result}.data, 
-					${StringBuilder.floor}.pickup
+		return spread(
+			insertBlock(insertBlockNameBefore),
+			skipStep(
+				!!this.params.skip,
+				index,
+				/* js */`
+				${StringBuilder.result} = ${maybeAwait(async)}this.steps[${index}].checkerFunction(
+					this.steps[${index}].params.input(${StringBuilder.floor}.pickup),
+					(info, data) => ({info, data}),
+					${options},
 				);
 
-				${this.getBlockContractResponse(index)}
+				${insertBlock(insertBlockNameBeforeTreatResult)}
 
-				break ${StringBuilder.label};
-			}
+				if(${checkResult}){
+					${StringBuilder.result} = this.steps[${index}].params.catch(
+						${StringBuilder.result}.info, 
+						${StringBuilder.result}.data, 
+						${StringBuilder.floor}.pickup
+					);
 
-			${insertBlock(`step-checker-(${index})-before-indexing`)}
+					${this.getBlockContractResponse(index)}
 
-			${indexing}
+					break ${StringBuilder.label};
+				}
 
-			${insertBlock(`step-checker-(${index})-after`)}
-			`,
+				${insertBlock(insertBlockNameBeforeIndexingResult)}
+
+				${indexing}
+				`,
+			),
+			insertBlock(insertBlockNameAfter),
 		);
 	}
 }

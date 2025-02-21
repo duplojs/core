@@ -1,46 +1,27 @@
-import { checkResult, condition, insertBlock, mapped, maybeAwait, skipPreflight, StringBuilder } from "@utils/stringBuilder";
+import { PreflightStep } from "../preflight";
+import { ProcessStep } from "../process";
 import { BuildedProcessStep } from "./process";
 
 export class BuildedPreflightStep extends BuildedProcessStep {
 	public override toString(index: number): string {
-		const async = this.processFunction.constructor.name === "AsyncFunction";
-
-		const options = typeof this.params.options === "function"
-			? /* js */`this.preflightSteps[${index}].params.options(${StringBuilder.floor}.pickup)`
-			: /* js */`this.preflightSteps[${index}].params.options`;
-
-		const input = condition(
-			!!this.params.input,
-			() => /* js */`this.preflightSteps[${index}].params.input(${StringBuilder.floor}.pickup)`,
-		);
-
-		const drop = mapped(
-			this.params.pickup ?? [],
-			(key) => /* js */`${StringBuilder.floor}.drop("${key}", ${StringBuilder.result}["${key}"]);`,
-		);
-
-		return skipPreflight(
-			!!this.params.skip,
-			index,
-			/* js */`
-				${insertBlock(`preflight-process-(${index})-before`)}
-
-				${StringBuilder.result} = ${maybeAwait(async)}this.preflightSteps[${index}].processFunction(
-					${StringBuilder.request},
-					${options},
-					${input}
-				);
-
-				${insertBlock(`preflight-process-(${index})-before-check-result`)}
-
-				${checkResult()}
-
-				${insertBlock(`preflight-process-(${index})-before-drop`)}
-
-				${drop}
-
-				${insertBlock(`preflight-process-(${index})-after`)}
-			`,
-		);
+		return super
+			.toString(index)
+			.replaceAll(`this.steps[${index}]`, `this.preflightSteps[${index}]`)
+			.replace(
+				ProcessStep.insertBlockName.before({ index: index.toString() }),
+				PreflightStep.insertBlockName.before({ index: index.toString() }),
+			)
+			.replace(
+				ProcessStep.insertBlockName.beforeTreatResult({ index: index.toString() }),
+				PreflightStep.insertBlockName.beforeTreatResult({ index: index.toString() }),
+			)
+			.replace(
+				ProcessStep.insertBlockName.beforeIndexingResult({ index: index.toString() }),
+				PreflightStep.insertBlockName.beforeIndexingResult({ index: index.toString() }),
+			)
+			.replace(
+				ProcessStep.insertBlockName.after({ index: index.toString() }),
+				PreflightStep.insertBlockName.after({ index: index.toString() }),
+			);
 	}
 }

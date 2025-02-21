@@ -5,7 +5,7 @@ import type { ZodSpace } from "@scripts/parser";
 import type { PresetGenericResponse } from "@scripts/response";
 import type { CurrentRequestObject } from "@scripts/request";
 import { BuildedExtractStep } from "./builded/extract";
-import { type GetPropsWithTrueValue } from "@duplojs/utils";
+import { createInterpolation, type GetPropsWithTrueValue } from "@duplojs/utils";
 
 export interface DisabledExtractKey {
 	method: true;
@@ -56,4 +56,19 @@ export class ExtractStep<
 			),
 		);
 	}
+
+	public static insertBlockName = {
+		before: createInterpolation("beforeExtractStep(index: {index})"),
+		after: createInterpolation("afterExtractStep(index: {index})"),
+
+		beforeLevelOne: createInterpolation("beforeLevelOneExtractStep(index: {index}, one: {one})"),
+		beforeTreatResultLevelOne: createInterpolation("beforeTreatResultLevelOneExtractStep(index: {index}, one: {one})"),
+		beforeIndexingResultLevelOne: createInterpolation("beforeIndexingResultLevelOneExtractStep(index: {index}, one: {one})"),
+		afterLevelOne: createInterpolation("afterLevelOneExtractStep(index: {index}, one: {one})"),
+
+		beforeLevelTwo: createInterpolation("beforeLevelTwoExtractStep(index: {index}, one: {one}, two: {two})"),
+		beforeTreatResultLevelTwo: createInterpolation("beforeTreatResultLevelTwoExtractStep(index: {index}, one: {one}, two: {two})"),
+		beforeIndexingResultLevelTwo: createInterpolation("beforeIndexingResultLevelTwoExtractStep(index: {index}, one: {one}, two: {two})"),
+		afterLevelTwo: createInterpolation("afterLevelTowExtractStep(index: {index}, one: {one}, two: {two})"),
+	};
 }

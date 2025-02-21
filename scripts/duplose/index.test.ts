@@ -30,6 +30,8 @@ describe("Duplose", () => {
 	const step = new ProcessStep(process2);
 	duplose.definiton.steps.push(step);
 
+	const content = `\n${insertBlock("test")}\n`;
+
 	it("getAllHooks", () => {
 		const hooks = duplose.getAllHooks();
 
@@ -54,7 +56,7 @@ describe("Duplose", () => {
 			"top",
 		);
 
-		expect(() => duplose.aef(insertBlock("test"))).toThrowError(InjectBlockNotfoundError);
+		expect(() => duplose.aef(content)).toThrowError(InjectBlockNotfoundError);
 
 		duplose.resetEditingFunction();
 
@@ -82,7 +84,7 @@ describe("Duplose", () => {
 			"bottom",
 		);
 
-		expect(duplose.aef(insertBlock("test"))).toMatchSnapshot();
+		expect(duplose.aef(content)).toMatchSnapshot();
 	});
 
 	it("injectFunction", () => {
@@ -92,7 +94,7 @@ describe("Duplose", () => {
 			"top",
 		);
 
-		expect(duplose.aef(insertBlock("test"))).toMatchSnapshot();
+		expect(duplose.aef(content)).toMatchSnapshot();
 	});
 
 	it("addExtensions", () => {

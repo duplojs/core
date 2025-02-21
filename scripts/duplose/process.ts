@@ -6,7 +6,7 @@ import { insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { makeFloor } from "@scripts/floor";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { type PreflightStep } from "@scripts/step/preflight";
-import { simpleClone, type MybePromise } from "@duplojs/utils";
+import { createInterpolation, simpleClone, type MybePromise } from "@duplojs/utils";
 
 export interface ProcessBuildedFunction<
 	GenericProcess extends Process<any, any, any> = Process<any, any, any>,
@@ -112,26 +112,29 @@ export class Process<
 		floor.drop("options", ${StringBuilder.options});
 		floor.drop("input", ${StringBuilder.input});
 		${StringBuilder.label}: {
-			${insertBlock("preflight-before")}
+			${insertBlock(Process.insertBlockName.beforePreflightSteps())}
 
 			${mapped(buildedPreflight, (value, index) => value.toString(index))}
 
-			${insertBlock("preflight-after")}
+			${insertBlock(Process.insertBlockName.afterPreflightSteps())}
 
-			${insertBlock("steps-before")}
+			${insertBlock(Process.insertBlockName.beforeSteps())}
 
 			${mapped(buildedStep, (value, index) => value.toString(index))}
 
-			${insertBlock("steps-after")}
+			${insertBlock(Process.insertBlockName.afterSteps())}
 		}
 
-		${insertBlock("process-if-return-before")}
+		${insertBlock(Process.insertBlockName.beforeTreatResult())}
+
 		if(${StringBuilder.result} instanceof this.Response){
-			${insertBlock("process-result-return-before")}
+			${insertBlock(Process.insertBlockName.beforeReturnResponse())}
+
 			return result;
 		}
 		else {
-			${insertBlock("process-drop-return-before")}
+			${insertBlock(Process.insertBlockName.beforeReturnValues())}
+			
 			return {
 				${drop}
 			};
@@ -166,4 +169,17 @@ export class Process<
 
 		return buildedFunction;
 	}
+
+	public static insertBlockName = {
+		beforePreflightSteps: createInterpolation("beforePreflightSteps"),
+		afterPreflightSteps: createInterpolation("afterPreflightSteps"),
+
+		beforeSteps: createInterpolation("beforeSteps"),
+		afterSteps: createInterpolation("afterSteps"),
+
+		beforeTreatResult: createInterpolation("beforeTreatResult"),
+
+		beforeReturnResponse: createInterpolation("beforeReturnResponse"),
+		beforeReturnValues: createInterpolation("beforeReturnValues"),
+	};
 }

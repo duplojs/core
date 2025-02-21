@@ -10,10 +10,6 @@ it("BuildedExtractStep", () => {
 		query: {
 			search: zod.string(),
 		},
-		params: {
-			userId: zod.string().presetCheck(manualPresetChecker),
-		},
-		host: zod.string().presetCheck(manualPresetChecker),
 		body: zod.object({
 			prop1: zod.string(),
 		}),

@@ -1,5 +1,4 @@
-import type { ZodSpace, ZodPresetChecker } from "@scripts/parser";
-import type { GetPresetCheckerGeneric } from "@scripts/builder/checker";
+import type { ZodSpace } from "@scripts/parser";
 import type { ExtractObject } from "@scripts/step/extract";
 import { type ObjectKey, type SimplifyType } from "@duplojs/utils";
 
@@ -11,31 +10,19 @@ export interface KeyAndValue<
 	value: GenericValue;
 }
 
-export type ZodTypeToKeyAndValue<
-	GenericObjectKey extends ObjectKey,
-	GenericZodType extends ZodSpace.ZodType,
-> = GenericZodType extends ZodPresetChecker<any, infer inferedPresetChecker>
-	? (
-		string extends GetPresetCheckerGeneric<inferedPresetChecker>["key"]
-			? never
-			: KeyAndValue<
-				GetPresetCheckerGeneric<inferedPresetChecker>["key"],
-				ZodSpace.infer<GenericZodType>
-			>
-	)
-	: KeyAndValue<GenericObjectKey, ZodSpace.infer<GenericZodType>>;
-
 export type FlatExtract<
-	T extends ExtractObject,
-	O extends KeyAndValue = {
-		[P in keyof T]: T[P] extends ZodSpace.ZodType
-			? ZodTypeToKeyAndValue<P, T[P]>
+	GenericExtractObject extends ExtractObject,
+	GenericKeyAndValue extends KeyAndValue = {
+		[Prop in keyof GenericExtractObject]:
+		GenericExtractObject[Prop] extends ZodSpace.ZodType
+			? KeyAndValue<Prop, ZodSpace.infer<GenericExtractObject[Prop]>>
 			: {
-				[S in keyof T[P]]: T[P][S] extends ZodSpace.ZodType
-					? ZodTypeToKeyAndValue<S, T[P][S]>
+				[SubProp in keyof GenericExtractObject[Prop]]:
+				GenericExtractObject[Prop][SubProp] extends ZodSpace.ZodType
+					? KeyAndValue<SubProp, ZodSpace.infer<GenericExtractObject[Prop][SubProp]>>
 					: never
-			}[keyof T[P]]
-	}[keyof T],
+			}[keyof GenericExtractObject[Prop]]
+	}[keyof GenericExtractObject],
 > = SimplifyType<{
-	[P in O as P["key"]]: P["value"];
+	[KeyAndValue in GenericKeyAndValue as KeyAndValue["key"]]: KeyAndValue["value"];
 }>;

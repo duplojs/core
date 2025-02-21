@@ -1,25 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`stringBuilder > skipPreflight 1`] = `
-"
-		
-/* preflight-skip-(1)-before */
-/* end_block */
-
-
-		if(!this.preflightSteps[1].params.skip(floor.pickup)){
-			
-		}
-		"
-`;
-
 exports[`stringBuilder > skipStep 1`] = `
 "
-		
-/* step-skip-(1)-before */
-/* end_block */
-
-
 		if(!this.steps[1].params.skip(floor.pickup)){
 			
 		}

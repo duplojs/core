@@ -8,13 +8,12 @@ exports[`Process > build 1`] = `
 		floor.drop("input", input);
 		Execution: {
 			
-/* preflight-before */
+/* beforePreflightSteps */
 /* end_block */
 
 
 			
-				
-/* preflight-process-(0)-before */
+/* beforePreflightStep(index: 0) */
 /* end_block */
 
 
@@ -25,7 +24,7 @@ exports[`Process > build 1`] = `
 				);
 
 				
-/* preflight-process-(0)-before-check-result */
+/* beforeTreatResultPreflightStep(index: 0) */
 /* end_block */
 
 
@@ -35,38 +34,37 @@ break Execution;
 }
 
 				
-/* preflight-process-(0)-before-drop */
+/* beforeIndexingResultPreflightStep(index: 0) */
 /* end_block */
 
 
 				floor.drop("flute", result["flute"]);
-
 				
-/* preflight-process-(0)-after */
-/* end_block */
 
-			
-
-			
-/* preflight-after */
+/* afterPreflightStep(index: 0) */
 /* end_block */
 
 
 			
-/* steps-before */
+/* afterPreflightSteps */
+/* end_block */
+
+
+			
+/* beforeSteps */
 /* end_block */
 
 
 			
 		
-/* step-cut-(0)-before */
+/* beforeCutStep(index: 0) */
 /* end_block */
 
 
 		result = this.steps[0].cutFunction(floor, request);
 
 		
-/* step-cut-(0)-before-check-result */
+/* beforeTreatResultCutStep(index: 0) */
 /* end_block */
 
 
@@ -82,31 +80,36 @@ break Execution;
 }
 
 		
-/* step-cut-(0)-before-drop */
+/* beforeIndexingResultCutStep(index: 0) */
 /* end_block */
 
 
 		floor.drop("toto", result["toto"]);
 
 		
-/* step-cut-(0)-after */
+/* afterCutStep(index: 0) */
 /* end_block */
 
 		
 
-/* setp-extract-(1)-before */
+/* beforeExtractStep(index: 1) */
 /* end_block */
 
 
-			
-/* setp-extract-(1)-(params)-(userId)-before */
-/* end_block */
-
-		
 			{
+				
+/* beforeLevelTwoExtractStep(index: 1, one: params, two: userId) */
+/* end_block */
+
+
 				let temp = this.steps[1]
 					.extractObject["params"]["userId"]
 					.safeParse(request["params"]?.["userId"])
+
+				
+/* beforeTreatResultLevelTwoExtractStep(index: 1, one: params, two: userId) */
+/* end_block */
+
 		
 				if(!temp.success){
 					result = this.steps[1].catchError(
@@ -116,45 +119,53 @@ break Execution;
 					);
 					break Execution;
 				}
+
+				
+/* beforeIndexingResultLevelTwoExtractStep(index: 1, one: params, two: userId) */
+/* end_block */
+
 		
 				floor.drop(
 					"userId",
 					temp.data,
 				);
+
+				
+/* afterLevelTowExtractStep(index: 1, one: params, two: userId) */
+/* end_block */
+
 			}
-		
-			
-/* setp-extract-(1)-(params)-(userId)-after */
-/* end_block */
-
 			
 
-/* setp-extract-(1)-after */
+/* afterExtractStep(index: 1) */
 /* end_block */
 
 
 			
-/* steps-after */
+/* afterSteps */
 /* end_block */
 
 		}
 
 		
-/* process-if-return-before */
+/* beforeTreatResult */
 /* end_block */
+
 
 		if(result instanceof this.Response){
 			
-/* process-result-return-before */
+/* beforeReturnResponse */
 /* end_block */
+
 
 			return result;
 		}
 		else {
 			
-/* process-drop-return-before */
+/* beforeReturnValues */
 /* end_block */
 
+			
 			return {
 				"toto": floor.pickup("toto"),
 "userId": floor.pickup("userId"),

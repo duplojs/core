@@ -11,7 +11,7 @@ import { type AnyFunction } from "@duplojs/utils";
 describe("duplo", () => {
 	const duplo = new DuploTest({
 		environment: "TEST",
-		prefix: [],
+		prefix: ["my-prefix"],
 	});
 
 	it("register duplo", () => {
@@ -103,5 +103,12 @@ describe("duplo", () => {
 		expect(
 			firstSubscriber.name,
 		).toBe("hookAddGlobalPrefix");
+	});
+
+	it("remove description hook is here", () => {
+		const firstSubscriber: AnyFunction = duplo.hooksInstanceLifeCycle.onStart.subscribers.at(0) as never;
+		expect(
+			firstSubscriber.name,
+		).toBe("hookRemoveDescriptions");
 	});
 });

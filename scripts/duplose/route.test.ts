@@ -1,10 +1,13 @@
 import { Process } from "./process";
 import {
 	BuildNoRegisteredDuploseError,
+	ContextPrefixDescription,
 	CutStep,
 	Duplose,
+	GlobalPrefixDescription,
 	Hook,
 	LastStepMustBeHandlerError,
+	LocalPrefixDescription,
 	OkHttpResponse,
 	zod,
 	type Floor,
@@ -19,6 +22,7 @@ import { DuploTest } from "@test/utils/duploTest";
 import { createProcessDefinition, createRouteDefinition } from "@test/utils/manualDuplose";
 import { ExtractStep } from "@scripts/step/extract";
 import { type AnyFunction, getTypedEntries } from "@duplojs/utils";
+import path from "path";
 
 describe("Route", () => {
 	const checkpointList = new CheckpointList();
@@ -121,6 +125,37 @@ describe("Route", () => {
 			"start",
 			"cut",
 			"end",
+		]);
+	});
+
+	it("full paths fields have correct prefix", () => {
+		const route = new Route(createRouteDefinition({ paths: ["my-path-1", "my-path-2"] }));
+
+		const globalPrefix = new GlobalPrefixDescription("global-prefix");
+		const contextPrefix = new ContextPrefixDescription(["context-prefix-1", "context-prefix-2"]);
+		const localPrefix = new LocalPrefixDescription("local-prefix");
+
+		route.definiton.descriptions.push(globalPrefix);
+
+		expect(route.fullPaths).toEqual([
+			"/global-prefix/my-path-1",
+			"/global-prefix/my-path-2",
+		]);
+
+		route.definiton.descriptions.push(localPrefix);
+
+		expect(route.fullPaths).toEqual([
+			"/global-prefix/local-prefix/my-path-1",
+			"/global-prefix/local-prefix/my-path-2",
+		]);
+
+		route.definiton.descriptions.push(contextPrefix);
+
+		expect(route.fullPaths).toEqual([
+			"/global-prefix/context-prefix-1/local-prefix/my-path-1",
+			"/global-prefix/context-prefix-2/local-prefix/my-path-1",
+			"/global-prefix/context-prefix-1/local-prefix/my-path-2",
+			"/global-prefix/context-prefix-2/local-prefix/my-path-2",
 		]);
 	});
 });

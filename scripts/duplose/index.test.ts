@@ -1,10 +1,8 @@
 import { Duplose } from ".";
 import { Process } from "./process";
 import { ProcessStep } from "@scripts/step/process";
-import { Hook } from "@scripts/hook";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 import { createProcessDefinition } from "@test/utils/manualDuplose";
-import { getTypedEntries } from "@duplojs/utils";
 import { insertBlock } from "@utils/stringBuilder";
 
 describe("Duplose", () => {
@@ -31,23 +29,6 @@ describe("Duplose", () => {
 	duplose.definiton.steps.push(step);
 
 	const content = `\n${insertBlock("test")}\n`;
-
-	it("getAllHooks", () => {
-		const hooks = duplose.getAllHooks();
-
-		getTypedEntries(hooks)
-			.forEach(([key, value]) => {
-				if (!(value instanceof Hook)) {
-					return;
-				}
-
-				expect(value.subscribers[0])
-					.toBe(duplose.hooks[key]);
-
-				expect((value.subscribers[1] as Hook).subscribers[0])
-					.toBe(process2.hooks[key]);
-			});
-	});
 
 	it("injectCode", () => {
 		duplose.edition.injectCode(
@@ -111,13 +92,5 @@ describe("Duplose", () => {
 		expect(duplose.hasDuplose(new Process(createProcessDefinition()))).toBe(false);
 		expect(duplose.hasDuplose(new Process(createProcessDefinition()), 0)).toBe(false);
 		expect(duplose.hasDuplose(process2)).toBe(true);
-	});
-
-	it("add hook", () => {
-		const fnc = () => void undefined;
-		duplose.hook("afterSend", fnc);
-
-		expect(duplose.hooks.afterSend.subscribers[0])
-			.toBe(fnc);
 	});
 });

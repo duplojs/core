@@ -6,9 +6,13 @@ import { DuploTest } from "@test/utils/duploTest";
 import { CheckpointList } from "@test/utils/checkpointList";
 import { Duplo } from "./duplo";
 import { createProcessDefinition } from "@test/utils/manualDuplose";
+import { type AnyFunction } from "@duplojs/utils";
 
 describe("duplo", () => {
-	const duplo = new DuploTest({ environment: "TEST" });
+	const duplo = new DuploTest({
+		environment: "TEST",
+		prefix: [],
+	});
 
 	it("register duplo", () => {
 		const process = new Process(createProcessDefinition());
@@ -87,11 +91,17 @@ describe("duplo", () => {
 		]);
 	});
 
-	it("hook beforeSend", () => {
-		const response = new Response(200, "test", undefined);
+	it("information hook is here", () => {
+		const firstSubscriber: AnyFunction = duplo.hooksRouteLifeCycle.beforeSend.subscribers.at(0) as never;
+		expect(
+			firstSubscriber.name,
+		).toBe("hookInformation");
+	});
 
-		duplo.hooksRouteLifeCycle.beforeSend.launchSubscriber({} as any, response);
-
-		expect(response.headers.information).toBe("test");
+	it("global hook is here", () => {
+		const firstSubscriber: AnyFunction = duplo.hooksInstanceLifeCycle.onRegistered.subscribers.at(0) as never;
+		expect(
+			firstSubscriber.name,
+		).toBe("hookAddGlobalPrefix");
 	});
 });

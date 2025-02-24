@@ -6,7 +6,7 @@ import { Process, type ProcessDefinition } from "@scripts/duplose/process";
 import { type ExpectType } from "@duplojs/utils";
 
 it("instanceofDuplose", () => {
-	const testProcess: Duplose<any, any, any> = manualProcess;
+	const testProcess: Duplose<any, any> = manualProcess;
 
 	if (!instanceofDuplose(Process, testProcess)) {
 		throw new Error("instance error");

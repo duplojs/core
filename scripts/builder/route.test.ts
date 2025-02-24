@@ -10,6 +10,7 @@ import {
 	type CurrentRequestObject,
 	ProcessStep,
 	CutStep,
+	ContextPrefixDescription,
 } from "..";
 import { createRoute, useRouteBuilder } from "./route";
 import { HandlerStep } from "@scripts/step/handler";
@@ -266,5 +267,20 @@ describe("useRouteBuilder", () => {
 		useRouteBuilder.resetCreatedRoute();
 
 		expect([...useRouteBuilder.getAllCreatedRoute()]).length(0);
+	});
+
+	it("context prefix", () => {
+		useRouteBuilder.setContextPrefixToNextCreatedRoutes("my-prefix");
+
+		const route = useRouteBuilder("GET", ["/"], [], [])
+			.handler(
+				() => new OkHttpResponse("test", ""),
+			);
+
+		useRouteBuilder.removeActiveContextPrefix();
+
+		expect(route.definiton.descriptions.at(0)).toEqual(
+			new ContextPrefixDescription("my-prefix"),
+		);
 	});
 });

@@ -2,12 +2,11 @@ import type { Response } from "@scripts/response";
 import type { Description } from "@scripts/description";
 import type { CurrentRequestObject } from "@scripts/request";
 import type { Step } from "@scripts/step";
-import { ProcessStep } from "@scripts/step/process";
 import type { Duplo } from "@scripts/duplo";
 import type { makeFloor } from "@scripts/floor";
 import type { BuildedStep } from "@scripts/step/builded";
 import type { ContractResponseError } from "@scripts/error/contractResponseError";
-import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
+import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 import { StringBuilder } from "@utils/stringBuilder";
 import { DuplicateExtentionkeyError } from "@scripts/error/duplicateExtentionKeyError";
@@ -63,12 +62,9 @@ export class DuploseEvaler extends Evaler<DuploseEvalerParams> {
 
 export abstract class Duplose<
 	GenericDuploseDefinition extends DuploseDefinition = DuploseDefinition,
-	_GenericRequest extends CurrentRequestObject = any,
 	_GenericFloorData extends object = any,
 > {
 	public readonly definiton: GenericDuploseDefinition;
-
-	public hooks = new HooksRouteLifeCycle<_GenericRequest>();
 
 	public instance?: Duplo;
 
@@ -84,19 +80,6 @@ export abstract class Duplose<
 
 	public constructor(definiton: GenericDuploseDefinition) {
 		this.definiton = definiton;
-	}
-
-	public getAllHooks() {
-		const hooks = new HooksRouteLifeCycle<_GenericRequest>();
-
-		hooks.import(this.hooks);
-
-		this.definiton
-			.steps
-			.filter((step): step is ProcessStep => step instanceof ProcessStep)
-			.forEach((step) => void hooks.import(step.parent.getAllHooks()));
-
-		return hooks;
 	}
 
 	protected applyEditingFunctions(content: string) {
@@ -174,7 +157,7 @@ export abstract class Duplose<
 		};
 	}
 
-	public hasDuplose(duplose: Duplose<any, any, any>, deep = Infinity) {
+	public hasDuplose(duplose: Duplose<any, any>, deep = Infinity) {
 		if (deep === 0) {
 			return false;
 		} else if (duplose === this) {
@@ -191,14 +174,6 @@ export abstract class Duplose<
 		}
 
 		return false;
-	}
-
-	public hook<
-		T extends keyof BuildedHooksRouteLifeCycle<_GenericRequest>,
-	>(hookName: T, subscriber: BuildedHooksRouteLifeCycle<_GenericRequest>[T]) {
-		this.hooks[hookName].addSubscriber(subscriber as AnyFunction);
-
-		return this;
 	}
 
 	public abstract build(): Promise<AnyFunction>;

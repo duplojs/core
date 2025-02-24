@@ -3,6 +3,7 @@ import { type ExpectType } from "@duplojs/utils";
 
 export const duplo = new Duplo({
 	environment: "TEST",
+	prefix: "global-prefix",
 });
 
 duplo.hook("beforeRouteExecution", (request) => {

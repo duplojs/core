@@ -1,4 +1,5 @@
 import { GlobalPrefixDescription } from "@scripts/description/prefix/global";
+import { type Duplo } from "@scripts/duplo";
 import { type Duplose } from "@scripts/duplose";
 import { Route } from "@scripts/duplose/route";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
@@ -39,4 +40,22 @@ export function makeHookAddGlobalPrefix(prefix: string[]) {
 			);
 		}
 	};
+}
+
+export function hookRemoveDescriptions(instance: Duplo) {
+	instance.duploses.forEach(
+		(duplose) => {
+			duplose.definiton.descriptions = [];
+
+			duplose.definiton.steps.forEach((step) => {
+				step.descriptions = [];
+			});
+
+			if (instanceofDuplose(Route, duplose)) {
+				duplose.definiton.preflightSteps.forEach((step) => {
+					step.descriptions = [];
+				});
+			}
+		},
+	);
 }

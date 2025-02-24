@@ -1,10 +1,12 @@
 import { InternalServerErrorHttpResponse, LoopDetectedHttpResponse, OkHttpResponse, ServiceUnavailableHttpResponse } from "@scripts/response/simplePreset";
-import { hookRouteError, hookRouteContractResponseError, hookRouteRangeError, makeHookInformation, makeHookAddGlobalPrefix } from "./default";
+import { hookRouteError, hookRouteContractResponseError, hookRouteRangeError, makeHookInformation, makeHookAddGlobalPrefix, hookRemoveDescriptions } from "./default";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { makeFakeRequest } from "@test/utils/request";
 import { Route } from "@scripts/duplose/route";
 import { createRouteDefinition } from "@test/utils/manualDuplose";
 import { GlobalPrefixDescription } from "@scripts/description/prefix/global";
+import { duploTest } from "@test/utils/duploTest";
+import { fixtureCheckerStep, fixtureDescription, fixtureProcessStep } from "@test/utils/fixture";
 
 describe("default hook", () => {
 	it("route error", () => {
@@ -48,5 +50,24 @@ describe("default hook", () => {
 		hookAddGlobalPrefix(route);
 
 		expect(route.definiton.descriptions).toEqual([new GlobalPrefixDescription(prefix)]);
+	});
+
+	it("remove descriuption from duplose", () => {
+		fixtureCheckerStep.descriptions.push(fixtureDescription);
+		fixtureProcessStep.descriptions.push(fixtureDescription);
+
+		const route = new Route(createRouteDefinition({
+			steps: [fixtureCheckerStep],
+			preflightSteps: [fixtureProcessStep],
+			descriptions: [fixtureDescription],
+		}));
+
+		duploTest.register(route);
+
+		hookRemoveDescriptions(duploTest);
+
+		expect(route.definiton.descriptions).toEqual([]);
+		expect(route.definiton.steps.at(0)!.descriptions).toEqual([]);
+		expect(route.definiton.preflightSteps.at(0)!.descriptions).toEqual([]);
 	});
 });

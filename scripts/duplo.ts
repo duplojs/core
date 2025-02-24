@@ -7,7 +7,7 @@ import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "./hook/rou
 import type { RecieveFormDataOptions } from "./parser";
 import type { HookEvaler } from "./hook";
 import type { BuildedRouter, RouterEvaler } from "./router";
-import { makeHookAddGlobalPrefix, makeHookInformation } from "./hook/default";
+import { hookRemoveDescriptions, makeHookAddGlobalPrefix, makeHookInformation } from "./hook/default";
 import type { ExtractErrorFunction } from "./step/extract";
 import { type AnyFunction, type BytesInString, type GetPropsWithTrueValue, hasKey, type PartialKeys, type RequiredKeys, type SimplifyType, stringToBytes } from "@duplojs/utils";
 
@@ -33,6 +33,7 @@ export interface DuploConfig {
 		"prefixTempName" | "strict" | "uploadDirectory"
 	>;
 	prefix: string[];
+	keepDescriptions: boolean;
 }
 
 export type DuploInputConfig = SimplifyType<
@@ -43,6 +44,7 @@ export type DuploInputConfig = SimplifyType<
 			| "disabledZodAccelerator"
 			| "keyToInformationInHeaders"
 			| "plugins"
+			| "keepDescriptions"
 		>,
 		| "bodySizeLimit"
 		| "recieveFormDataOptions"
@@ -97,19 +99,26 @@ export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInput
 			prefix: typeof inputConfig.prefix === "string"
 				? [inputConfig.prefix]
 				: (inputConfig.prefix ?? []),
+			keepDescriptions: !!inputConfig.keepDescriptions,
 		};
 
 		this.hooksRouteLifeCycle.beforeSend.addSubscriber(
 			makeHookInformation(this.config.keyToInformationInHeaders),
 		);
 
-		if (inputConfig.prefix) {
+		this.config.plugins.forEach((plugin) => void plugin(this));
+
+		if (this.config.prefix.length > 0) {
 			this.hooksInstanceLifeCycle.onRegistered.addSubscriber(
 				makeHookAddGlobalPrefix(this.config.prefix),
 			);
 		}
 
-		this.config.plugins.forEach((plugin) => void plugin(this));
+		if (!this.config.keepDescriptions) {
+			this.hooksInstanceLifeCycle.onStart.addSubscriber(
+				hookRemoveDescriptions,
+			);
+		}
 	}
 
 	public extractError: ExtractErrorFunction = (type, key, error) => new UnprocessableEntityHttpResponse(`TYPE_ERROR.${type}${key ? `.${key}` : ""}`, error);

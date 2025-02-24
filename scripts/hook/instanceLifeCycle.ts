@@ -14,7 +14,7 @@ export class HooksInstanceifeCycle extends HooksLifeCycle {
 
 	public onRegistered = new Hook<(duplose: Duplose) => boolean | void>(1);
 
-	public beforeBuildRouter = new Hook<(duplose: Duplo) => MybePromise<boolean | void>>(1);
+	public beforeBuildRouter = new Hook<(duplo: Duplo) => MybePromise<boolean | void>>(1);
 }
 
 export type BuildedHooksInstanceLifeCycle = Omit<

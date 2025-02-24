@@ -1,4 +1,5 @@
-import { createChecker, createPresetChecker, BadRequestHttpResponse, createProcess } from "@scripts/index";
+import { createChecker, createPresetChecker, BadRequestHttpResponse, createProcess, ProcessStep, CheckerStep } from "@scripts/index";
+import { TestDescription } from "./testDescription";
 
 export const fixtureProcessWichDropValue = createProcess(
 	"processWichDropValue",
@@ -23,6 +24,8 @@ export const fixtureProcessWichDropValue = createProcess(
 	)
 	.exportation(["dropOptions", "dropInput"]);
 
+export const fixtureProcessStep = new ProcessStep(fixtureProcessWichDropValue);
+
 export const fixtureCheckerWithoutOptions = createChecker("checkerWithoutOptions")
 	.handler(
 		async(input: number, output) => {
@@ -34,6 +37,8 @@ export const fixtureCheckerWithoutOptions = createChecker("checkerWithoutOptions
 			return output("no", <const>false);
 		},
 	);
+
+export const fixtureCheckerStep = new CheckerStep(fixtureCheckerWithoutOptions, {} as never);
 
 export const fixtureCheckerWithOptions = createChecker(
 	"checkerWithoutOptions",
@@ -63,3 +68,6 @@ export const fixturePresetChecker = createPresetChecker(
 		},
 	},
 );
+
+export const fixtureDescription = new TestDescription();
+

@@ -87,7 +87,7 @@ export class Router {
 			.reduce<Promise<BuildedRouter["methodToFinderMapper"]>>(
 				async(pv, [method, routes]) => {
 					const functionContent = routes.flatMap(
-						(route, index) => route.definiton.paths.map(
+						(route, index) => route.fullPaths.map(
 							(path) => /* js */`
 								${StringBuilder.result} = ${Router.pathToStringRegExp(path)}.exec(path);
 								if(${StringBuilder.result} !== null) return {

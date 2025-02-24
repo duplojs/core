@@ -6,6 +6,7 @@ import { insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { makeFloor } from "@scripts/floor";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { createInterpolation, simpleClone, type MybePromise } from "@duplojs/utils";
+import { HttpDuplose } from "./http";
 
 export interface ProcessBuildedFunction<
 	GenericProcess extends Process<any, any, any> = Process<any, any, any>,
@@ -44,12 +45,12 @@ export interface ProcessDefinition extends DuploseDefinition {
 
 export class Process<
 	GenericProcessDefinition extends ProcessDefinition = ProcessDefinition,
-	_GenericRequest extends CurrentRequestObject = any,
-	_GenericFloorData extends object = any,
-> extends Duplose<
+	GenericRequest extends CurrentRequestObject = any,
+	GenericFloorData extends object = any,
+> extends HttpDuplose<
 		GenericProcessDefinition,
-		_GenericRequest,
-		_GenericFloorData
+		GenericRequest,
+		GenericFloorData
 	> {
 	public constructor(
 		definiton: GenericProcessDefinition,

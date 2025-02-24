@@ -15,6 +15,7 @@ import { type Cut, CutStep } from "@scripts/step/cut";
 import { HandlerStep, type Handler } from "@scripts/step/handler";
 import { ExtractStep, type ExtractErrorFunction, type ExtractObject } from "@scripts/step/extract";
 import { type AddOne, simpleClone } from "@duplojs/utils";
+import { ContextPrefixDescription } from "@scripts/description/prefix/context";
 
 export interface RouteBuilder<
 	GenericRequest extends CurrentRequestObject = CurrentRequestObject,
@@ -196,8 +197,6 @@ export interface RouteBuilder<
 
 export type AnyRouteBuilder = RouteBuilder<any, any, any, any, any>;
 
-const createdRouteSymbol = Symbol("CreatedRoute");
-
 export function useRouteBuilder<
 	GenericRequest extends CurrentRequestObject,
 	GenericPreflightSteps extends PreflightStep = PreflightStep,
@@ -316,6 +315,12 @@ export function useRouteBuilder<
 
 		const route = new Route(routeDefinition);
 
+		if (useRouteBuilder[contextPrefixSymbol]) {
+			route.definiton.descriptions.push(
+				new ContextPrefixDescription(useRouteBuilder[contextPrefixSymbol]),
+			);
+		}
+
 		useRouteBuilder[createdRouteSymbol].add(route);
 
 		return route;
@@ -330,6 +335,8 @@ export function useRouteBuilder<
 	});
 }
 
+const createdRouteSymbol = Symbol("CreatedRoute");
+
 useRouteBuilder[createdRouteSymbol] = new Set<Route>();
 
 useRouteBuilder.getAllCreatedRoute = function *() {
@@ -338,6 +345,20 @@ useRouteBuilder.getAllCreatedRoute = function *() {
 
 useRouteBuilder.resetCreatedRoute = function() {
 	useRouteBuilder[createdRouteSymbol] = new Set();
+};
+
+const contextPrefixSymbol = Symbol("ContextPrefix");
+
+useRouteBuilder[contextPrefixSymbol] = <string[] | undefined>undefined;
+
+useRouteBuilder.setContextPrefixToNextCreatedRoutes = function(prefix: string | string[]) {
+	useRouteBuilder[contextPrefixSymbol] = prefix instanceof Array
+		? prefix
+		: [prefix];
+};
+
+useRouteBuilder.removeActiveContextPrefix = function() {
+	useRouteBuilder[contextPrefixSymbol] = undefined;
 };
 
 export function createRoute<

@@ -206,8 +206,6 @@ export interface ProcessBuilderParamsToFloorData<GenericProcessBuilderParams ext
 
 export type AnyProcessBuilder = ProcessBuilder<any, any, any, any>;
 
-const createdProcessSymbol = Symbol("CreatedProcess");
-
 export function useProcessBuilder<
 	GenericRequest extends CurrentRequestObject,
 	GenericParams extends ProcessBuilderParams = ProcessBuilderParams,
@@ -339,6 +337,8 @@ export function useProcessBuilder<
 		...params,
 	});
 }
+
+const createdProcessSymbol = Symbol("CreatedProcess");
 
 useProcessBuilder[createdProcessSymbol] = new Set<Process>();
 

@@ -13,6 +13,11 @@ import { hookRouteContractResponseError, hookRouteError, hookRouteRangeError } f
 import { type PreflightStep } from "@scripts/step/preflight";
 import { createInterpolation, type GetPropsWithTrueValue, simpleClone } from "@duplojs/utils";
 import { type BuildedPreflightStep } from "@scripts/step/builded/preflight";
+import { HttpDuplose } from "./http";
+import { fixPath } from "@utils/fixPath";
+import { GlobalPrefixDescription, IgnoreGlobalPrefixDescription } from "@scripts/description/prefix/global";
+import { ContextPrefixDescription, IgnoreContextPrefixDescription } from "@scripts/description/prefix/context";
+import { IgnoreLocalPrefixDescription, LocalPrefixDescription } from "@scripts/description/prefix/local";
 
 export interface HttpMethods {
 	DELETE: true;
@@ -62,15 +67,54 @@ export class Route<
 	GenericRouteDefinition extends RouteDefinition = RouteDefinition,
 	GenericRequest extends CurrentRequestObject = any,
 	GenericFloorData extends object = any,
-> extends Duplose<
+> extends HttpDuplose<
 		GenericRouteDefinition,
 		GenericRequest,
 		GenericFloorData
 	> {
+	public get fullPaths() {
+		const descriptions = this.definiton.descriptions;
+
+		const globalPrefix = descriptions.find((desc) => desc instanceof IgnoreGlobalPrefixDescription)
+			? undefined
+			: descriptions.find((desc) => desc instanceof GlobalPrefixDescription);
+
+		const contextPrefix = descriptions.find((desc) => desc instanceof IgnoreContextPrefixDescription)
+			? undefined
+			: descriptions.find((desc) => desc instanceof ContextPrefixDescription);
+
+		const localPrefix = descriptions.find((desc) => desc instanceof IgnoreLocalPrefixDescription)
+			? undefined
+			: descriptions.find((desc) => desc instanceof LocalPrefixDescription);
+
+		return this
+			.definiton
+			.paths
+			.flatMap(
+				(path) => localPrefix
+					? localPrefix.value.map((prefix) => `${prefix}${path}`)
+					: path,
+			)
+			.flatMap(
+				(path) => contextPrefix
+					? contextPrefix.value.map((prefix) => `${prefix}${path}`)
+					: path,
+			)
+			.flatMap(
+				(path) => globalPrefix
+					? globalPrefix.value.map((prefix) => `${prefix}${path}`)
+					: path,
+			)
+			.map(fixPath);
+	}
+
 	public constructor(
 		definiton: GenericRouteDefinition,
 	) {
-		super(definiton);
+		super({
+			...definiton,
+			paths: definiton.paths.map(fixPath),
+		});
 	}
 
 	public override getAllHooks() {
@@ -83,7 +127,7 @@ export class Route<
 		return hooks;
 	}
 
-	public override hasDuplose(duplose: Duplose<any, any, any>, deep = Infinity) {
+	public override hasDuplose(duplose: Duplose<any, any>, deep = Infinity) {
 		if (super.hasDuplose(duplose, deep)) {
 			return true;
 		}

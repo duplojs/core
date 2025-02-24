@@ -7,7 +7,7 @@ import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "./hook/rou
 import type { RecieveFormDataOptions } from "./parser";
 import type { HookEvaler } from "./hook";
 import type { BuildedRouter, RouterEvaler } from "./router";
-import { makeHookInformation } from "./hook/default";
+import { makeHookAddGlobalPrefix, makeHookInformation } from "./hook/default";
 import type { ExtractErrorFunction } from "./step/extract";
 import { type AnyFunction, type BytesInString, type GetPropsWithTrueValue, hasKey, type PartialKeys, type RequiredKeys, type SimplifyType, stringToBytes } from "@duplojs/utils";
 
@@ -32,18 +32,25 @@ export interface DuploConfig {
 		RecieveFormDataOptions,
 		"prefixTempName" | "strict" | "uploadDirectory"
 	>;
+	prefix: string[];
 }
 
 export type DuploInputConfig = SimplifyType<
 	Omit<
 		PartialKeys<
 			DuploConfig,
-			"disabledRuntimeEndPointCheck" | "disabledZodAccelerator" | "keyToInformationInHeaders" | "plugins"
+			| "disabledRuntimeEndPointCheck"
+			| "disabledZodAccelerator"
+			| "keyToInformationInHeaders"
+			| "plugins"
 		>,
-		"bodySizeLimit" | "recieveFormDataOptions"
+		| "bodySizeLimit"
+		| "recieveFormDataOptions"
+		| "prefix"
 	> & {
 		bodySizeLimit?: number | BytesInString;
 		recieveFormDataOptions?: Partial<RecieveFormDataOptions>;
+		prefix?: string | string[];
 	}
 >;
 
@@ -87,11 +94,20 @@ export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInput
 				prefixTempName: inputConfig.recieveFormDataOptions?.prefixTempName ?? "tmp-",
 				strict: !!inputConfig.recieveFormDataOptions?.strict,
 			},
+			prefix: typeof inputConfig.prefix === "string"
+				? [inputConfig.prefix]
+				: (inputConfig.prefix ?? []),
 		};
 
 		this.hooksRouteLifeCycle.beforeSend.addSubscriber(
 			makeHookInformation(this.config.keyToInformationInHeaders),
 		);
+
+		if (inputConfig.prefix) {
+			this.hooksInstanceLifeCycle.onRegistered.addSubscriber(
+				makeHookAddGlobalPrefix(this.config.prefix),
+			);
+		}
 
 		this.config.plugins.forEach((plugin) => void plugin(this));
 	}

@@ -5,9 +5,11 @@ import type { CurrentRequestObject } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import type { ProcessStepParams } from "@scripts/step/process";
 import { type AnyRouteBuilder, useRouteBuilder, type RouteBuilder } from "./route";
-import { type HttpMethod } from "@scripts/duplose/route";
+import { type RouteDefinition, type HttpMethod } from "@scripts/duplose/route";
 import type { Step } from "@scripts/step";
 import { type AddOne, simpleClone } from "@duplojs/utils";
+
+export type PartialRouteDefinition = Pick<RouteDefinition, "preflightSteps" | "descriptions">;
 
 export interface Builder<
 	GenericRequest extends CurrentRequestObject = CurrentRequestObject,
@@ -67,43 +69,46 @@ export interface Builder<
 		GenericFloorData
 	>;
 
-	preflightSteps: GenericPreflightSteps[];
+	definition: PartialRouteDefinition;
 }
 
 export type AnyBuilder = Builder<any, any, any, any>;
 
 export function useBuilder<
 	Request extends CurrentRequestObject = CurrentRequestObject,
->(): Builder<Request> {
-	function returnFunction(preflightSteps: PreflightStep[]): AnyBuilder {
+>(...desc: Description[]): Builder<Request> {
+	function returnFunction(definition: PartialRouteDefinition): AnyBuilder {
 		return {
-			preflight: (...args) => preflight(simpleClone(preflightSteps), args),
-			createRoute: (...args) => createRoute(simpleClone(preflightSteps), args),
-			preflightSteps,
+			preflight: (...args) => preflight(simpleClone(definition), args),
+			createRoute: (...args) => createRoute(simpleClone(definition), args),
+			definition,
 		};
 	}
 	function createRoute(
-		preflightSteps: PreflightStep[],
+		{ preflightSteps, descriptions }: PartialRouteDefinition,
 		[method, paths, ...desc]: Parameters<AnyBuilder["createRoute"]>,
 	): AnyRouteBuilder {
 		return useRouteBuilder(
 			method,
 			paths instanceof Array ? paths : [paths],
 			preflightSteps,
-			desc,
+			[...descriptions, ...desc],
 		);
 	}
 
 	function preflight(
-		preflightSteps: PreflightStep[],
+		definition: PartialRouteDefinition,
 		[process, params, ...desc]: Parameters<AnyBuilder["preflight"]>,
 	): ReturnType<AnyBuilder["preflight"]> {
-		preflightSteps.push(
+		definition.preflightSteps.push(
 			new PreflightStep(process, params, desc),
 		);
 
-		return returnFunction(preflightSteps);
+		return returnFunction(definition);
 	}
 
-	return returnFunction([]);
+	return returnFunction({
+		preflightSteps: [],
+		descriptions: desc,
+	});
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-invalid-this */
 import { clone } from "@duplojs/utils";
 import { ZodError } from "zod";
 
@@ -7,9 +8,7 @@ expect.addEqualityTesters([
 			const { addIssue: _addIssue1, addIssues: _addIssues1, ...expectValueWhoCanCompare } = clone(expectValue);
 			const { addIssue: _addIssue2, addIssues: _addIssues2, ...wantedValueWhoCanCompare } = clone(wantedValue);
 
-			expect(expectValueWhoCanCompare).toEqual(wantedValueWhoCanCompare);
-
-			return true;
+			return this.equals(expectValueWhoCanCompare, wantedValueWhoCanCompare);
 		} else {
 			return undefined;
 		}

@@ -8,7 +8,7 @@ export * from "@scripts/parser";
 export * from "@scripts/mimeType";
 export * from "@scripts/globals";
 
-export * from "@scripts/builder/duplose";
+export * from "@scripts/builder";
 export * from "@scripts/builder/route";
 export * from "@scripts/builder/process";
 export * from "@scripts/builder/checker";

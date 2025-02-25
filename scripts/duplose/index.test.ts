@@ -1,12 +1,9 @@
 import { Duplose } from ".";
 import { Process } from "./process";
 import { ProcessStep } from "@scripts/step/process";
-import { getTypedEntries } from "@utils/getTypedEntries";
-import { PreflightStep } from "@scripts/step/preflight";
-import { Hook } from "@scripts/hook";
-import { insertBlock } from "@utils/stringBuilder";
 import { InjectBlockNotfoundError } from "@scripts/error/injectBlockNotfoundError";
 import { createProcessDefinition } from "@test/utils/manualDuplose";
+import { insertBlock } from "@utils/stringBuilder";
 
 describe("Duplose", () => {
 	class SubDuplo extends Duplose {
@@ -24,36 +21,14 @@ describe("Duplose", () => {
 	}
 
 	const duplose = new SubDuplo({
-		preflightSteps: [],
 		steps: [],
 		descriptions: [],
 	});
-	const process1 = new Process(createProcessDefinition());
 	const process2 = new Process(createProcessDefinition());
-	const preflight = new PreflightStep(process1);
 	const step = new ProcessStep(process2);
-	duplose.definiton.preflightSteps.push(preflight);
 	duplose.definiton.steps.push(step);
 
-	it("getAllHooks", () => {
-		const hooks = duplose.getAllHooks();
-
-		getTypedEntries(hooks)
-			.forEach(([key, value]) => {
-				if (!(value instanceof Hook)) {
-					return;
-				}
-
-				expect(value.subscribers[0])
-					.toBe(duplose.hooks[key]);
-
-				expect((value.subscribers[1] as Hook).subscribers[0])
-					.toBe(process2.hooks[key]);
-
-				expect((value.subscribers[2] as Hook).subscribers[0])
-					.toBe(process1.hooks[key]);
-			});
-	});
+	const content = `\n${insertBlock("test")}\n`;
 
 	it("injectCode", () => {
 		duplose.edition.injectCode(
@@ -62,7 +37,7 @@ describe("Duplose", () => {
 			"top",
 		);
 
-		expect(() => duplose.aef(insertBlock("test"))).toThrowError(InjectBlockNotfoundError);
+		expect(() => duplose.aef(content)).toThrowError(InjectBlockNotfoundError);
 
 		duplose.resetEditingFunction();
 
@@ -90,7 +65,7 @@ describe("Duplose", () => {
 			"bottom",
 		);
 
-		expect(duplose.aef(insertBlock("test"))).toMatchSnapshot();
+		expect(duplose.aef(content)).toMatchSnapshot();
 	});
 
 	it("injectFunction", () => {
@@ -100,7 +75,7 @@ describe("Duplose", () => {
 			"top",
 		);
 
-		expect(duplose.aef(insertBlock("test"))).toMatchSnapshot();
+		expect(duplose.aef(content)).toMatchSnapshot();
 	});
 
 	it("addExtensions", () => {
@@ -116,7 +91,6 @@ describe("Duplose", () => {
 	it("hasDuplose", () => {
 		expect(duplose.hasDuplose(new Process(createProcessDefinition()))).toBe(false);
 		expect(duplose.hasDuplose(new Process(createProcessDefinition()), 0)).toBe(false);
-		expect(duplose.hasDuplose(process1)).toBe(true);
 		expect(duplose.hasDuplose(process2)).toBe(true);
 	});
 });

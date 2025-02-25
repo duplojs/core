@@ -42,21 +42,7 @@ export function maybeAwait(async: boolean) {
 export function skipStep(bool: boolean, index: number, block: string) {
 	return bool
 		? /* js */`
-		${insertBlock(`step-skip-(${index})-before`)}
-
 		if(!this.steps[${index}].params.skip(${StringBuilder.floor}.pickup)){
-			${block}
-		}
-		`
-		: block;
-}
-
-export function skipPreflight(bool: boolean, index: number, block: string) {
-	return bool
-		? /* js */`
-		${insertBlock(`preflight-skip-(${index})-before`)}
-
-		if(!this.preflightSteps[${index}].params.skip(${StringBuilder.floor}.pickup)){
 			${block}
 		}
 		`

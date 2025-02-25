@@ -1,21 +1,15 @@
-import { hasKey } from "@utils/hasKey";
 import type { Duplose, DuploseEvaler } from "./duplose";
 import { NotFoundHttpResponse, UnprocessableEntityHttpResponse } from "./response/simplePreset";
-import type { AnyFunction } from "@utils/types";
 import type { CurrentRequestObject } from "./request";
 import type { PresetGenericResponse } from "./response";
-import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
 import { type BuildedHooksInstanceLifeCycle, HooksInstanceifeCycle } from "./hook/instanceLifeCycle";
 import { type BuildedHooksRouteLifeCycle, HooksRouteLifeCycle } from "./hook/routeLifeCycle";
-import type { PartialKeys } from "@utils/partialKeys";
-import type { SimplifyType } from "@utils/simplifyType";
-import { type BytesInString, stringToBytes } from "@utils/stringToBytes";
 import type { RecieveFormDataOptions } from "./parser";
-import type { RequiredKeys } from "@utils/requiredKeys";
 import type { HookEvaler } from "./hook";
 import type { BuildedRouter, RouterEvaler } from "./router";
-import { makeHookInformation } from "./hook/default";
+import { hookRemoveDescriptions, makeHookAddGlobalPrefix, makeHookInformation } from "./hook/default";
 import type { ExtractErrorFunction } from "./step/extract";
+import { type AnyFunction, type BytesInString, type GetPropsWithTrueValue, hasKey, type PartialKeys, type RequiredKeys, type SimplifyType, stringToBytes } from "@duplojs/utils";
 
 export interface Environments {
 	DEV: true;
@@ -38,18 +32,27 @@ export interface DuploConfig {
 		RecieveFormDataOptions,
 		"prefixTempName" | "strict" | "uploadDirectory"
 	>;
+	prefix: string[];
+	keepDescriptions: boolean;
 }
 
 export type DuploInputConfig = SimplifyType<
 	Omit<
 		PartialKeys<
 			DuploConfig,
-			"disabledRuntimeEndPointCheck" | "disabledZodAccelerator" | "keyToInformationInHeaders" | "plugins"
+			| "disabledRuntimeEndPointCheck"
+			| "disabledZodAccelerator"
+			| "keyToInformationInHeaders"
+			| "plugins"
+			| "keepDescriptions"
 		>,
-		"bodySizeLimit" | "recieveFormDataOptions"
+		| "bodySizeLimit"
+		| "recieveFormDataOptions"
+		| "prefix"
 	> & {
 		bodySizeLimit?: number | BytesInString;
 		recieveFormDataOptions?: Partial<RecieveFormDataOptions>;
+		prefix?: string | string[];
 	}
 >;
 
@@ -93,6 +96,10 @@ export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInput
 				prefixTempName: inputConfig.recieveFormDataOptions?.prefixTempName ?? "tmp-",
 				strict: !!inputConfig.recieveFormDataOptions?.strict,
 			},
+			prefix: typeof inputConfig.prefix === "string"
+				? [inputConfig.prefix]
+				: (inputConfig.prefix ?? []),
+			keepDescriptions: !!inputConfig.keepDescriptions,
 		};
 
 		this.hooksRouteLifeCycle.beforeSend.addSubscriber(
@@ -100,6 +107,18 @@ export class Duplo<GenericDuploInputConfig extends DuploInputConfig = DuploInput
 		);
 
 		this.config.plugins.forEach((plugin) => void plugin(this));
+
+		if (this.config.prefix.length > 0) {
+			this.hooksInstanceLifeCycle.onRegistered.addSubscriber(
+				makeHookAddGlobalPrefix(this.config.prefix),
+			);
+		}
+
+		if (!this.config.keepDescriptions) {
+			this.hooksInstanceLifeCycle.onStart.addSubscriber(
+				hookRemoveDescriptions,
+			);
+		}
 	}
 
 	public extractError: ExtractErrorFunction = (type, key, error) => new UnprocessableEntityHttpResponse(`TYPE_ERROR.${type}${key ? `.${key}` : ""}`, error);

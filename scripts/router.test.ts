@@ -1,9 +1,9 @@
 import { Router } from "./router";
 import { Route } from "./duplose/route";
 import { HandlerStep } from "./step/handler";
-import type { AnyFunction } from "@utils/types";
 import { DuploTest } from "@test/utils/duploTest";
 import { createRouteDefinition } from "@test/utils/manualDuplose";
+import { type AnyFunction } from "@duplojs/utils";
 
 describe("Router", () => {
 	const duplo = new DuploTest({ environment: "TEST" });

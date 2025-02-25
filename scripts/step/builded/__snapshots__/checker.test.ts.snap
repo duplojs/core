@@ -2,30 +2,29 @@
 
 exports[`BuildedCheckerStep > toString options: function, result: string, indexing 1`] = `
 "
-			
-/* step-checker-(1)-before */
+/* beforeCheckerStep(index: 1) */
 /* end_block */
 
 
-			result = this.steps[1].checkerFunction(
-				this.steps[1].params.input(floor.pickup),
-				(info, data) => ({info, data}),
-				this.steps[1].params.options(floor.pickup),
-			);
-
-			
-/* step-checker-(1)-before-treat-result */
-/* end_block */
-
-
-			if(this.steps[1].params.result !== result.info){
-				result = this.steps[1].params.catch(
-					result.info, 
-					result.data, 
-					floor.pickup
+				result = this.steps[1].checkerFunction(
+					this.steps[1].params.input(floor.pickup),
+					(info, data) => ({info, data}),
+					this.steps[1].params.options(floor.pickup),
 				);
 
 				
+/* beforeTreatResultCheckerStep(index: 1) */
+/* end_block */
+
+
+				if(this.steps[1].params.result !== result.info){
+					result = this.steps[1].params.catch(
+						result.info, 
+						result.data, 
+						floor.pickup
+					);
+
+					
 				let temp = this.steps[1].responseZodSchema.safeParse(result);
 
 				if(!temp.success){
@@ -33,56 +32,49 @@ exports[`BuildedCheckerStep > toString options: function, result: string, indexi
 				}
 			
 
-				break Execution;
-			}
+					break Execution;
+				}
 
-			
-/* step-checker-(1)-before-indexing */
+				
+/* beforeIndexingResultCheckerStep(index: 1) */
 /* end_block */
 
 
-			floor.drop(this.steps[1].params.indexing, result.data)
+				floor.drop(this.steps[1].params.indexing, result.data)
+				
 
-			
-/* step-checker-(1)-after */
+/* afterCheckerStep(index: 1) */
 /* end_block */
-
-			"
+"
 `;
 
 exports[`BuildedCheckerStep > toString options: object, result: array 1`] = `
 "
-		
-/* step-skip-(1)-before */
+/* beforeCheckerStep(index: 1) */
 /* end_block */
 
 
 		if(!this.steps[1].params.skip(floor.pickup)){
 			
-			
-/* step-checker-(1)-before */
-/* end_block */
-
-
-			result = this.steps[1].checkerFunction(
-				this.steps[1].params.input(floor.pickup),
-				(info, data) => ({info, data}),
-				this.steps[1].params.options,
-			);
-
-			
-/* step-checker-(1)-before-treat-result */
-/* end_block */
-
-
-			if(!this.steps[1].params.result.includes(result.info)){
-				result = this.steps[1].params.catch(
-					result.info, 
-					result.data, 
-					floor.pickup
+				result = this.steps[1].checkerFunction(
+					this.steps[1].params.input(floor.pickup),
+					(info, data) => ({info, data}),
+					this.steps[1].params.options,
 				);
 
 				
+/* beforeTreatResultCheckerStep(index: 1) */
+/* end_block */
+
+
+				if(!this.steps[1].params.result.includes(result.info)){
+					result = this.steps[1].params.catch(
+						result.info, 
+						result.data, 
+						floor.pickup
+					);
+
+					
 				let temp = this.steps[1].responseZodSchema.safeParse(result);
 
 				if(!temp.success){
@@ -90,21 +82,20 @@ exports[`BuildedCheckerStep > toString options: object, result: array 1`] = `
 				}
 			
 
-				break Execution;
-			}
+					break Execution;
+				}
 
-			
-/* step-checker-(1)-before-indexing */
+				
+/* beforeIndexingResultCheckerStep(index: 1) */
 /* end_block */
 
 
-			
-
-			
-/* step-checker-(1)-after */
-/* end_block */
-
-			
+				
+				
 		}
-		"
+		
+
+/* afterCheckerStep(index: 1) */
+/* end_block */
+"
 `;

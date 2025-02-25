@@ -7,66 +7,22 @@ exports[`Process > build 1`] = `
 		floor.drop("options", options);
 		floor.drop("input", input);
 		Execution: {
-			
-/* preflight-before */
-/* end_block */
-
 
 			
-				
-/* preflight-process-(0)-before */
-/* end_block */
-
-
-				result = this.preflightSteps[0].processFunction(
-					request,
-					this.preflightSteps[0].params.options,
-					this.preflightSteps[0].params.input(floor.pickup)
-				);
-
-				
-/* preflight-process-(0)-before-check-result */
-/* end_block */
-
-
-				if(result instanceof this.Response){
-
-break Execution;
-}
-
-				
-/* preflight-process-(0)-before-drop */
-/* end_block */
-
-
-				floor.drop("flute", result["flute"]);
-
-				
-/* preflight-process-(0)-after */
-/* end_block */
-
-			
-
-			
-/* preflight-after */
-/* end_block */
-
-
-			
-/* steps-before */
+/* beforeSteps */
 /* end_block */
 
 
 			
 		
-/* step-cut-(0)-before */
+/* beforeCutStep(index: 0) */
 /* end_block */
 
 
 		result = this.steps[0].cutFunction(floor, request);
 
 		
-/* step-cut-(0)-before-check-result */
+/* beforeTreatResultCutStep(index: 0) */
 /* end_block */
 
 
@@ -82,31 +38,36 @@ break Execution;
 }
 
 		
-/* step-cut-(0)-before-drop */
+/* beforeIndexingResultCutStep(index: 0) */
 /* end_block */
 
 
 		floor.drop("toto", result["toto"]);
 
 		
-/* step-cut-(0)-after */
+/* afterCutStep(index: 0) */
 /* end_block */
 
 		
 
-/* setp-extract-(1)-before */
+/* beforeExtractStep(index: 1) */
 /* end_block */
 
 
-			
-/* setp-extract-(1)-(params)-(userId)-before */
-/* end_block */
-
-		
 			{
+				
+/* beforeLevelTwoExtractStep(index: 1, one: params, two: userId) */
+/* end_block */
+
+
 				let temp = this.steps[1]
 					.extractObject["params"]["userId"]
 					.safeParse(request["params"]?.["userId"])
+
+				
+/* beforeTreatResultLevelTwoExtractStep(index: 1, one: params, two: userId) */
+/* end_block */
+
 		
 				if(!temp.success){
 					result = this.steps[1].catchError(
@@ -116,45 +77,53 @@ break Execution;
 					);
 					break Execution;
 				}
+
+				
+/* beforeIndexingResultLevelTwoExtractStep(index: 1, one: params, two: userId) */
+/* end_block */
+
 		
 				floor.drop(
 					"userId",
 					temp.data,
 				);
+
+				
+/* afterLevelTowExtractStep(index: 1, one: params, two: userId) */
+/* end_block */
+
 			}
-		
-			
-/* setp-extract-(1)-(params)-(userId)-after */
-/* end_block */
-
 			
 
-/* setp-extract-(1)-after */
+/* afterExtractStep(index: 1) */
 /* end_block */
 
 
 			
-/* steps-after */
+/* afterSteps */
 /* end_block */
 
 		}
 
 		
-/* process-if-return-before */
+/* beforeTreatResult */
 /* end_block */
+
 
 		if(result instanceof this.Response){
 			
-/* process-result-return-before */
+/* beforeReturnResponse */
 /* end_block */
+
 
 			return result;
 		}
 		else {
 			
-/* process-drop-return-before */
+/* beforeReturnValues */
 /* end_block */
 
+			
 			return {
 				"toto": floor.pickup("toto"),
 "userId": floor.pickup("userId"),

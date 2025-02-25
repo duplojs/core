@@ -3,10 +3,10 @@ import { type PresetGenericResponse, Response } from "@scripts/response";
 import { Duplose, type DuploseBuildedFunctionContext, type DuploseDefinition } from ".";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
 import { insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
-import { simpleClone } from "@utils/simpleClone";
 import { makeFloor } from "@scripts/floor";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
-import type { PromiseOrNot } from "@utils/types";
+import { createInterpolation, simpleClone, type MybePromise } from "@duplojs/utils";
+import { HttpDuplose } from "./http";
 
 export interface ProcessBuildedFunction<
 	GenericProcess extends Process<any, any, any> = Process<any, any, any>,
@@ -15,7 +15,7 @@ export interface ProcessBuildedFunction<
 		request: CurrentRequestObject,
 		options: undefined | object,
 		input: unknown
-	): PromiseOrNot<object | PresetGenericResponse>;
+	): MybePromise<object | PresetGenericResponse>;
 	context: DuploseBuildedFunctionContext<GenericProcess>;
 }
 
@@ -30,7 +30,6 @@ export type GetProcessGeneric<
 		options: InferedProcessDefinition["options"];
 		input: InferedProcessDefinition["input"];
 		drop: InferedProcessDefinition["drop"];
-		preflightStep: InferedProcessDefinition["preflightSteps"];
 		steps: InferedProcessDefinition["steps"];
 		request: inferedRequest;
 		floor: inferedFloorData;
@@ -46,12 +45,12 @@ export interface ProcessDefinition extends DuploseDefinition {
 
 export class Process<
 	GenericProcessDefinition extends ProcessDefinition = ProcessDefinition,
-	_GenericRequest extends CurrentRequestObject = any,
-	_GenericFloorData extends object = any,
-> extends Duplose<
+	GenericRequest extends CurrentRequestObject = any,
+	GenericFloorData extends object = any,
+> extends HttpDuplose<
 		GenericProcessDefinition,
-		_GenericRequest,
-		_GenericFloorData
+		GenericRequest,
+		GenericFloorData
 	> {
 	public constructor(
 		definiton: GenericProcessDefinition,
@@ -63,12 +62,6 @@ export class Process<
 		if (!this.instance) {
 			throw new BuildNoRegisteredDuploseError(this);
 		}
-
-		const buildedPreflight = await Promise.all(
-			this.definiton.preflightSteps.map(
-				(step) => step.build(this.instance!),
-			),
-		);
 
 		const buildedStep = await Promise.all(
 			this.definiton.steps.map(
@@ -87,26 +80,24 @@ export class Process<
 		floor.drop("options", ${StringBuilder.options});
 		floor.drop("input", ${StringBuilder.input});
 		${StringBuilder.label}: {
-			${insertBlock("preflight-before")}
 
-			${mapped(buildedPreflight, (value, index) => value.toString(index))}
-
-			${insertBlock("preflight-after")}
-
-			${insertBlock("steps-before")}
+			${insertBlock(Process.insertBlockName.beforeSteps())}
 
 			${mapped(buildedStep, (value, index) => value.toString(index))}
 
-			${insertBlock("steps-after")}
+			${insertBlock(Process.insertBlockName.afterSteps())}
 		}
 
-		${insertBlock("process-if-return-before")}
+		${insertBlock(Process.insertBlockName.beforeTreatResult())}
+
 		if(${StringBuilder.result} instanceof this.Response){
-			${insertBlock("process-result-return-before")}
+			${insertBlock(Process.insertBlockName.beforeReturnResponse())}
+
 			return result;
 		}
 		else {
-			${insertBlock("process-drop-return-before")}
+			${insertBlock(Process.insertBlockName.beforeReturnValues())}
+			
 			return {
 				${drop}
 			};
@@ -118,7 +109,6 @@ export class Process<
 		const context: DuploseBuildedFunctionContext<this> = {
 			makeFloor,
 			Response,
-			preflightSteps: buildedPreflight,
 			steps: buildedStep,
 			extensions: simpleClone(this.extensions),
 			ContractResponseError,
@@ -141,4 +131,14 @@ export class Process<
 
 		return buildedFunction;
 	}
+
+	public static insertBlockName = {
+		beforeSteps: createInterpolation("beforeSteps"),
+		afterSteps: createInterpolation("afterSteps"),
+
+		beforeTreatResult: createInterpolation("beforeTreatResult"),
+
+		beforeReturnResponse: createInterpolation("beforeReturnResponse"),
+		beforeReturnValues: createInterpolation("beforeReturnValues"),
+	};
 }

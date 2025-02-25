@@ -1,9 +1,9 @@
 import { Checker, type CheckerOutput, type GetCheckerGeneric } from "@scripts/checker";
 import { PresetChecker, createChecker, createPresetChecker, type GetPresetCheckerGeneric } from "./checker";
-import type { ExpectType } from "@test/utils/expectType";
 import { ForbiddenHttpResponse, OkHttpResponse, UnprocessableEntityHttpResponse } from "@scripts/response/simplePreset";
 import { zod, type Response } from "..";
 import type { ZodUndefined } from "zod";
+import { type ExpectType } from "@duplojs/utils";
 
 describe("checker builder", () => {
 	it("create without options", () => {

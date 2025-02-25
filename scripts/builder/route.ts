@@ -7,7 +7,6 @@ import type { PreflightStep } from "@scripts/step/preflight";
 import type { FlatExtract } from "@utils/flatExtract";
 import type { PresetChecker, GetPresetCheckerGeneric } from "./checker";
 import type { ContractResponse, ContractToResponse } from "@scripts/response";
-import type { AddOne } from "@utils/incremente";
 import { CheckerStep, type CheckerStepParams } from "@scripts/step/checker";
 import type { DroppedValue, Floor } from "@scripts/floor";
 import { ProcessStep, type ProcessStepParams } from "@scripts/step/process";
@@ -15,8 +14,8 @@ import type { GetProcessGeneric, Process } from "@scripts/duplose/process";
 import { type Cut, CutStep } from "@scripts/step/cut";
 import { HandlerStep, type Handler } from "@scripts/step/handler";
 import { ExtractStep, type ExtractErrorFunction, type ExtractObject } from "@scripts/step/extract";
-import { simpleClone } from "@utils/simpleClone";
-import { useBuilder } from "./duplose";
+import { type AddOne, simpleClone } from "@duplojs/utils";
+import { ContextPrefixDescription } from "@scripts/description/prefix/context";
 
 export interface RouteBuilder<
 	GenericRequest extends CurrentRequestObject = CurrentRequestObject,
@@ -204,8 +203,8 @@ export function useRouteBuilder<
 >(
 	method: HttpMethod,
 	paths: string[],
-	preflightSteps?: GenericPreflightSteps[],
-	desc: Description[] = [],
+	preflightSteps: GenericPreflightSteps[],
+	desc: Description[],
 ): RouteBuilder<GenericRequest> {
 	function returnFunction(routeDefinition: RouteDefinition): AnyRouteBuilder {
 		return {
@@ -316,7 +315,13 @@ export function useRouteBuilder<
 
 		const route = new Route(routeDefinition);
 
-		useBuilder.push(route);
+		if (useRouteBuilder[contextPrefixSymbol]) {
+			route.definiton.descriptions.push(
+				new ContextPrefixDescription(useRouteBuilder[contextPrefixSymbol]),
+			);
+		}
+
+		useRouteBuilder[createdRouteSymbol].add(route);
 
 		return route;
 	}
@@ -328,4 +333,49 @@ export function useRouteBuilder<
 		steps: [],
 		descriptions: desc,
 	});
+}
+
+const createdRouteSymbol = Symbol("CreatedRoute");
+
+useRouteBuilder[createdRouteSymbol] = new Set<Route>();
+
+useRouteBuilder.getAllCreatedRoute = function *() {
+	yield *useRouteBuilder[createdRouteSymbol];
+};
+
+useRouteBuilder.resetCreatedRoute = function() {
+	useRouteBuilder[createdRouteSymbol] = new Set();
+};
+
+const contextPrefixSymbol = Symbol("ContextPrefix");
+
+useRouteBuilder[contextPrefixSymbol] = <string[] | undefined>undefined;
+
+useRouteBuilder.setContextPrefixToNextCreatedRoutes = function(prefix: string | string[]) {
+	useRouteBuilder[contextPrefixSymbol] = prefix instanceof Array
+		? prefix
+		: [prefix];
+};
+
+useRouteBuilder.removeActiveContextPrefix = function() {
+	useRouteBuilder[contextPrefixSymbol] = undefined;
+};
+
+export function createRoute<
+	GenericLocalRequest extends CurrentRequestObject,
+>(
+	method: HttpMethod,
+	paths: string | string[],
+	...desc: Description[]
+) {
+	return useRouteBuilder<
+		GenericLocalRequest
+	>(
+		method,
+		paths instanceof Array
+			? paths
+			: [paths],
+		[],
+		desc,
+	);
 }

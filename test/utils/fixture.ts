@@ -1,16 +1,16 @@
-import { createChecker, createPresetChecker, useBuilder, Response, BadRequestHttpResponse } from "@scripts/index";
+import { createChecker, createPresetChecker, BadRequestHttpResponse, createProcess, ProcessStep, CheckerStep, type Description } from "@scripts/index";
+import { TestDescription } from "./testDescription";
 
-export const fixtureProcessWichDropValue = useBuilder()
-	.createProcess(
-		"processWichDropValue",
-		{
-			options: {
-				option1: "test",
-				option2: 12,
-			},
-			input: 22,
+export const fixtureProcessWichDropValue = createProcess(
+	"processWichDropValue",
+	{
+		options: {
+			option1: "test",
+			option2: 12,
 		},
-	)
+		input: 22,
+	},
+)
 	.cut(
 		async({ pickup, dropper }) => {
 			const value = await dropper({
@@ -24,6 +24,8 @@ export const fixtureProcessWichDropValue = useBuilder()
 	)
 	.exportation(["dropOptions", "dropInput"]);
 
+export const fixtureProcessStep = new ProcessStep(fixtureProcessWichDropValue);
+
 export const fixtureCheckerWithoutOptions = createChecker("checkerWithoutOptions")
 	.handler(
 		async(input: number, output) => {
@@ -35,6 +37,12 @@ export const fixtureCheckerWithoutOptions = createChecker("checkerWithoutOptions
 			return output("no", <const>false);
 		},
 	);
+
+export const fixtureCheckerStep = new CheckerStep(fixtureCheckerWithoutOptions, {} as never);
+
+export function createFixtureCheckerStep(descriptions?: Description[]) {
+	return new CheckerStep(fixtureCheckerWithoutOptions, {} as never, [], descriptions);
+}
 
 export const fixtureCheckerWithOptions = createChecker(
 	"checkerWithoutOptions",
@@ -64,3 +72,6 @@ export const fixturePresetChecker = createPresetChecker(
 		},
 	},
 );
+
+export const fixtureDescription = new TestDescription();
+

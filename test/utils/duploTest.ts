@@ -1,9 +1,10 @@
-import { Duplo, Route, Router, useRouteBuilder, type PromiseOrNot } from "@scripts/index";
+import { type MybePromise } from "@duplojs/utils";
+import { createRoute, Duplo, type DuploInputConfig, Route, Router, useRouteBuilder } from "@scripts/index";
 
 export class DuploTest extends Duplo {
-	public async start(onStart?: (duplo: Duplo) => PromiseOrNot<void>) {
+	public async start(onStart?: (duplo: Duplo) => MybePromise<void>) {
 		const notfoundHandler = this.notfoundHandler;
-		const notfoundRoute = useRouteBuilder("GET", ["/*"]).handler((pickup, request) => notfoundHandler(request));
+		const notfoundRoute = createRoute("GET", ["/*"]).handler((pickup, request) => notfoundHandler(request));
 		this.register(notfoundRoute);
 
 		await this.hooksInstanceLifeCycle.beforeBuildRouter.launchSubscriber(this);
@@ -28,3 +29,10 @@ export class DuploTest extends Duplo {
 export const duploTest = new DuploTest({
 	environment: "TEST",
 });
+
+export function createDuploTest(config?: Omit<DuploInputConfig, "environment">) {
+	return new DuploTest({
+		...config,
+		environment: "TEST",
+	});
+}

@@ -3,14 +3,14 @@
 exports[`BuildedHandlerStep 1`] = `
 "
 		
-/* step-handler-(4)-before */
+/* beforeHandlerStep(index: 4) */
 /* end_block */
 
 
 		result = this.steps[4].handlerFunction(floor.pickup, request);
 
 		
-/* step-handler-(4)-before-check-result */
+/* beforeTreatResultHandlerStep(index: 4) */
 /* end_block */
 
 
@@ -26,7 +26,7 @@ break Execution;
 }
 
 		
-/* step-handler-(4)-after */
+/* afterHandlerStep(index: 4) */
 /* end_block */
 
 		"

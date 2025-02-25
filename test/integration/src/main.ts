@@ -1,8 +1,9 @@
 import { Duplo, Route, type Request, type globalValues } from "@duplojs/core";
-import type { ExpectType } from "@test/expectType";
+import { type ExpectType } from "@duplojs/utils";
 
 export const duplo = new Duplo({
 	environment: "TEST",
+	prefix: "global-prefix",
 });
 
 duplo.hook("beforeRouteExecution", (request) => {

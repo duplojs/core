@@ -1,5 +1,5 @@
+import { type ExpectType } from "@duplojs/utils";
 import type { ExtractKey } from "@scripts/step/extract";
-import type { ExpectType } from "@test/utils/expectType";
 
 declare module "@scripts/step/extract" {
 	interface DisabledExtractKey {

@@ -1,8 +1,7 @@
-import { useBuilder, zod } from "@scripts/index";
-import type { ExpectType } from "@test/utils/expectType";
+import { type ExpectType } from "@duplojs/utils";
+import { createProcess, useBuilder, zod } from "@scripts/index";
 
-export const processWithExtract = useBuilder()
-	.createProcess("processWithExtract")
+export const processWithExtract = createProcess("processWithExtract")
 	.extract({
 		params: {
 			userId: zod.string(),

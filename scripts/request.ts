@@ -1,5 +1,4 @@
-import { getTypedEntries } from "@utils/getTypedEntries";
-import type { OverrideInterface } from "@utils/overrideInterface";
+import { getTypedEntries, type OverrideInterface } from "@duplojs/utils";
 
 export interface RequestInitializationData {
 	readonly headers: Partial<Record<string, string | string[]>>;

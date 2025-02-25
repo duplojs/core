@@ -4,6 +4,7 @@ import { Step } from ".";
 import type { Floor } from "@scripts/floor";
 import { BuildedProcessStep } from "./builded/process";
 import { type Duplo } from "@scripts/duplo";
+import { createInterpolation } from "@duplojs/utils";
 
 export interface ProcessStepParams<
 	ProcessGeneric extends GetProcessGeneric = GetProcessGeneric,
@@ -41,4 +42,11 @@ export class ProcessStep<
 			processFunction,
 		);
 	}
+
+	public static insertBlockName = {
+		before: createInterpolation("beforeProcessStep(index: {index})"),
+		beforeTreatResult: createInterpolation("beforeTreatResultProcessStep(index: {index})"),
+		beforeIndexingResult: createInterpolation("beforeIndexingResultProcessStep(index: {index})"),
+		after: createInterpolation("afterProcessStep(index: {index})"),
+	};
 }

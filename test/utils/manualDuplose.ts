@@ -68,7 +68,6 @@ export function createProcessDefinition(processDefinition?: Partial<ProcessDefin
 		options: { test1: 1 },
 		input: "test",
 		drop: ["test1", "test2"],
-		preflightSteps: [],
 		steps: [],
 		descriptions: [],
 		...processDefinition,

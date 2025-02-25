@@ -40,6 +40,10 @@ describe("register", async() => {
 
 		expect(result.information).toBe("createdUser");
 	});
+
+	it("check full paths", () => {
+		expect(registerUser.fullPaths).toEqual(["/global-prefix/users"]);
+	});
 });
 
 describe("login", async() => {

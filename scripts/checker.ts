@@ -1,4 +1,4 @@
-import type { PromiseOrNot } from "@utils/types";
+import { type MybePromise } from "@duplojs/utils";
 import type { Description } from "./description";
 
 export type GetCheckerGeneric<
@@ -34,7 +34,7 @@ export type CheckerHandler<
 	input: any,
 	output: CheckerOutputFunction,
 	options: Options
-) => PromiseOrNot<CheckerOutput>;
+) => MybePromise<CheckerOutput>;
 
 export class Checker<
 	_Options extends object | undefined = any,

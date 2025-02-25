@@ -1,21 +1,25 @@
 import { mustBeConnectedBuilder } from "@security/mustBeConnected";
 import { makeResponseContract, OkHttpResponse, zod, zoderce } from "@duplojs/core";
-import { iWantUserExist, iWantUserExistById } from "@checkers/user";
+import { iWantUserExistById } from "@checkers/user";
 import { MyOrm } from "@providers/myOrm";
 import { userSchema } from "../schemas";
-import type { ExpectType } from "@test/expectType";
+import { type ExpectType } from "@duplojs/utils";
 
 export const adminEditUser = mustBeConnectedBuilder({ role: "ADMIN" })
 	.createRoute("PATCH", "/users/{userId}")
 	.extract({
 		params: {
-			userId: zoderce.number().presetCheck(iWantUserExistById),
+			userId: zoderce.number(),
 		},
 		body: zod.object({
 			username: zod.string(),
 			role: zod.string(),
 		}).partial(),
 	})
+	.presetCheck(
+		iWantUserExistById,
+		(pickup) => pickup("userId"),
+	)
 	.handler(
 		async(pickup) => {
 			const { user: { password, ...user }, body, currentUser } = pickup(["user", "body", "currentUser"]);

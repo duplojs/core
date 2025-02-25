@@ -7,19 +7,16 @@ import type { PreflightStep } from "@scripts/step/preflight";
 import type { FlatExtract } from "@utils/flatExtract";
 import type { PresetChecker, GetPresetCheckerGeneric } from "./checker";
 import type { ContractResponse, ContractToResponse } from "@scripts/response";
-import type { AddOne } from "@utils/incremente";
 import { CheckerStep, type CheckerStepParams } from "@scripts/step/checker";
 import type { DroppedValue, Floor } from "@scripts/floor";
 import { ProcessStep, type ProcessStepParams } from "@scripts/step/process";
 import { type GetProcessGeneric, Process, type ProcessDefinition } from "@scripts/duplose/process";
 import { type Cut, CutStep } from "@scripts/step/cut";
 import { ExtractStep, type ExtractErrorFunction, type ExtractObject } from "@scripts/step/extract";
-import { simpleClone } from "@utils/simpleClone";
-import { useBuilder } from "./duplose";
+import { type AddOne, simpleClone } from "@duplojs/utils";
 
 export interface ProcessBuilder<
 	GenericRequest extends CurrentRequestObject = CurrentRequestObject,
-	GenericPreflightSteps extends PreflightStep = PreflightStep,
 	GenericSteps extends Step = Step,
 	GenericStepsCount extends number = 0,
 	GenericFloorData extends object & { options?: object } = object & { options?: object },
@@ -33,7 +30,6 @@ export interface ProcessBuilder<
 		...desc: Description[]
 	): ProcessBuilder<
 		GenericRequest,
-		GenericPreflightSteps,
 		GenericSteps | ExtractStep<GenericExtract, GenericStepsCount>,
 		AddOne<GenericStepsCount>,
 		Omit<GenericFloorData, keyof GenericFlatExtract> & NoInfer<GenericFlatExtract>
@@ -61,7 +57,6 @@ export interface ProcessBuilder<
 		...desc: Description[]
 	): ProcessBuilder<
 		GenericRequest,
-		GenericPreflightSteps,
 		GenericSteps | CheckerStep<GenericChecker, GenericContractResponse, GenericStepsCount>,
 		AddOne<GenericStepsCount>,
 		(
@@ -89,7 +84,6 @@ export interface ProcessBuilder<
 		...desc: Description[]
 	): ProcessBuilder<
 		GenericRequest,
-		GenericPreflightSteps,
 		GenericSteps | CheckerStep<
 			GenericPresetCheckerValue["checker"],
 			GenericPresetCheckerValue["response"],
@@ -126,7 +120,6 @@ export interface ProcessBuilder<
 		...desc: Description[]
 	): ProcessBuilder<
 		GenericRequest & GenericProcessValue["request"],
-		GenericPreflightSteps,
 		GenericSteps | ProcessStep<GenericProcess, GenericStepsCount>,
 		AddOne<GenericStepsCount>,
 		(
@@ -165,7 +158,6 @@ export interface ProcessBuilder<
 		...desc: Description[]
 	): ProcessBuilder<
 		GenericRequest,
-		GenericPreflightSteps,
 		GenericSteps | CutStep<GenericContractResponse, GenericStepsCount>,
 		AddOne<GenericStepsCount>,
 		(
@@ -190,7 +182,6 @@ export interface ProcessBuilder<
 				? GenericFloorData["input"]
 				: undefined;
 			drop: GenericDrop[];
-			preflightSteps: GenericPreflightSteps[];
 			steps: GenericSteps[];
 			descriptions: Description[];
 		},
@@ -199,37 +190,31 @@ export interface ProcessBuilder<
 	>;
 }
 
-export interface ProcessBuilderParams<
-	Options extends object = object,
-	Input extends unknown = unknown,
-> {
-	options?: Options;
-	input?: Input;
+export interface ProcessBuilderParams {
+	options?: object;
+	input?: unknown;
 }
 
-export interface ProcessBuilderParamsToFloorData<P extends ProcessBuilderParams> {
-	options: object extends P["options"]
+export interface ProcessBuilderParamsToFloorData<GenericProcessBuilderParams extends ProcessBuilderParams> {
+	options: undefined extends GenericProcessBuilderParams["options"]
 		? undefined
-		: P["options"];
-	input: unknown extends P["input"]
+		: GenericProcessBuilderParams["options"];
+	input: undefined extends GenericProcessBuilderParams["input"]
 		? undefined
-		: P["input"];
+		: GenericProcessBuilderParams["input"];
 }
 
-export type AnyProcessBuilder = ProcessBuilder<any, any, any, any, any>;
+export type AnyProcessBuilder = ProcessBuilder<any, any, any, any>;
 
 export function useProcessBuilder<
 	GenericRequest extends CurrentRequestObject,
 	GenericParams extends ProcessBuilderParams = ProcessBuilderParams,
-	GenericPreflightSteps extends PreflightStep = PreflightStep,
 >(
 	name: string,
-	params?: GenericParams,
-	preflightSteps?: GenericPreflightSteps[],
-	desc: Description[] = [],
+	params: GenericParams | undefined,
+	desc: Description[],
 ): ProcessBuilder<
 		GenericRequest,
-		GenericPreflightSteps,
 		PreflightStep,
 		0,
 		ProcessBuilderParamsToFloorData<GenericParams>
@@ -333,23 +318,52 @@ export function useProcessBuilder<
 		processDefinition: ProcessDefinition,
 		[drop = [], ...desc]: Parameters<AnyProcessBuilder["exportation"]>,
 	) {
-		const process = new Process<any>({
+		const process = new Process({
 			...processDefinition,
 			drop: <string[]>drop,
 			descriptions: [...processDefinition.descriptions, ...desc],
 		});
 
-		useBuilder.push(process);
+		useProcessBuilder[createdProcessSymbol].add(process);
 
-		return process;
+		return process as Process<any>;
 	}
 
 	return returnFunction({
 		name,
-		preflightSteps: simpleClone(preflightSteps ?? []),
 		steps: [],
 		drop: [],
 		descriptions: desc,
 		...params,
 	});
+}
+
+const createdProcessSymbol = Symbol("CreatedProcess");
+
+useProcessBuilder[createdProcessSymbol] = new Set<Process>();
+
+useProcessBuilder.getAllCreatedProcess = function *() {
+	yield *useProcessBuilder[createdProcessSymbol];
+};
+
+useProcessBuilder.resetCreatedProcess = function() {
+	useProcessBuilder[createdProcessSymbol] = new Set();
+};
+
+export function createProcess<
+	GenericLocalRequest extends CurrentRequestObject,
+	GenericProcessBuilderParams extends ProcessBuilderParams = ProcessBuilderParams,
+>(
+	name: string,
+	params?: GenericProcessBuilderParams,
+	...desc: Description[]
+) {
+	return useProcessBuilder<
+		GenericLocalRequest,
+		GenericProcessBuilderParams
+	>(
+		name,
+		params,
+		desc,
+	);
 }

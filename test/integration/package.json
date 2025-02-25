@@ -1,13 +1,9 @@
 {
   "name": "test-integration",
-  "version": "0.0.0",
-  "main": "index.js",
   "type": "module",
   "scripts": {
     "test:types": "tsc"
   },
-  "author": "mathcovax",
-  "license": "ISC",
   "dependencies": {
     "@duplojs/core": "file:../.."
   }

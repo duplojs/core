@@ -1,5 +1,5 @@
 import { Process } from "./process";
-import { BuildNoRegisteredDuploseError, CutStep, Duplose, zod } from "..";
+import { BuildNoRegisteredDuploseError, CutStep, Duplose, Hook, zod } from "..";
 import { Request } from "@scripts/request";
 import { PreflightStep } from "@scripts/step/preflight";
 import { Response } from "@scripts/response";
@@ -7,14 +7,11 @@ import { CheckpointList } from "@test/utils/checkpointList";
 import { DuploTest } from "@test/utils/duploTest";
 import { createProcessDefinition } from "@test/utils/manualDuplose";
 import { ExtractStep } from "@scripts/step/extract";
+import { getTypedEntries } from "@duplojs/utils";
 
 describe("Process", () => {
 	const checkpointList = new CheckpointList();
 	const duplo = new DuploTest({ environment: "TEST" });
-
-	const preflightProcess = new Process(createProcessDefinition({}));
-	preflightProcess.instance = duplo;
-	const preflight = new PreflightStep(preflightProcess, { pickup: ["flute"] as any });
 	const cutStep = new CutStep(
 		({ dropper }) => {
 			checkpointList.addPoint("cut");
@@ -33,13 +30,31 @@ describe("Process", () => {
 
 	const process = new Process(createProcessDefinition({
 		steps: [cutStep, extractStep],
-		preflightSteps: [preflight],
 		drop: ["toto", "userId"],
 		name: "test",
 	}));
 
 	it("name", () => {
 		expect(process.definiton.name).toBe("test");
+	});
+
+	it("getAllHooks", () => {
+		const hooks = process.getAllHooks();
+
+		getTypedEntries(hooks)
+			.forEach(([key, value]) => {
+				if (!(value instanceof Hook)) {
+					return;
+				}
+
+				expect(value.subscribers[0])
+					.toBe(process.hooks[key]);
+			});
+	});
+
+	it("hasDuplose", () => {
+		expect(process.hasDuplose(new Process(createProcessDefinition()))).toBe(false);
+		expect(process.hasDuplose(process)).toBe(true);
 	});
 
 	it("build", async() => {

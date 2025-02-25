@@ -3,14 +3,14 @@
 exports[`BuildedCutStep 1`] = `
 "
 		
-/* step-cut-(2)-before */
+/* beforeCutStep(index: 2) */
 /* end_block */
 
 
 		result = this.steps[2].cutFunction(floor, request);
 
 		
-/* step-cut-(2)-before-check-result */
+/* beforeTreatResultCutStep(index: 2) */
 /* end_block */
 
 
@@ -26,14 +26,14 @@ break Execution;
 }
 
 		
-/* step-cut-(2)-before-drop */
+/* beforeIndexingResultCutStep(index: 2) */
 /* end_block */
 
 
 		floor.drop("test", result["test"]);
 
 		
-/* step-cut-(2)-after */
+/* afterCutStep(index: 2) */
 /* end_block */
 
 		"

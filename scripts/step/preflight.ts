@@ -1,13 +1,14 @@
 import type { Process } from "@scripts/duplose/process";
 import { BuildedPreflightStep } from "./builded/preflight";
-import { ProcessStep } from "./process";
 import { type Duplo } from "@scripts/duplo";
+import { createInterpolation } from "@duplojs/utils";
+import { ProcessStep } from "./process";
 
 export class PreflightStep<
 	GenericProcess extends Process = Process,
 	_GenericStepNumber extends number = number,
 > extends ProcessStep<GenericProcess, _GenericStepNumber> {
-	public override async build(instance: Duplo): Promise<BuildedPreflightStep> {
+	public async build(instance: Duplo): Promise<BuildedPreflightStep> {
 		const processFunction = await this.parent.build();
 
 		return new BuildedPreflightStep(
@@ -16,4 +17,11 @@ export class PreflightStep<
 			processFunction,
 		);
 	}
+
+	public static insertBlockName = {
+		before: createInterpolation("beforePreflightStep(index: {index})"),
+		beforeTreatResult: createInterpolation("beforeTreatResultPreflightStep(index: {index})"),
+		beforeIndexingResult: createInterpolation("beforeIndexingResultPreflightStep(index: {index})"),
+		after: createInterpolation("afterPreflightStep(index: {index})"),
+	};
 }

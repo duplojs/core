@@ -1,5 +1,5 @@
+import { type ExpectType } from "@duplojs/utils";
 import { useBuilder, zod, Response, OkHttpResponse } from "@scripts/index";
-import type { ExpectType } from "@test/utils/expectType";
 import { fixtureCheckerWithoutOptions } from "@test/utils/fixture";
 
 export const routeWithSkipChecker = useBuilder()

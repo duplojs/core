@@ -1,11 +1,10 @@
 
 import type { HttpMethod, Route, RouteBuildedFunction } from "./duplose/route";
 import type { RequestInitializationData } from "./request";
-import { getTypedEntries } from "@utils/getTypedEntries";
 import { StringBuilder } from "@utils/stringBuilder";
-import { hasKey } from "@utils/hasKey";
 import { Evaler, type EvalerParams } from "@scripts/evaler";
 import type { Duplo } from "./duplo";
+import { getTypedEntries, hasKey } from "@duplojs/utils";
 
 export interface RouterFinderResult {
 	buildedRoute: RouteBuildedFunction;
@@ -88,7 +87,7 @@ export class Router {
 			.reduce<Promise<BuildedRouter["methodToFinderMapper"]>>(
 				async(pv, [method, routes]) => {
 					const functionContent = routes.flatMap(
-						(route, index) => route.definiton.paths.map(
+						(route, index) => route.fullPaths.map(
 							(path) => /* js */`
 								${StringBuilder.result} = ${Router.pathToStringRegExp(path)}.exec(path);
 								if(${StringBuilder.result} !== null) return {

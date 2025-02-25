@@ -26,14 +26,14 @@
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
     },
-	"./globals": {
-	  "types": "./dist/globalThis.d.ts"
-	}
+    "./globals": {
+      "types": "./dist/globalThis.d.ts"
+    }
   },
   "files": [
     "dist",
     "README.md",
-	"globals.d.ts"
+    "globals.d.ts"
   ],
   "workspaces": [
     "test/integration"
@@ -42,7 +42,8 @@
     "zod": ">=3.23.8 <4.0.0"
   },
   "dependencies": {
-    "@duplojs/zod-accelerator": "2.5.3",
+	"@duplojs/utils": "0.2.1",
+    "@duplojs/zod-accelerator": "2.6.2",
     "mime": "4.0.4"
   },
   "devDependencies": {
@@ -52,7 +53,7 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "22.1.0",
     "@vitest/coverage-istanbul": "3.0.5",
-    "eslint": "9.9.0",
+    "eslint": "9.20.0",
     "husky": "9.1.7",
     "rollup": "^4.24.0",
     "rollup-plugin-esbuild": "6.1.1",

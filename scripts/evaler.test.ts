@@ -1,5 +1,5 @@
+import { type AnyFunction } from "@duplojs/utils";
 import { Evaler } from "./evaler";
-import type { AnyFunction } from "./utils/types";
 
 describe("advancedEval", () => {
 	class TestEvaler extends Evaler {

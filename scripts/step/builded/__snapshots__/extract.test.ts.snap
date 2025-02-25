@@ -2,19 +2,24 @@
 
 exports[`BuildedExtractStep 1`] = `
 "
-/* setp-extract-(4)-before */
+/* beforeExtractStep(index: 4) */
 /* end_block */
 
 
-			
-/* setp-extract-(4)-(query)-(search)-before */
-/* end_block */
-
-		
 			{
+				
+/* beforeLevelTwoExtractStep(index: 4, one: query, two: search) */
+/* end_block */
+
+
 				let temp = this.steps[4]
 					.extractObject["query"]["search"]
 					.safeParse(request["query"]?.["search"])
+
+				
+/* beforeTreatResultLevelTwoExtractStep(index: 4, one: query, two: search) */
+/* end_block */
+
 		
 				if(!temp.success){
 					result = this.steps[4].catchError(
@@ -24,94 +29,38 @@ exports[`BuildedExtractStep 1`] = `
 					);
 					break Execution;
 				}
+
+				
+/* beforeIndexingResultLevelTwoExtractStep(index: 4, one: query, two: search) */
+/* end_block */
+
 		
 				floor.drop(
 					"search",
 					temp.data,
 				);
+
+				
+/* afterLevelTowExtractStep(index: 4, one: query, two: search) */
+/* end_block */
+
 			}
-		
-			
-/* setp-extract-(4)-(query)-(search)-after */
-/* end_block */
-
 			
 
-			
-/* setp-extract-(4)-(params)-(userId)-before */
-/* end_block */
-
-		
 			{
-				let temp = await this.steps[4]
-					.extractObject["params"]["userId"].safeParseAsync(request["params"]?.["userId"])
-		
-				if(!temp.success){
-					result = temp.error.issues.at(-1)?.params?.response;
-		
-					if(result instanceof this.Response) {
-						break Execution;
-					}
-		
-					result = this.steps[4].catchError(
-						"params",
-						"userId",
-						temp.error,
-					);
-					break Execution;
-				}
-		
-				floor.drop("presetResult", temp.data)
-			}
-		
-			
-/* setp-extract-(4)-(params)-(userId)-after */
+				
+/* beforeLevelOneExtractStep(index: 4, one: body) */
 /* end_block */
 
-			
 
-			
-/* setp-extract-(4)-(host)-before */
-/* end_block */
-
-		
-			{
-				let temp = await this.steps[4]
-					.extractObject["host"].safeParseAsync(request["host"])
-		
-				if(!temp.success){
-					result = temp.error.issues.at(-1)?.params?.response;
-		
-					if(result instanceof this.Response) {
-						break Execution;
-					}
-		
-					result = this.steps[4].catchError(
-						"host",
-						undefined,
-						temp.error,
-					);
-					break Execution;
-				}
-		
-				floor.drop("presetResult", temp.data)
-			}
-		
-			
-/* setp-extract-(4)-(host)-after */
-/* end_block */
-
-			
-
-			
-/* setp-extract-(4)-(body)-before */
-/* end_block */
-
-		
-			{
 				let temp = this.steps[4]
 					.extractObject["body"]
 					.safeParse(request["body"])
+
+				
+/* beforeTreatResultLevelOneExtractStep(index: 4, one: body) */
+/* end_block */
+
 		
 				if(!temp.success){
 					result = this.steps[4].catchError(
@@ -121,20 +70,25 @@ exports[`BuildedExtractStep 1`] = `
 					);
 					break Execution;
 				}
+
+				
+/* beforeIndexingResultLevelOneExtractStep(index: 4, one: body) */
+/* end_block */
+
 		
 				floor.drop(
 					"body",
 					temp.data,
 				);
-			}
-		
-			
-/* setp-extract-(4)-(body)-after */
+
+				
+/* afterLevelOneExtractStep(index: 4, one: body) */
 /* end_block */
 
+			}
 			
 
-/* setp-extract-(4)-after */
+/* afterExtractStep(index: 4) */
 /* end_block */
 "
 `;

@@ -1,5 +1,5 @@
+import { type ExpectType } from "@duplojs/utils";
 import type { HttpMethod } from "@scripts/duplose/route";
-import type { ExpectType } from "@test/utils/expectType";
 
 declare module "@scripts/duplose/route" {
 	interface HttpMethods {

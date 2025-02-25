@@ -1,27 +1,15 @@
-import { useBuilder } from "@scripts/index";
+import { useProcessBuilder, useRouteBuilder } from "@scripts/index";
 import { duploTest } from "@test/utils/duploTest";
-import { preflightOnProcess } from "./preflight/onProcess";
 import { makeFakeRequest } from "@test/utils/request";
 import { preflightOnRoute } from "./preflight/onRoute";
 import { preflightwithOptionsAndInputOnRoute } from "./preflight/withOptionsAndInputOnRoute";
 import { preflightWithSkipOnRoute } from "./preflight/withSkipOnRoute";
 
 describe("preflight", () => {
-	duploTest.register(...useBuilder.getAllCreatedDuplose());
-
-	it("on process", async() => {
-		const buildedProcess = await preflightOnProcess.build();
-
-		const result = await buildedProcess(makeFakeRequest(), undefined, undefined);
-
-		expect(result).toStrictEqual({
-			dropInput: 22,
-			dropOptions: {
-				option1: "test",
-				option2: 12,
-			},
-		});
-	});
+	duploTest.register(
+		...useProcessBuilder.getAllCreatedProcess(),
+		...useRouteBuilder.getAllCreatedRoute(),
+	);
 
 	it("on route", async() => {
 		const buildedProcess = await preflightOnRoute.build();

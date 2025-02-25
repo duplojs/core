@@ -1,4 +1,4 @@
-import type { AnyFunction } from "./utils/types";
+import { type AnyFunction } from "@duplojs/utils";
 
 const shadowEval = eval;
 

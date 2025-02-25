@@ -4,14 +4,20 @@ import { type DuploseDefinition, type DuploseBuildedFunctionContext, Duplose } f
 import { checkResult, condition, insertBlock, mapped, StringBuilder } from "@utils/stringBuilder";
 import { makeFloor } from "@scripts/floor";
 import { BuildNoRegisteredDuploseError } from "@scripts/error/buildNoRegisteredDuplose";
-import { simpleClone } from "@utils/simpleClone";
 import { HandlerStep } from "@scripts/step/handler";
 import { LastStepMustBeHandlerError } from "@scripts/error/lastStepMustBeHandlerError";
 import { ContractResponseError } from "@scripts/error/contractResponseError";
 import { ResultIsNotAResponseError } from "@scripts/error/resultIsNotAResponseError";
 import { type BuildedHooksRouteLifeCycle } from "@scripts/hook/routeLifeCycle";
 import { hookRouteContractResponseError, hookRouteError, hookRouteRangeError } from "@scripts/hook/default";
-import type { GetPropsWithTrueValue } from "@utils/getPropsWithTrueValue";
+import { type PreflightStep } from "@scripts/step/preflight";
+import { createInterpolation, type GetPropsWithTrueValue, simpleClone } from "@duplojs/utils";
+import { type BuildedPreflightStep } from "@scripts/step/builded/preflight";
+import { HttpDuplose } from "./http";
+import { fixPath } from "@utils/fixPath";
+import { GlobalPrefixDescription, IgnoreGlobalPrefixDescription } from "@scripts/description/prefix/global";
+import { ContextPrefixDescription, IgnoreContextPrefixDescription } from "@scripts/description/prefix/context";
+import { IgnoreLocalPrefixDescription, LocalPrefixDescription } from "@scripts/description/prefix/local";
 
 export interface HttpMethods {
 	DELETE: true;
@@ -27,6 +33,7 @@ export type HttpMethod = GetPropsWithTrueValue<HttpMethods>;
 
 export interface RouteBuildedFunctionContext extends DuploseBuildedFunctionContext<Route> {
 	hooks: BuildedHooksRouteLifeCycle<any>;
+	preflightSteps: BuildedPreflightStep[];
 	ResultIsNotAResponseError: typeof ResultIsNotAResponseError;
 }
 
@@ -51,6 +58,7 @@ export type GetRouteGeneric<
 	: never;
 
 export interface RouteDefinition extends DuploseDefinition {
+	preflightSteps: PreflightStep[];
 	method: HttpMethod;
 	paths: string[];
 }
@@ -59,15 +67,78 @@ export class Route<
 	GenericRouteDefinition extends RouteDefinition = RouteDefinition,
 	GenericRequest extends CurrentRequestObject = any,
 	GenericFloorData extends object = any,
-> extends Duplose<
+> extends HttpDuplose<
 		GenericRouteDefinition,
 		GenericRequest,
 		GenericFloorData
 	> {
+	public get fullPaths() {
+		const descriptions = this.definiton.descriptions;
+
+		const globalPrefix = descriptions.find((desc) => desc instanceof IgnoreGlobalPrefixDescription)
+			? undefined
+			: descriptions.find((desc) => desc instanceof GlobalPrefixDescription);
+
+		const contextPrefix = descriptions.find((desc) => desc instanceof IgnoreContextPrefixDescription)
+			? undefined
+			: descriptions.find((desc) => desc instanceof ContextPrefixDescription);
+
+		const localPrefix = descriptions.find((desc) => desc instanceof IgnoreLocalPrefixDescription)
+			? undefined
+			: descriptions.find((desc) => desc instanceof LocalPrefixDescription);
+
+		return this
+			.definiton
+			.paths
+			.flatMap(
+				(path) => localPrefix
+					? localPrefix.value.map((prefix) => `${prefix}${path}`)
+					: path,
+			)
+			.flatMap(
+				(path) => contextPrefix
+					? contextPrefix.value.map((prefix) => `${prefix}${path}`)
+					: path,
+			)
+			.flatMap(
+				(path) => globalPrefix
+					? globalPrefix.value.map((prefix) => `${prefix}${path}`)
+					: path,
+			)
+			.map(fixPath);
+	}
+
 	public constructor(
 		definiton: GenericRouteDefinition,
 	) {
-		super(definiton);
+		super({
+			...definiton,
+			paths: definiton.paths.map(fixPath),
+		});
+	}
+
+	public override getAllHooks() {
+		const hooks = super.getAllHooks();
+
+		this.definiton.preflightSteps.forEach((step) => {
+			hooks.import(step.parent.getAllHooks());
+		});
+
+		return hooks;
+	}
+
+	public override hasDuplose(duplose: Duplose<any, any>, deep = Infinity) {
+		if (super.hasDuplose(duplose, deep)) {
+			return true;
+		}
+
+		for (const preflight of this.definiton.preflightSteps) {
+			if (preflight.parent.hasDuplose(duplose, deep - 1)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public async build() {
@@ -86,7 +157,7 @@ export class Route<
 		hooks.onError.addSubscriber(hookRouteRangeError);
 		hooks.onError.addSubscriber(hookRouteError);
 
-		const buildedPreflight = await Promise.all(
+		const buildedPreflightSteps = await Promise.all(
 			this.definiton.preflightSteps.map(
 				(step) => step.build(this.instance!),
 			),
@@ -98,20 +169,20 @@ export class Route<
 			),
 			() => /* js */`
 			if(request.body === undefined){
-				${insertBlock("hook-parsingBody-before")}
+				${insertBlock(Route.insertBlockName.beforeHookParsingBody())}
 
 				${StringBuilder.result} = await this.hooks.parsingBody(${StringBuilder.request});
 
-				${insertBlock("hook-parsingBody-before-check-result")}
+				${insertBlock(Route.insertBlockName.beforeTreatResultHookParsingBody())}
 
 				${checkResult()}
 
-				${insertBlock("hook-parsingBody-after")}
+				${insertBlock(Route.insertBlockName.afterHookParsingBody())}
 			}
 			`,
 		);
 
-		const buildedStep = await Promise.all(
+		const buildedSteps = await Promise.all(
 			this.definiton.steps.map(
 				(step) => step.build(this.instance!),
 			),
@@ -119,54 +190,53 @@ export class Route<
 
 		let content = /* js */`
 		let ${StringBuilder.result} = undefined;
+		let ${StringBuilder.floor} = this.makeFloor();
 
 		try {
-			let ${StringBuilder.floor} = this.makeFloor();
-
 			${StringBuilder.label}: {
-				${insertBlock("hook-beforeRouteExecution-before")}
+				${insertBlock(Route.insertBlockName.beforeHookBeforeRouteExecution())}
 
 				${StringBuilder.result} = await this.hooks.beforeRouteExecution(${StringBuilder.request})
 				
-				${insertBlock("hook-beforeRouteExecution-before-check-result")}
+				${insertBlock(Route.insertBlockName.beforeTreatResultHookBeforeRouteExecution())}
 
 				${checkResult()}
 
-				${insertBlock("hook-beforeRouteExecution-after")}
+				${insertBlock(Route.insertBlockName.afterHookBeforeRouteExecution())}
 
-				${insertBlock("preflight-before")}
+				${insertBlock(Route.insertBlockName.beforePreflightSteps())}
 
-				${mapped(buildedPreflight, (value, index) => value.toString(index))}
+				${mapped(buildedPreflightSteps, (value, index) => value.toString(index))}
 
-				${insertBlock("preflight-after")}
+				${insertBlock(Route.insertBlockName.afterPreflightSteps())}
 
 				${bodyTreat}
 
-				${insertBlock("steps-before")}
+				${insertBlock(Route.insertBlockName.beforeSteps())}
 
-				${mapped(buildedStep, (value, index) => value.toString(index))}
+				${mapped(buildedSteps, (value, index) => value.toString(index))}
 
-				${insertBlock("steps-after")}
+				${insertBlock(Route.insertBlockName.afterSteps())}
 
-				${insertBlock("defaultResponse-before")}
+				${insertBlock(Route.insertBlockName.beforeDefaultResponse())}
 
 				${StringBuilder.result} = new this.Response(503, "NO_RESPONSE_SENT", undefined);
 			}
 		} catch (error) {
-			${insertBlock("hook-onError-before")}
+			${insertBlock(Route.insertBlockName.beforeHookOnError())}
 
 			${StringBuilder.result} = await this.hooks.onError(${StringBuilder.request}, error) 
 
-			${insertBlock("hook-onError-after")}
+			${insertBlock(Route.insertBlockName.afterHookOnError())}
 		}
 
-		${insertBlock("check-result-before")}
+		${insertBlock(Route.insertBlockName.beforeTreatResult())}
 
 		if(!(${StringBuilder.result} instanceof this.Response)){
 			throw new this.ResultIsNotAResponseError(${StringBuilder.result})
 		}
 
-		${insertBlock("check-result-after")}
+		${insertBlock(Route.insertBlockName.afterTreatResult())}
 
 		return ${StringBuilder.result}
 		`;
@@ -184,8 +254,8 @@ export class Route<
 			},
 			makeFloor,
 			Response,
-			preflightSteps: buildedPreflight,
-			steps: buildedStep,
+			preflightSteps: buildedPreflightSteps,
+			steps: buildedSteps,
 			extensions: simpleClone(this.extensions),
 			ContractResponseError,
 			ResultIsNotAResponseError,
@@ -209,4 +279,28 @@ export class Route<
 	}
 
 	public static methodsWithBody: HttpMethod[] = ["POST", "PUT", "PATCH"];
+
+	public static insertBlockName = {
+		beforeHookBeforeRouteExecution: createInterpolation("beforeHookBeforeRouteExecution"),
+		beforeTreatResultHookBeforeRouteExecution: createInterpolation("beforeTreatResultHookBeforeRouteExecution"),
+		afterHookBeforeRouteExecution: createInterpolation("afterHookBeforeRouteExecution"),
+
+		beforeHookParsingBody: createInterpolation("beforeHookParsingBody"),
+		beforeTreatResultHookParsingBody: createInterpolation("beforeTreatResultHookParsingBody"),
+		afterHookParsingBody: createInterpolation("afterHookParsingBody"),
+
+		beforePreflightSteps: createInterpolation("beforePreflightSteps"),
+		afterPreflightSteps: createInterpolation("afterPreflightSteps"),
+
+		beforeSteps: createInterpolation("beforeSteps"),
+		afterSteps: createInterpolation("afterSteps"),
+
+		beforeDefaultResponse: createInterpolation("beforeDefaultResponse"),
+
+		beforeHookOnError: createInterpolation("beforeHookOnError"),
+		afterHookOnError: createInterpolation("afterHookOnError"),
+
+		beforeTreatResult: createInterpolation("beforeTreatResult"),
+		afterTreatResult: createInterpolation("afterTreatResult"),
+	};
 }

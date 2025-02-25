@@ -1,8 +1,8 @@
-import type { ExpectType } from "@test/utils/expectType";
 import { zod } from ".";
 import { receiveFormData, ReceiveFormData, ReceiveFormDataIssue, recieveFiles, zodSchemaHasReceiveFormData } from "./receiveFormData";
 import { File } from "@utils/file";
 import { zodSchemaIsAsync } from "@duplojs/zod-accelerator";
+import { type ExpectType } from "@duplojs/utils";
 
 describe("receiveFormData", () => {
 	const zodSchema = receiveFormData({

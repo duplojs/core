@@ -2,110 +2,33 @@
 
 exports[`Duplose > injectCode 1`] = `
 "
-							
-							
-							
-							
 
-							let toto = 1;
-							
-							
-							
-							
-							
-							
-							/* test */
-							
-							
-							
-							
-							toto = 2;
-							
-							
-							
+let toto = 1;
+/* test */
+toto = 2;
+toto = 3;
+/* end_block */
+toto = 4;
 
-							
-							
-							
-							
-							toto = 3;
-							
-							
-							/* end_block */
-							toto = 4;
-							
-							
-							
-							
-							
-							
-							
-
-						
-						
-						
-						"
+"
 `;
 
 exports[`Duplose > injectFunction 1`] = `
 "
-							
-							
-							
-							
-							
 
-							let toto = 1;
-							
-							
-							
-							
-							
-							
-							
-							
+let toto = 1;
+
 						this.extensions.injectedFunction[0](
 							request, 
 							this,
 							result,
 						);
 					
-							/* test */
-							
-							
-							
-							
-							
-							
-							toto = 2;
-							
-							
-							
+/* test */
+toto = 2;
+toto = 3;
+/* end_block */
+toto = 4;
 
-							
-							
-							
-							
-							toto = 3;
-							
-							
-							
-							
-							/* end_block */
-							
-							
-							toto = 4;
-							
-							
-							
-							
-							
-							
-							
-
-						
-						
-						
-						
-						"
+"
 `;

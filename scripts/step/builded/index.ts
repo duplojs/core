@@ -5,12 +5,29 @@ import ZodAccelerator, { type ZodAcceleratorParser } from "@duplojs/zod-accelera
 import { condition, StringBuilder } from "@utils/stringBuilder";
 import { findZodTypeInZodSchema } from "@utils/findZodTypeInZodSchema";
 import { ContractResponseHasZodEffectError } from "@scripts/error/contractResponseHasZodEffectError";
+import { ForceEnabledRuntimeEndPointCheck } from "@scripts/description/runtimeEndPointCheck/forceEnabled";
+import { ForceDisabledRuntimeEndPointCheck } from "@scripts/description/runtimeEndPointCheck/forceDisabled";
+import { ForceDisabledZodAccelerator } from "@scripts/description/zodAccelerator/forceDisabled";
+import { ForceEnabledZodAccelerator } from "@scripts/description/zodAccelerator/forceEnabled";
 
 export abstract class BuildedStep<T extends Step = Step> {
 	public constructor(
 		public instance: Duplo,
 		public step: T,
 	) {}
+
+	public zodAcceleratorIsEnabled() {
+		const zodAcceleratorIsEnabled = !this.instance.config.disabledZodAccelerator
+			|| !!this.step.descriptions.find(
+				(desc) => desc instanceof ForceEnabledZodAccelerator && !desc.isExpire,
+			);
+
+		const forceDisabledZodAccelerator = !!this.step.descriptions.find(
+			(desc) => desc instanceof ForceDisabledZodAccelerator && !desc.isExpire,
+		);
+
+		return zodAcceleratorIsEnabled && !forceDisabledZodAccelerator;
+	}
 
 	public abstract toString(index: number): string;
 }
@@ -26,7 +43,7 @@ export abstract class BuildedStepWithResponses<
 	) {
 		super(instance, step);
 
-		if (step.responses.length !== 0) {
+		if (step.responses.length !== 0 && this.runtimeEndPointCheckIsEnabled()) {
 			this.responseZodSchema = zod.union(
 				step.responses.map(
 					(contractResponse) => zod.object({
@@ -43,15 +60,28 @@ export abstract class BuildedStepWithResponses<
 				throw new ContractResponseHasZodEffectError();
 			}
 
-			if (!instance.config.disabledZodAccelerator) {
+			if (this.zodAcceleratorIsEnabled()) {
 				this.responseZodSchema = ZodAccelerator.build(this.responseZodSchema);
 			}
 		}
 	}
 
+	public runtimeEndPointCheckIsEnabled() {
+		const runtimeEndPointCheckIsEnabled = !this.instance.config.disabledRuntimeEndPointCheck
+				|| !!this.step.descriptions.find(
+					(desc) => desc instanceof ForceEnabledRuntimeEndPointCheck && !desc.isExpire,
+				);
+
+		const forceDisabledRuntimeEndPointCheck = !!this.step.descriptions.find(
+			(desc) => desc instanceof ForceDisabledRuntimeEndPointCheck && !desc.isExpire,
+		);
+
+		return runtimeEndPointCheckIsEnabled && !forceDisabledRuntimeEndPointCheck;
+	}
+
 	public getBlockContractResponse(index: number) {
 		return condition(
-			!!this.responseZodSchema && !this.instance.config.disabledRuntimeEndPointCheck,
+			!!this.responseZodSchema,
 			() => /* js */`
 				let temp = this.steps[${index}].responseZodSchema.safeParse(${StringBuilder.result});
 

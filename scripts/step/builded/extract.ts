@@ -26,7 +26,7 @@ export class BuildedExtractStep extends BuildedStep<ExtractStep> {
 		this.catchError = step.catchError ?? instance.extractError;
 		this.extractObject = simpleClone(step.parent);
 
-		if (!this.instance.config.disabledZodAccelerator) {
+		if (this.zodAcceleratorIsEnabled()) {
 			this.extractObject = getTypedEntries(this.extractObject)
 				.reduce<AcceleratedExtractObject>(
 					(pv, [key, value]) => {

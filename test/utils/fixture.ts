@@ -1,4 +1,4 @@
-import { createChecker, createPresetChecker, BadRequestHttpResponse, createProcess, ProcessStep, CheckerStep } from "@scripts/index";
+import { createChecker, createPresetChecker, BadRequestHttpResponse, createProcess, ProcessStep, CheckerStep, type Description } from "@scripts/index";
 import { TestDescription } from "./testDescription";
 
 export const fixtureProcessWichDropValue = createProcess(
@@ -39,6 +39,10 @@ export const fixtureCheckerWithoutOptions = createChecker("checkerWithoutOptions
 	);
 
 export const fixtureCheckerStep = new CheckerStep(fixtureCheckerWithoutOptions, {} as never);
+
+export function createFixtureCheckerStep(descriptions?: Description[]) {
+	return new CheckerStep(fixtureCheckerWithoutOptions, {} as never, [], descriptions);
+}
 
 export const fixtureCheckerWithOptions = createChecker(
 	"checkerWithoutOptions",

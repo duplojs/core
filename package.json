@@ -39,11 +39,11 @@
     "test/integration"
   ],
   "peerDependencies": {
-    "@duplojs/utils": ">=0.2.0 <1.0.0",
     "zod": ">=3.23.8 <4.0.0"
   },
   "dependencies": {
-    "@duplojs/zod-accelerator": "2.5.3",
+	"@duplojs/utils": "0.2.1",
+    "@duplojs/zod-accelerator": "2.6.2",
     "mime": "4.0.4"
   },
   "devDependencies": {

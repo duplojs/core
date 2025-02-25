@@ -1,5 +1,5 @@
 import { type MybePromise } from "@duplojs/utils";
-import { createRoute, Duplo, Route, Router, useRouteBuilder } from "@scripts/index";
+import { createRoute, Duplo, type DuploInputConfig, Route, Router, useRouteBuilder } from "@scripts/index";
 
 export class DuploTest extends Duplo {
 	public async start(onStart?: (duplo: Duplo) => MybePromise<void>) {
@@ -29,3 +29,10 @@ export class DuploTest extends Duplo {
 export const duploTest = new DuploTest({
 	environment: "TEST",
 });
+
+export function createDuploTest(config?: Omit<DuploInputConfig, "environment">) {
+	return new DuploTest({
+		...config,
+		environment: "TEST",
+	});
+}

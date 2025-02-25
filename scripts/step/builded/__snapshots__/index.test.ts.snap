@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BuildedStepWithResponses error > getBlockContractResponse 1`] = `
+"
+				let temp = this.steps[2].responseZodSchema.safeParse(result);
+
+				if(!temp.success){
+					throw new this.ContractResponseError(temp.error, result);
+				}
+			"
+`;

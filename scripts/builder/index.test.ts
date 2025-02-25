@@ -1,5 +1,5 @@
 import { manualProcess } from "@test/utils/manualDuplose";
-import { useBuilder } from "./duplose";
+import { useBuilder } from ".";
 import { TestDescription } from "@test/utils/testDescription";
 import { OkHttpResponse } from "@scripts/response/simplePreset";
 import { zod } from "..";
@@ -61,24 +61,24 @@ describe("useBuilder", () => {
 				description4,
 			);
 
-		expect(builder.preflightSteps[0].parent).toBe(manualProcess);
-		expect(builder.preflightSteps[0].descriptions[0]).toBe(description1);
-		expect(builder.preflightSteps[0].params).keys(["pickup"]);
+		expect(builder.definition.preflightSteps[0].parent).toBe(manualProcess);
+		expect(builder.definition.preflightSteps[0].descriptions[0]).toBe(description1);
+		expect(builder.definition.preflightSteps[0].params).keys(["pickup"]);
 
-		expect(builder.preflightSteps[1].parent).toBe(manualProcess);
-		expect(builder.preflightSteps[1].descriptions[0]).toBe(description2);
-		expect(builder.preflightSteps[1].params).keys(["input", "pickup", "options"]);
+		expect(builder.definition.preflightSteps[1].parent).toBe(manualProcess);
+		expect(builder.definition.preflightSteps[1].descriptions[0]).toBe(description2);
+		expect(builder.definition.preflightSteps[1].params).keys(["input", "pickup", "options"]);
 
-		expect(builder.preflightSteps[2].parent).toBe(manualProcess);
-		expect(builder.preflightSteps[2].descriptions[0]).toBe(description3);
-		expect(builder.preflightSteps[2].params).keys(["input", "options"]);
+		expect(builder.definition.preflightSteps[2].parent).toBe(manualProcess);
+		expect(builder.definition.preflightSteps[2].descriptions[0]).toBe(description3);
+		expect(builder.definition.preflightSteps[2].params).keys(["input", "options"]);
 
-		expect(builder.preflightSteps[3].parent).toBe(manualProcess);
-		expect(builder.preflightSteps[3].params).toStrictEqual({});
+		expect(builder.definition.preflightSteps[3].parent).toBe(manualProcess);
+		expect(builder.definition.preflightSteps[3].params).toStrictEqual({});
 
-		expect(builder.preflightSteps[4].parent).toBe(manualProcess);
-		expect(builder.preflightSteps[4].descriptions[0]).toBe(description4);
-		expect(builder.preflightSteps[4].params).keys(["options"]);
+		expect(builder.definition.preflightSteps[4].parent).toBe(manualProcess);
+		expect(builder.definition.preflightSteps[4].descriptions[0]).toBe(description4);
+		expect(builder.definition.preflightSteps[4].params).keys(["options"]);
 	});
 
 	it("create route with preflight", () => {

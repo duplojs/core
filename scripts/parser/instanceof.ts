@@ -1,5 +1,4 @@
-import ZodAccelerator from "@duplojs/zod-accelerator";
-import { type ZodAcceleratorContent } from "node_modules/@duplojs/zod-accelerator/types/content";
+import ZodAccelerator, { type ZodAcceleratorContent } from "@duplojs/zod-accelerator";
 import { addIssueToContext, INVALID, type ParseInput, type ParseReturnType, ParseStatus, ZodIssueCode, ZodType, type ZodTypeDef } from "zod";
 
 export interface ZodInstanceofDef<

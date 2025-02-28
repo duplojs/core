@@ -55,9 +55,17 @@ it("global values", () => {
 		"zod",
 		"zoderce",
 		"useBuilder",
+		"createProcess",
 		"createChecker",
 		"createPresetChecker",
 		"createTypeInput",
 		"makeResponseContract",
+		"LocalPrefixDescription",
+		"ContextPrefixDescription",
+		"GlobalPrefixDescription",
+		"ForceDisabledRuntimeEndPointCheck",
+		"ForceEnabledRuntimeEndPointCheck",
+		"ForceDisabledZodAccelerator",
+		"ForceEnabledZodAccelerator",
 	]);
 });

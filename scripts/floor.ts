@@ -1,8 +1,9 @@
 declare const unique: unique symbol;
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type UniqueObjectDroppedValue = {
 	[unique]: typeof unique;
-} & {};
+};
 
 export type DroppedValue<
 	T extends Record<string, unknown> = Record<string, unknown>,

@@ -13,7 +13,7 @@ import { ProcessStep, type ProcessStepParams } from "@scripts/step/process";
 import { type GetProcessGeneric, Process, type ProcessDefinition } from "@scripts/duplose/process";
 import { type Cut, CutStep } from "@scripts/step/cut";
 import { ExtractStep, type ExtractErrorFunction, type ExtractObject } from "@scripts/step/extract";
-import { type AddOne, simpleClone } from "@duplojs/utils";
+import { type AddOne, type MergeObjects, simpleClone } from "@duplojs/utils";
 
 export interface ProcessBuilder<
 	GenericRequest extends CurrentRequestObject = CurrentRequestObject,
@@ -32,7 +32,7 @@ export interface ProcessBuilder<
 		GenericRequest,
 		GenericSteps | ExtractStep<GenericExtract, GenericStepsCount>,
 		AddOne<GenericStepsCount>,
-		Omit<GenericFloorData, keyof GenericFlatExtract> & NoInfer<GenericFlatExtract>
+		MergeObjects<GenericFloorData, NoInfer<GenericFlatExtract>>
 	>;
 
 	check<
@@ -59,7 +59,8 @@ export interface ProcessBuilder<
 		GenericRequest,
 		GenericSteps | CheckerStep<GenericChecker, GenericContractResponse, GenericStepsCount>,
 		AddOne<GenericStepsCount>,
-		(
+		MergeObjects<
+			GenericFloorData,
 			string extends GenericKey
 				? object
 				: {
@@ -67,11 +68,7 @@ export interface ProcessBuilder<
 						| Extract<GenericCheckerValue["output"], { info: GenericInfo }>["data"]
 						| (undefined extends GenericSkip ? never : undefined)
 				}
-		) & (
-			string extends GenericKey
-				? GenericFloorData
-				: Omit<GenericFloorData, GenericKey>
-		)
+		>
 	>;
 
 	presetCheck<
@@ -90,18 +87,15 @@ export interface ProcessBuilder<
 			GenericStepsCount
 		>,
 		AddOne<GenericStepsCount>,
-		(
+		MergeObjects<
+			GenericFloorData,
 			string extends GenericPresetCheckerValue["key"]
 				? object
 				: {
 					[P in GenericPresetCheckerValue["key"]]:
 						| Extract<GenericCheckerValue["output"], { info: GenericPresetCheckerValue["info"] }>["data"]
 				}
-		) & (
-			string extends GenericPresetCheckerValue["key"]
-				? GenericFloorData
-				: Omit<GenericFloorData, GenericPresetCheckerValue["key"]>
-		)
+		>
 	>;
 
 	execute<
@@ -122,23 +116,20 @@ export interface ProcessBuilder<
 		GenericRequest & GenericProcessValue["request"],
 		GenericSteps | ProcessStep<GenericProcess, GenericStepsCount>,
 		AddOne<GenericStepsCount>,
-		(
+		MergeObjects<
+			GenericFloorData,
 			undefined extends GenericSkip
 				? Pick<
-					GenericProcessValue["floor"],
+					GenericPickup extends keyof GenericProcessValue["floor"] ? GenericProcessValue["floor"] : object,
 					GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
 				>
 				: Partial<
 					Pick<
-						GenericProcessValue["floor"],
+						GenericPickup extends keyof GenericProcessValue["floor"] ? GenericProcessValue["floor"] : object,
 						GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
 					>
 				>
-		) & (
-			string extends GenericPickup
-				? GenericFloorData
-				: Omit<GenericFloorData, GenericPickup>
-		)
+		>
 	>;
 
 	cut<
@@ -160,11 +151,12 @@ export interface ProcessBuilder<
 		GenericRequest,
 		GenericSteps | CutStep<GenericContractResponse, GenericStepsCount>,
 		AddOne<GenericStepsCount>,
-		(
+		MergeObjects<
+			GenericFloorData,
 			string extends GenericDrop
-				? GenericFloorData
-				: Omit<GenericFloorData, GenericDrop> & Pick<GenericDroppedValue, GenericDrop>
-		)
+				? object
+				: Pick<GenericDroppedValue, GenericDrop>
+		>
 	>;
 
 	exportation<

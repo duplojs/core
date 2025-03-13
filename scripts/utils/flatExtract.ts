@@ -1,6 +1,6 @@
 import type { ZodSpace } from "@scripts/parser";
 import type { ExtractObject } from "@scripts/step/extract";
-import { type ObjectKey, type SimplifyType } from "@duplojs/utils";
+import { type ObjectKey } from "@duplojs/utils";
 
 export interface KeyAndValue<
 	GenericObjectKey extends ObjectKey = ObjectKey,
@@ -23,6 +23,6 @@ export type FlatExtract<
 					: never
 			}[keyof GenericExtractObject[Prop]]
 	}[keyof GenericExtractObject],
-> = SimplifyType<{
+> = {
 	[KeyAndValue in GenericKeyAndValue as KeyAndValue["key"]]: KeyAndValue["value"];
-}>;
+};

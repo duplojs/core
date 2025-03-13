@@ -7,7 +7,7 @@ import type { ProcessStepParams } from "@scripts/step/process";
 import { type AnyRouteBuilder, useRouteBuilder, type RouteBuilder } from "./route";
 import { type RouteDefinition, type HttpMethod } from "@scripts/duplose/route";
 import type { Step } from "@scripts/step";
-import { type AddOne, simpleClone } from "@duplojs/utils";
+import { type AddOne, type MergeObjects, simpleClone } from "@duplojs/utils";
 
 export type PartialRouteDefinition = Pick<RouteDefinition, "preflightSteps" | "descriptions">;
 
@@ -36,23 +36,20 @@ export interface Builder<
 		| GenericPreflightSteps
 		| PreflightStep<GenericProcess, GenericPreflightsCount>,
 		AddOne<GenericPreflightsCount>,
-		(
+		MergeObjects<
+			GenericFloorData,
 			undefined extends GenericSkip
 				? Pick<
-					GenericProcessValue["floor"],
+					GenericPickup extends keyof GenericProcessValue["floor"] ? GenericProcessValue["floor"] : object,
 					GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
 				>
 				: Partial<
 					Pick<
-						GenericProcessValue["floor"],
+						GenericPickup extends keyof GenericProcessValue["floor"] ? GenericProcessValue["floor"] : object,
 						GenericPickup extends keyof GenericProcessValue["floor"] ? GenericPickup : never
 					>
 				>
-		) & (
-			string extends GenericPickup
-				? GenericFloorData
-				: Omit<GenericFloorData, GenericPickup>
-		)
+		>
 	>;
 
 	createRoute<

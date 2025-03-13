@@ -3,7 +3,7 @@ import { inputUserExist, iWantUserExist } from "@checkers/user";
 import { useBuilder, zod, UnauthorizedHttpResponse, createProcess, makeResponseContract } from "@duplojs/core";
 import { type ExpectType } from "@duplojs/utils";
 
-interface MustBeConnectedOptions {
+export interface MustBeConnectedOptions {
 	role: string;
 }
 

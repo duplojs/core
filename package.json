@@ -42,7 +42,7 @@
     "zod": ">=3.23.8 <4.0.0"
   },
   "dependencies": {
-	"@duplojs/utils": "0.2.1",
+	"@duplojs/utils": "0.3.1",
     "@duplojs/zod-accelerator": "2.6.2",
     "mime": "4.0.4"
   },

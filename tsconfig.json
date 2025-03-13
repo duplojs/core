@@ -107,7 +107,8 @@
 
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
+    "skipLibCheck": true,                                /* Skip type checking all .d.ts files. */
+	// "disableSizeLimit": false                         /* Remove limit of computed type */
   },
   "include": ["scripts/**/*.ts", "test/utils/**/*.ts", "test/spec/**/*.ts", "bin/**/*.ts", "test/setup.ts"]
 }

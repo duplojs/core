@@ -83,11 +83,11 @@ describe("Router", () => {
 		});
 
 		expect({
-			...buildedRouter.find("GET", "/users/15"),
+			...buildedRouter.find("GET", "/users/1.5"),
 			buildedRoute: undefined,
 		}).toEqual({
 			matchedPath: "/users/{userId}",
-			params: { userId: "15" },
+			params: { userId: "1.5" },
 			buildedRoute: undefined,
 		});
 

@@ -5,7 +5,7 @@ exports[`Router > mapper and function builder 1`] = `
 								let result;
 	
 								
-								result = /^\\/users\\/(?<userId>[A-zÀ-ÿ0-9_\\- ]+)\\/?(?:\\?[^]*)?$/.exec(path);
+								result = /^\\/users\\/(?<userId>[A-zÀ-ÿ0-9_\\-. ]+)\\/?(?:\\?[^]*)?$/.exec(path);
 								if(result !== null) return {
 									buildedRoute: this.buildedRoutes[0],
 									params: result.groups || {},
@@ -13,7 +13,7 @@ exports[`Router > mapper and function builder 1`] = `
 								};
 							
 
-								result = /^\\/posts\\/(?<postId>[A-zÀ-ÿ0-9_\\- ]+)\\/?(?:\\?[^]*)?$/.exec(path);
+								result = /^\\/posts\\/(?<postId>[A-zÀ-ÿ0-9_\\-. ]+)\\/?(?:\\?[^]*)?$/.exec(path);
 								if(result !== null) return {
 									buildedRoute: this.buildedRoutes[1],
 									params: result.groups || {},
